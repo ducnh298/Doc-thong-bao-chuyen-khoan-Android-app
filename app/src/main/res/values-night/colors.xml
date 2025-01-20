@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">@color/black</color>
+    <color name="dialog_background">@color/dark_grey</color>
+    <color name="taskbar_background">@color/dark_blue</color>
+
+    <color name="text_color">@color/light_grey</color>
+    <color name="text_color_dialog">@color/light_blue</color>
+    <color name="text_color_taskbar">@color/light_grey</color>
+    <color name="stroke_color">@color/white</color>
+
+    <color name="button_icon_next">@color/dark_grey</color>
+
+    <color name="onclick_background">@color/light_grey</color>
+</resources>

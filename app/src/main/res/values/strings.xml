@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Đọc thông báo chuyển khoản</string>
+
+    <string name="night_mode_enabled">night_mode_enabled</string>
+
+    <string name="notification_enabled">notification_enabled</string>
+
+    <string name="notification_content_received">notification_content_received</string>
+    <string name="notification_content_sent">notification_content_sent</string>
+    <string name="notification_content_received_default">Đã nhận</string>
+    <string name="notification_content_sent_default">Đã chuyển</string>
+
+    <string name="notification_sound">notification_sound</string>
+    <string name="notification_sound_default">R.raw.ting</string>
+    <string name="notification_sound_default_name">Mặc định (*Ting)</string>
+
+    <integer name="notification_volume_default">100</integer>
+
+    <string name="text_size_title">34sp</string>
+    <string name="text_size_sub_title">26sp</string>
+    <string name="text_size_content">18sp</string>
+    <string name="text_size_sub_content">16sp</string>
+</resources>

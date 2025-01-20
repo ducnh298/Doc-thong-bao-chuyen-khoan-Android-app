@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="light_grey">#EDEDED</color>
+    <color name="grey">#D4D4D4</color>
+    <color name="dark_grey">#606060</color>
+    <color name="light_blue">#7BC1D0</color>
+    <color name="blue">#00a9ce</color>
+    <color name="dark_blue">#00829F</color>
+    <color name="green">#2fd058</color>
+    <color name="light_red">#ff8787</color>
+    <color name="transparent_red">#8AFF0000</color>
+    <color name="transparent">#00FFFFFF</color>
+
+    <color name="background">@color/white</color>
+    <color name="dialog_background">@color/light_grey</color>
+    <color name="taskbar_background">@color/blue</color>
+
+    <color name="text_color">@color/black</color>
+    <color name="text_color_dialog">@color/blue</color>
+    <color name="text_color_taskbar">@color/white</color>
+    <color name="stroke_color">@color/black</color>
+
+    <color name="button_icon_next">@color/dark_grey</color>
+
+    <color name="onclick_background">@color/grey</color>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/ic_setting_pressed" android:state_pressed="true" />
+    <item android:state_pressed="false">
+        <layer-list>
+            <item android:left="8dp" android:top="10dp" android:drawable="@drawable/ic_setting_pressed"/>
+            <item android:drawable="@drawable/ic_setting" android:bottom="10dp" android:right="8dp" />
+        </layer-list>
+    </item>
+</selector>

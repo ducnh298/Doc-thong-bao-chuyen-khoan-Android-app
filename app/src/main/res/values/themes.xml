@@ -1,0 +1,13 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.DocThongBaoChuyenKhoan" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.DocThongBaoChuyenKhoan" parent="Base.Theme.DocThongBaoChuyenKhoan" />
+
+    <style name="CustomDialogTheme" parent="Theme.AppCompat.Dialog">
+        <item name="android:backgroundDimAmount">0.5</item>
+    </style>
+</resources>

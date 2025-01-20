@@ -1,0 +1,223 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutTaskBar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/taskbar_background"
+        android:orientation="horizontal"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="Đọc thông báo chuyển khoản"
+            android:textColor="@color/text_color_taskbar"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switchNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="17dp"
+            android:checked="false"
+            android:elevation="10dp"
+            android:scaleX="1.65"
+            android:scaleY="1.8"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:thumb="@drawable/ic_thumb_switch_noti_on"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView"
+            app:layout_constraintTop_toTopOf="parent"
+            app:track="@drawable/bg_track_switch_noti_on" />
+
+        <ImageButton
+            android:id="@+id/btnSetting"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="right"
+            android:background="@color/transparent"
+            android:padding="7dp"
+            android:scaleType="fitEnd"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/btn_setting" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/tvRequestNotificationAccessPermission"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent_red"
+        android:elevation="10dp"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:padding="5dp"
+        android:text="Quyền truy cập thông báo chưa được cấp. Để sử dụng ứng dụng, nhấn vào đây để cấp quyền."
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/swipeRefreshLayout" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/layoutDisplayTotalAmount"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutTaskBar">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/background"
+            android:padding="5dp"
+            tools:listitem="@layout/item_transaction" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutDisplayTotalAmount"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@color/taskbar_background"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="50"
+            android:background="@drawable/bg_box_layout"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="50"
+                android:gravity="center"
+                android:text="Tổng tiền đã nhận trong ngày:"
+                android:textAlignment="viewStart"
+                android:textColor="@color/text_color_taskbar"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvTotalAmountReceived"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="30"
+                android:gravity="center"
+                android:text="0 đ"
+                android:textColor="@color/text_color_taskbar"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="50"
+            android:background="@drawable/bg_box_layout"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="50"
+                android:gravity="center"
+                android:text="Tổng tiền đã chuyển trong ngày:"
+                android:textAlignment="viewStart"
+                android:textColor="@color/text_color_taskbar"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvTotalAmountSent"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="30"
+                android:gravity="center"
+                android:text="0 đ"
+                android:textColor="@color/text_color_taskbar"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutChooseDate"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="5dp"
+        android:elevation="10dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@+id/swipeRefreshLayout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnPrev"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="20"
+            android:background="@color/transparent"
+            android:elevation="3dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_prev_arrow" />
+
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="60"
+            android:background="@drawable/bg_tv_date"
+            android:elevation="3dp"
+            android:gravity="center"
+            android:text="03/01/2025"
+            android:textColor="@color/text_color"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/btnNext"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="20"
+            android:background="@color/transparent"
+            android:elevation="3dp"
+            android:enabled="false"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_next_arrow_selector" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
