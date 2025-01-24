@@ -1,1 +1,1 @@
-# -c-th-ng-b-o-chuy-n-kho-n-Android-app
+Doc-thong-bao-chuyen-khoan-Android-app
