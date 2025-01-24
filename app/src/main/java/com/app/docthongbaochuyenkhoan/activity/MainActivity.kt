@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -15,7 +16,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.adapter.TransactionAdapter
 import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
@@ -104,9 +107,6 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     override fun onResume() {
         super.onResume()
 
-        if (selectedDay == today && this::transactionAdapter.isInitialized)
-            getTransactionFromDateAndDisplay()
-
         binding.recyclerView.scrollToPosition(0)
         binding.tvRequestNotificationAccessPermission.visibility =
             if (checkNotificationAccessEnabled()) View.GONE else View.VISIBLE
@@ -153,6 +153,14 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = transactionAdapter
+        }
+
+        binding.recyclerView.itemAnimator = object : DefaultItemAnimator() {
+            override fun animateAdd(holder: RecyclerView.ViewHolder?): Boolean {
+                holder?.itemView?.alpha = 0f
+                holder?.itemView?.animate()?.alpha(1f)?.setDuration(300)?.start()
+                return super.animateAdd(holder)
+            }
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener {
@@ -216,6 +224,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
             withContext(Dispatchers.Main) {
                 transactionAdapter.submitList(transactions)
+                animateTransitionRecyclerView()
                 updateTotalAmountTaskBar()
             }
         }
@@ -237,6 +246,11 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
                 }
             }
         }
+    }
+
+    private fun animateTransitionRecyclerView() {
+        val animation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation_slide)
+        binding.recyclerView.layoutAnimation = animation
     }
 
     private fun updateTotalAmountTaskBar() {

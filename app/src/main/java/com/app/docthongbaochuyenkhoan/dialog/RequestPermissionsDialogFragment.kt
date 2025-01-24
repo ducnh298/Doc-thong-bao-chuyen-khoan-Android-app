@@ -55,6 +55,7 @@ class RequestPermissionsDialogFragment : DialogFragment() {
             dialog.show()
             dialog.window?.attributes =
                 AppUtils.getDialogDimension(requireActivity(), dialog)
+            dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
 
             return dialog
         }

@@ -60,17 +60,18 @@ class SettingDialogFragment : DialogFragment() {
         val dialog = builder.create()
         dialog.window?.setGravity(Gravity.CENTER)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+
         return dialog
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         activity?.let {
-            if (it is MainActivity) {
+            if (it is MainActivity)
                 listener = it
-            } else {
+            else
                 Log.e("SettingDialogFragment", "$it must implement SettingDialogListener")
-            }
         }
     }
 
@@ -193,6 +194,7 @@ class SettingDialogFragment : DialogFragment() {
                 if (dialog != null) {
                     dialog.window?.setGravity(Gravity.CENTER)
                     dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+                    dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
                     dialog.setOnDismissListener {
                         dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
                     }

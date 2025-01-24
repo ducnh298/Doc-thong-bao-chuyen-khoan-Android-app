@@ -44,6 +44,7 @@ class DatePickerDialogFragment : DialogFragment() {
         dialogDatePicker.let { dialog ->
             dialog.window?.setGravity(Gravity.CENTER)
             dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+            dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
 
             bindingDialogDatePicker.datePicker.let {
 

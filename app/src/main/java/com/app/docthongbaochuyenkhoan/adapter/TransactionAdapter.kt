@@ -18,9 +18,9 @@ class TransactionAdapter :
         fun bind(transaction: Transaction) {
             binding.tvTitle.text = transaction.title
             binding.tvContent.text = transaction.content
-            binding.imgLogo.setImageResource(transaction.bank?.logo ?: 0)
+            binding.imgLogo.setImageResource(transaction.bank.logo)
 
-            binding.tvAmount.text = if (transaction.amount!! > 0)
+            binding.tvAmount.text = if (transaction.amount > 0)
                 "+" + AppUtils.formatCurrency(transaction.amount)
             else AppUtils.formatCurrency(transaction.amount)
 

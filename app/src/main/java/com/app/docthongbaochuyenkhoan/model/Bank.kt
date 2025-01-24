@@ -24,12 +24,6 @@ enum class Bank(val displayName: String, val logo: Int, vararg val aliases: Stri
             return entries.find { it.displayName.equals(name, ignoreCase = true) }
         }
 
-        fun fromAlias(alias: String): Bank? {
-            return entries.find { bank ->
-                alias.lowercase() in bank.aliases.map { it.lowercase() }
-            }
-        }
-
         fun fromPackageName(packageName: String): Bank? {   //  Example: com.mbmobile
             for (bank in entries) {
                 for (alias in bank.aliases) {
