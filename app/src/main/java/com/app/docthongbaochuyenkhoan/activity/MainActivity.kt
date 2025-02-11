@@ -5,6 +5,7 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -34,16 +35,19 @@ import com.app.docthongbaochuyenkhoan.service.MyNotificationListenerService
 import com.app.docthongbaochuyenkhoan.utils.AppUtils
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
+import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogListener,
-    DatePickerDialogFragment.DatePickerDialogListener {
+    DatePickerDialogFragment.DatePickerDialogListener, TransactionAdapter.AdapterListener,
+    TextToSpeech.OnInitListener {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private lateinit var binding: ActivityMainBinding
     private lateinit var dialogRequestPermissions: RequestPermissionsDialogFragment
@@ -53,6 +57,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     private var today = 0L
     private var selectedDay = 0L
     private lateinit var ringtonePickerLauncher: ActivityResultLauncher<Intent>
+    private lateinit var textToSpeech: TextToSpeech
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,14 +65,14 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         setContentView(binding.root)
         window.statusBarColor = ContextCompat.getColor(this, R.color.dark_blue)
 
-        if (!SharedPreferencesManager.isInitialized())
-            SharedPreferencesManager.init(this)
+        if (!SharedPreferencesManager.isInitialized()) SharedPreferencesManager.init(this)
 
         AppCompatDelegate.setDefaultNightMode(
             if (SharedPreferencesManager.isNightModeEnabled()) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
         )
 
         transactionDao = AppDatabase.getDatabase(this).transactionDao()
+        textToSpeech = TextToSpeech(this, this)
 
         today = DateUtils.getStartTimeOfToday()
 
@@ -78,8 +83,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         initRecyclerView()
         initLayoutChooseDate()
 
-        if (!checkNotificationAccessEnabled())
-            openDialogRequestPermissions(true)
+        if (!checkNotificationAccessEnabled()) openDialogRequestPermissions(true)
         else {
             coroutineScope.launch {
                 TransactionFlowManager.transactionFlow.collectLatest { transaction ->
@@ -98,8 +102,9 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
                     Log.d("TAG", "Selected Ringtone URI: $selectedRingtoneUri")
 
                     // Save the ringtone URI to SharedPreferences
-                    if (selectedRingtoneUri != null)
-                        SharedPreferencesManager.saveNotificationSound(selectedRingtoneUri.toString())
+                    if (selectedRingtoneUri != null) SharedPreferencesManager.saveNotificationSound(
+                        selectedRingtoneUri.toString()
+                    )
                 }
             }
     }
@@ -149,11 +154,13 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     }
 
     private fun initRecyclerView() {
-        transactionAdapter = TransactionAdapter()
+        transactionAdapter = TransactionAdapter(this)
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = transactionAdapter
         }
+
+        binding.recyclerView.setHasFixedSize(true)
 
         binding.recyclerView.itemAnimator = object : DefaultItemAnimator() {
             override fun animateAdd(holder: RecyclerView.ViewHolder?): Boolean {
@@ -206,10 +213,8 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     }
 
     private fun updateLayoutChooseDateButtonVisibility() {
-        if (selectedDay == today)
-            binding.btnNext.isEnabled = false
-        else if (selectedDay < today)
-            binding.btnNext.isEnabled = true
+        if (selectedDay == today) binding.btnNext.isEnabled = false
+        else if (selectedDay < today) binding.btnNext.isEnabled = true
     }
 
     private fun getTransactionFromDateAndDisplay() {
@@ -258,20 +263,17 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         var totalAmountSent = 0L
 
         for (transaction in transactionList) {
-            if (transaction.amount > 0)
-                totalAmountReceived += transaction.amount
+            if (transaction.amount > 0) totalAmountReceived += transaction.amount
             else totalAmountSent += transaction.amount
         }
 
-        binding.tvTotalAmountReceived.text =
-            AppUtils.formatCurrency(totalAmountReceived)
-        binding.tvTotalAmountSent.text =
-            AppUtils.formatCurrency(totalAmountSent)
+        binding.tvTotalAmountReceived.text = AppUtils.formatCurrency(totalAmountReceived)
+        binding.tvTotalAmountSent.text = AppUtils.formatCurrency(totalAmountSent)
     }
 
     private fun openDialogRequestPermissions(autoClose: Boolean) {
-        if (!this::dialogRequestPermissions.isInitialized)
-            dialogRequestPermissions = RequestPermissionsDialogFragment.newInstance(autoClose)
+        if (!this::dialogRequestPermissions.isInitialized) dialogRequestPermissions =
+            RequestPermissionsDialogFragment.newInstance(autoClose)
         dialogRequestPermissions.show(supportFragmentManager, "RequestPermissionsDialogFragment")
     }
 
@@ -283,8 +285,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
     private fun checkNotificationAccessEnabled(): Boolean {
         val enabledListeners = Settings.Secure.getString(
-            contentResolver,
-            "enabled_notification_listeners"
+            contentResolver, "enabled_notification_listeners"
         )
         return enabledListeners != null && enabledListeners.contains(packageName)
     }
@@ -358,7 +359,33 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     }
 
     private fun makeToast(msg: String, isLongToast: Boolean) {
-        Toast.makeText(this, msg, if (isLongToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT)
-            .show()
+        Toast.makeText(this, msg, if (isLongToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onAmountClicked(transaction: Transaction): View.OnClickListener {
+        return View.OnClickListener {
+            val notification = StringBuilder(transaction.bank.displayName)
+
+            if (transaction.amount > 0) {
+                val notificationContent = SharedPreferencesManager.getNotificationContentReceived()
+                notification.append(" $notificationContent")
+                notification.append(" ${AppUtils.formatCurrency(transaction.amount)}")
+            } else {
+                val notificationContent = SharedPreferencesManager.getNotificationContentSent()
+                notification.append(" $notificationContent")
+                notification.append(" ${AppUtils.formatCurrency(-transaction.amount)}")
+            }
+
+            if (!textToSpeech.isSpeaking) {
+                MediaPlayerUtils.playMedia(this, null)
+                textToSpeech.speak(notification.toString(), TextToSpeech.QUEUE_FLUSH, null, null)
+            }
+        }
+    }
+
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            textToSpeech.language = Locale("vi")
+        }
     }
 }

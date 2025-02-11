@@ -3,6 +3,7 @@ package com.app.docthongbaochuyenkhoan.model
 import com.app.docthongbaochuyenkhoan.R
 
 enum class Bank(val displayName: String, val logo: Int, vararg val aliases: String) {
+    UNKNOWN("", 0, ""),
     TECHCOMBANK(
         "Techcombank", R.drawable.logo_techcombank, "techcombank", "tcb", "tcbank"
     ),
@@ -24,14 +25,15 @@ enum class Bank(val displayName: String, val logo: Int, vararg val aliases: Stri
             return entries.find { it.displayName.equals(name, ignoreCase = true) }
         }
 
-        fun fromPackageName(packageName: String): Bank? {   //  Example: com.mbmobile
+        fun fromPackageName(packageName: String): Bank {   //  Example: com.mbmobile
             for (bank in entries) {
-                for (alias in bank.aliases) {
-                    if (packageName.contains(alias, ignoreCase = true))
-                        return bank
-                }
+                if (bank != UNKNOWN)
+                    for (alias in bank.aliases) {
+                        if (packageName.contains(alias, ignoreCase = true))
+                            return bank
+                    }
             }
-            return null
+            return UNKNOWN
         }
     }
 }

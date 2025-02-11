@@ -53,16 +53,14 @@ class MyNotificationListenerService : NotificationListenerService() {
                     if (packageName.isNullOrBlank() || title.isBlank() || content.isBlank())
                         return@launch
 
-                    if (isBankNotification(packageName)) {
-                        if (transactionDao == null)
-                            transactionDao =
-                                AppDatabase.getDatabase(applicationContext).transactionDao()
+                    if (transactionDao == null)
+                        transactionDao =
+                            AppDatabase.getDatabase(applicationContext).transactionDao()
 
-                        if (notificationReader == null)
-                            notificationReader = NotificationReader(applicationContext)
+                    if (notificationReader == null)
+                        notificationReader = NotificationReader(applicationContext)
 
-                        processNotification(packageName, title, content)
-                    }
+                    processNotification(packageName, title, content)
                 }
             }
         }

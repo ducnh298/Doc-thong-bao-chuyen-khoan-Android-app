@@ -1,6 +1,7 @@
 package com.app.docthongbaochuyenkhoan.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -10,10 +11,14 @@ import com.app.docthongbaochuyenkhoan.model.Transaction
 import com.app.docthongbaochuyenkhoan.utils.AppUtils
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
 
-class TransactionAdapter :
+class TransactionAdapter(private val listener: AdapterListener) :
     ListAdapter<Transaction, TransactionAdapter.ViewHolder>(TransactionDiffCallback()) {
 
-    class ViewHolder(private val binding: ItemTransactionBinding) :
+    interface AdapterListener {
+        fun onAmountClicked(transaction: Transaction): View.OnClickListener
+    }
+
+    inner class ViewHolder(private val binding: ItemTransactionBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(transaction: Transaction) {
             binding.tvTitle.text = transaction.title
@@ -25,6 +30,9 @@ class TransactionAdapter :
             else AppUtils.formatCurrency(transaction.amount)
 
             binding.tvDateTime.text = DateUtils.formatDateTime(transaction.timestamp)
+
+            binding.imgLogo.setOnClickListener(listener.onAmountClicked(transaction))
+            binding.tvAmount.setOnClickListener(listener.onAmountClicked(transaction))
         }
     }
 

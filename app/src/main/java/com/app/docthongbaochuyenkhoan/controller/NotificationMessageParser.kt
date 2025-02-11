@@ -78,7 +78,7 @@ class NotificationMessageParser {
                 return null
 
             // Tìm cụm "Số tiền:" trong nội dung
-            val amountRegex = """Số tiền:\s*([\d.,]+)\s*[₫]""".toRegex()
+            val amountRegex = """Số tiền:\s*([\d.,]+)\s*₫""".toRegex()
 
             // Kiểm tra và lấy số tiền
             val matchResult = amountRegex.find(content)
@@ -99,13 +99,17 @@ class NotificationMessageParser {
         }
 
         private fun extractAmount(title: String?, content: String?): Long? {
-            return extractAmountFromTitle(title)
+            return extractAmountFromTitle(title, content)
                 ?: extractAmountFromContent(content)
         }
 
-        private fun extractAmountFromTitle(title: String?): Long? {
-            if (title == null || !title.contains("VND") && !title.contains("₫"))
+        private fun extractAmountFromTitle(title: String?, content: String?): Long? {
+            if (title == null || (!title.contains("VND") && !title.contains("₫")))
                 return null
+
+            if (content.isNullOrBlank() ||
+                (!content.contains("SD", true) && !content.contains("số dư", true))
+            ) return null
 
             val amount =
                 title.replace("[^0-9+-]".toRegex(), "").trim() // Remove non-numeric characters
