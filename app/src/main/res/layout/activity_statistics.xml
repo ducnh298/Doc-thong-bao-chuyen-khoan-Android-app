@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutTaskBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <include
+            android:id="@+id/task_bar"
+            layout="@layout/task_bar" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Chọn khoảng thời gian -->
+    <Button
+        android:id="@+id/btnSelectDateRange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="Chọn khoảng thời gian" />
+
+    <!-- Hiển thị khoảng thời gian được chọn -->
+    <Spinner
+        android:id="@+id/spinnerTime"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp" />
+
+    <TextView
+        android:id="@+id/tvDateRange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="8dp"
+        android:text="07/02/2025 - 13/02/2025"
+        android:textColor="@color/text_color"
+        android:textSize="16sp" />
+
+    <!-- Biểu đồ cột -->
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/barChart"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_marginTop="16dp" />
+
+    <!-- Thông tin thống kê -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvTotalReceived"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tổng tiền nhận: 0 VND"
+            android:textColor="@color/text_color" />
+
+        <TextView
+            android:id="@+id/tvTotalSent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tổng tiền chuyển: 0 VND"
+            android:textColor="@color/text_color" />
+
+        <TextView
+            android:id="@+id/tvComparison"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="So với tuần trước: "
+            android:textColor="@color/text_color" />
+    </LinearLayout>
+</LinearLayout>

@@ -2,6 +2,7 @@ package com.app.docthongbaochuyenkhoan.utils
 
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class DateUtils {
     companion object{
@@ -25,6 +26,16 @@ class DateUtils {
 
             // Get the first time today
             return calendar.timeInMillis
+        }
+
+        fun getDayOfWeek(dateString: String): String {
+            val date = sdfDate.parse(dateString) ?: return ""
+
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+
+            val daysOfWeek = arrayOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+            return daysOfWeek[calendar.get(Calendar.DAY_OF_WEEK) - 1]
         }
     }
 }

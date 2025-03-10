@@ -8,59 +8,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTaskBar"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@color/taskbar_background"
-        android:orientation="horizontal"
+        android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="3dp"
-            android:text="Đọc thông báo chuyển khoản"
-            android:textColor="@color/text_color_taskbar"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.63" />
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchNotification"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="15dp"
-            android:checked="false"
-            android:elevation="10dp"
-            android:scaleX="1.65"
-            android:scaleY="1.8"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:thumb="@drawable/ic_thumb_switch_noti_on"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/textView"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.22"
-            app:track="@drawable/bg_track_switch_noti_on" />
-
-        <ImageButton
-            android:id="@+id/btnSetting"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="right"
-            android:layout_marginRight="3dp"
-            android:background="@color/transparent"
-            android:scaleType="fitEnd"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.15"
-            app:srcCompat="@drawable/btn_setting" />
+        <include
+            android:id="@+id/task_bar"
+            layout="@layout/task_bar" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -95,7 +50,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/background"
-            android:padding="5dp"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
             tools:listitem="@layout/item_transaction" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
@@ -115,30 +71,31 @@
             android:layout_weight="50"
             android:background="@drawable/bg_box_layout"
             android:orientation="horizontal"
-            android:padding="5dp">
+            android:padding="3dp">
 
             <TextView
+                android:id="@+id/tvTotalTransactions"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="50"
-                android:gravity="center"
-                android:text="Tổng tiền đã nhận trong ngày:"
-                android:textAlignment="viewStart"
+                android:layout_weight="60"
+                android:background="@color/taskbar_background"
+                android:text="Tổng giao dịch trong ngày : 0"
+                android:textAlignment="center"
                 android:textColor="@color/text_color_taskbar"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/tvTotalAmountReceived"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="30"
-                android:gravity="center"
-                android:text="0 đ"
-                android:textColor="@color/text_color_taskbar"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnStatistics"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="40"
+                android:background="@drawable/bg_sub_dialog"
+                android:text="Thống kê"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -147,32 +104,64 @@
             android:layout_weight="50"
             android:background="@drawable/bg_box_layout"
             android:orientation="horizontal"
-            android:padding="5dp">
+            android:padding="3dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginLeft="3dp"
+                android:layout_weight="18"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="Nhận:"
+                android:textColor="@color/text_color_taskbar"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTotalAmountReceived"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="3dp"
+                android:layout_weight="40"
+                android:gravity="center|start"
+                android:singleLine="true"
+                android:text="0 đ"
+                android:textColor="@color/text_color_taskbar"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="50"
+                android:layout_gravity="center"
+                android:layout_weight="23"
+                android:ellipsize="none"
                 android:gravity="center"
-                android:text="Tổng tiền đã chuyển trong ngày:"
-                android:textAlignment="viewStart"
+                android:singleLine="true"
+                android:text="Chuyển:"
                 android:textColor="@color/text_color_taskbar"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvTotalAmountSent"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="30"
-                android:gravity="center"
+                android:layout_marginLeft="3dp"
+                android:layout_weight="40"
+                android:gravity="center|start"
+                android:singleLine="true"
                 android:text="0 đ"
                 android:textColor="@color/text_color_taskbar"
                 android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout

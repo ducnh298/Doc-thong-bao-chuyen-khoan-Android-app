@@ -271,4 +271,8 @@ class SettingDialogFragment : DialogFragment() {
         )
             .show()
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+    }
 }

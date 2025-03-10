@@ -20,6 +20,9 @@
         android:theme="@style/Theme.DocThongBaoChuyenKhoan"
         tools:targetApi="31">
         <activity
+            android:name=".activity.StatisticsActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
@@ -45,7 +48,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>

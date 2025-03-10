@@ -31,7 +31,6 @@ import com.app.docthongbaochuyenkhoan.flow.TransactionFlowManager
 import com.app.docthongbaochuyenkhoan.model.Transaction
 import com.app.docthongbaochuyenkhoan.model.database.AppDatabase
 import com.app.docthongbaochuyenkhoan.model.database.TransactionDao
-import com.app.docthongbaochuyenkhoan.service.MyNotificationListenerService
 import com.app.docthongbaochuyenkhoan.utils.AppUtils
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
@@ -45,11 +44,13 @@ import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
+
 class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogListener,
     DatePickerDialogFragment.DatePickerDialogListener, TransactionAdapter.AdapterListener,
     TextToSpeech.OnInitListener {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private lateinit var binding: ActivityMainBinding
+    private lateinit var taskbarManager: TaskbarManager
     private lateinit var dialogRequestPermissions: RequestPermissionsDialogFragment
     private lateinit var transactionDao: TransactionDao
     private lateinit var transactionAdapter: TransactionAdapter
@@ -71,6 +72,8 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
             if (SharedPreferencesManager.isNightModeEnabled()) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
         )
 
+        taskbarManager = TaskbarManager(this)
+
         transactionDao = AppDatabase.getDatabase(this).transactionDao()
         textToSpeech = TextToSpeech(this, this)
 
@@ -78,10 +81,10 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
         selectedDay = savedInstanceState?.getLong("selectedDay", today) ?: today
 
-        initNotificationSwitch()
         initTVRequestNotificationAccessPermission()
         initRecyclerView()
         initLayoutChooseDate()
+        initLayoutTotalTransactions()
 
         if (!checkNotificationAccessEnabled()) openDialogRequestPermissions(true)
         else {
@@ -122,29 +125,6 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
         // Save selectedDay value into Bundle
         outState.putLong("selectedDay", selectedDay)
-    }
-
-    private fun initNotificationSwitch() {
-        MyNotificationListenerService.isNotificationListenerEnabled =
-            SharedPreferencesManager.isNotificationListenerEnabled()
-
-        binding.switchNotification.let {
-            it.isChecked = MyNotificationListenerService.isNotificationListenerEnabled
-            it.setOnCheckedChangeListener { _, isChecked ->
-                MyNotificationListenerService.isNotificationListenerEnabled = isChecked
-                SharedPreferencesManager.saveNotificationListenerEnabled(isChecked)
-
-                makeToast(
-                    if (isChecked) "Đã bật tính năng đọc thông báo chuyển khoản" else "Đã tắt tính năng đọc thông báo chuyển khoản",
-                    false
-                )
-            }
-        }
-
-        binding.btnSetting.setOnClickListener {
-            openSettingDialog()
-        }
-        binding.btnSetting.addClickAnimation()
     }
 
     private fun initTVRequestNotificationAccessPermission() {
@@ -212,6 +192,13 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         binding.btnPrev.addClickAnimation()
     }
 
+    private fun initLayoutTotalTransactions() {
+        binding.btnStatistics.setOnClickListener {
+            val intent = Intent(this, StatisticsActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
     private fun updateLayoutChooseDateButtonVisibility() {
         if (selectedDay == today) binding.btnNext.isEnabled = false
         else if (selectedDay < today) binding.btnNext.isEnabled = true
@@ -267,6 +254,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
             else totalAmountSent += transaction.amount
         }
 
+        binding.tvTotalTransactions.text = "Tổng giao dịch trong ngày : " + transactionList.size
         binding.tvTotalAmountReceived.text = AppUtils.formatCurrency(totalAmountReceived)
         binding.tvTotalAmountSent.text = AppUtils.formatCurrency(totalAmountSent)
     }
@@ -329,22 +317,6 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         }
     }
 
-    private fun openSettingDialog() {
-        val fragment = supportFragmentManager.findFragmentByTag("SettingDialogFragment")
-
-        if (fragment != null && fragment is SettingDialogFragment) {
-            // If fragment has been added
-            if (fragment.isVisible) {
-                fragment.dismiss() // Make sure the fragment is deleted before displaying it again
-                fragment.show(supportFragmentManager, "SettingDialogFragment")
-            }
-        } else {
-            // If the fragment does not exist, create a new one and display it
-            val dialogSetting = SettingDialogFragment.newInstance(this)
-            dialogSetting.show(supportFragmentManager, "SettingDialogFragment")
-        }
-    }
-
     override fun onTvNotificationSoundClicked(): View.OnClickListener {
         return View.OnClickListener { openNotificationSoundPicker() }
     }
@@ -356,10 +328,6 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
             putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, null as Uri?)
         }
         ringtonePickerLauncher.launch(intent)
-    }
-
-    private fun makeToast(msg: String, isLongToast: Boolean) {
-        Toast.makeText(this, msg, if (isLongToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
     }
 
     override fun onAmountClicked(transaction: Transaction): View.OnClickListener {
@@ -387,5 +355,18 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         if (status == TextToSpeech.SUCCESS) {
             textToSpeech.language = Locale("vi")
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.tvDate.setOnClickListener(null)
+        binding.btnNext.setOnClickListener(null)
+        binding.btnPrev.setOnClickListener(null)
+
+        taskbarManager.release()
+    }
+
+    private fun makeToast(msg: String, isLongToast: Boolean) {
+        Toast.makeText(this, msg, if (isLongToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
     }
 }
