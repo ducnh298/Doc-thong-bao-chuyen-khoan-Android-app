@@ -35,5 +35,5 @@ interface TransactionDao {
         GROUP BY day
         ORDER BY day ASC
     """)
-    suspend fun getAmountsForLast7Days(startDate: Long, endDate: Long): List<DailyAmount>
+    suspend fun getAmountsForDays(startDate: Long, endDate: Long): List<DailyAmount>
 }

@@ -9,37 +9,57 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTaskBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
+        android:background="@color/taskbar_background"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <include
-            android:id="@+id/task_bar"
-            layout="@layout/task_bar" />
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="Đọc thông báo chuyển khoản"
+            android:textColor="@color/text_color_taskbar"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.63" />
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="right"
+            android:layout_marginRight="10dp"
+            android:background="@color/transparent"
+            android:scaleType="fitEnd"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/btn_back" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-- Chọn khoảng thời gian -->
-    <Button
-        android:id="@+id/btnSelectDateRange"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:text="Chọn khoảng thời gian" />
 
-    <!-- Hiển thị khoảng thời gian được chọn -->
     <Spinner
         android:id="@+id/spinnerTime"
-        android:layout_width="200dp"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp" />
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_spinner_statistics_time"
+        android:dropDownWidth="130dp" />
 
     <TextView
         android:id="@+id/tvDateRange"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:text="07/02/2025 - 13/02/2025"
         android:textColor="@color/text_color"
         android:textSize="16sp" />
@@ -64,20 +84,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tổng tiền nhận: 0 VND"
-            android:textColor="@color/text_color" />
+            android:textColor="@color/text_color"
+            android:textSize="18dp" />
 
         <TextView
             android:id="@+id/tvTotalSent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tổng tiền chuyển: 0 VND"
-            android:textColor="@color/text_color" />
-
-        <TextView
-            android:id="@+id/tvComparison"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="So với tuần trước: "
-            android:textColor="@color/text_color" />
+            android:textColor="@color/text_color"
+            android:textSize="18dp" />
     </LinearLayout>
 </LinearLayout>

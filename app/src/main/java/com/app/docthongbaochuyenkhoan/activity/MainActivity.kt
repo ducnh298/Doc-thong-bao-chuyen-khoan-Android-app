@@ -197,6 +197,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
             val intent = Intent(this, StatisticsActivity::class.java)
             startActivity(intent)
         }
+        binding.btnStatistics.addClickAnimation()
     }
 
     private fun updateLayoutChooseDateButtonVisibility() {

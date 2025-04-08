@@ -19,10 +19,10 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
     fun loadDailyAmounts(endCalendar: Calendar, numberOfDays: Int) {
         viewModelScope.launch {
             val endDate = endCalendar.timeInMillis
-            endCalendar.add(Calendar.DAY_OF_YEAR, -numberOfDays)
+            endCalendar.add(Calendar.DAY_OF_YEAR, -numberOfDays + 1)
             val startDate = endCalendar.timeInMillis
 
-            val data = transactionDao.getAmountsForLast7Days(startDate, endDate)
+            val data = transactionDao.getAmountsForDays(startDate, endDate)
 
             if (data.isNotEmpty()) {
                 // Chuyển dữ liệu từ database thành Map để dễ xử lý
@@ -32,7 +32,7 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
                 val resultList = mutableListOf<DailyAmount>()
                 val calendar = Calendar.getInstance().apply { timeInMillis = startDate }
 
-                for (i in 0 until numberOfDays + 1) {
+                for (i in 0 until numberOfDays) {
                     val dateKey = DateUtils.formatDate(calendar.timeInMillis)
                     val dailyData = dataMap[dateKey] ?: DailyAmount(
                         dateKey, 0, 0

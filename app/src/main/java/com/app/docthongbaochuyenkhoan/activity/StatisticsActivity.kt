@@ -2,6 +2,8 @@ package com.app.docthongbaochuyenkhoan.activity
 
 import android.os.Bundle
 import android.view.View
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
@@ -13,6 +15,7 @@ import com.app.docthongbaochuyenkhoan.dialog.SettingDialogFragment
 import com.app.docthongbaochuyenkhoan.model.DailyAmount
 import com.app.docthongbaochuyenkhoan.model.database.AppDatabase
 import com.app.docthongbaochuyenkhoan.utils.AppUtils
+import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
 import com.app.docthongbaochuyenkhoan.viewModel.StatisticsViewModel
 import com.app.docthongbaochuyenkhoan.viewModel.StatisticsViewModelFactory
@@ -37,13 +40,14 @@ class StatisticsActivity : AppCompatActivity(), SettingDialogFragment.SettingDia
     private lateinit var barChart: BarChart
     private lateinit var sentDataSet: BarDataSet
     private lateinit var receivedDataSet: BarDataSet
+    private val statisticsRangeOfDayList = listOf("7 ngày", "14 ngày", "1 tháng", "3 tháng")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityStatisticsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel.loadDailyAmounts(Calendar.getInstance(), 6)    // Default get data in 7 days
+        viewModel.loadDailyAmounts(Calendar.getInstance(), 7)    // Default get data in 7 days
 
         // Quan sát dữ liệu từ ViewModel và cập nhật biểu đồ
         CoroutineScope(Dispatchers.IO).launch {
@@ -52,15 +56,54 @@ class StatisticsActivity : AppCompatActivity(), SettingDialogFragment.SettingDia
             }
         }
 
-        TaskbarManager(this)
-
         val spinnerTime = findViewById<Spinner>(R.id.spinnerTime)
         val adapter = ArrayAdapter(
             this,
-            R.layout.spinner_time_item,
-            listOf("7 ngày", "1 tháng", "3 tháng", "6 tháng")
+            R.layout.item_spinner_statistics_time,
+            statisticsRangeOfDayList
         )
         spinnerTime.adapter = adapter
+        spinnerTime.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View,
+                position: Int,
+                id: Long
+            ) {
+                val selectedItem = parent.getItemAtPosition(position).toString()
+                when (selectedItem) {
+                    statisticsRangeOfDayList[0] -> viewModel.loadDailyAmounts(
+                        Calendar.getInstance(),
+                        7
+                    )
+
+                    statisticsRangeOfDayList[1] -> viewModel.loadDailyAmounts(
+                        Calendar.getInstance(),
+                        14
+                    )
+
+                    statisticsRangeOfDayList[2] -> viewModel.loadDailyAmounts(
+                        Calendar.getInstance(),
+                        30
+                    )
+
+                    statisticsRangeOfDayList[3] -> viewModel.loadDailyAmounts(
+                        Calendar.getInstance(),
+                        90
+                    )
+
+                    else -> viewModel.loadDailyAmounts(Calendar.getInstance(), 7)
+                }
+            } // to close the onItemSelected
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+
+            }
+        }
+        binding.btnBack.setOnClickListener {
+            finish()
+        }
+        binding.btnBack.addClickAnimation()
     }
 
     private val viewModel: StatisticsViewModel by viewModels<StatisticsViewModel> {
@@ -71,6 +114,8 @@ class StatisticsActivity : AppCompatActivity(), SettingDialogFragment.SettingDia
         barChart = findViewById(R.id.barChart)
 
         barChart.clear()
+
+        val size = dailyAmounts.size
         val entriesSent = mutableListOf<BarEntry>()
         val entriesReceived = mutableListOf<BarEntry>()
         val labels = mutableListOf<String>()
@@ -82,7 +127,7 @@ class StatisticsActivity : AppCompatActivity(), SettingDialogFragment.SettingDia
                 data.day.substring(
                     0,
                     2
-                ) + " " + DateUtils.getDayOfWeek(data.day)
+                ) + (if (size <= 7) " " + DateUtils.getDayOfWeek(data.day) else "")
             )
 
             entriesSent.add(BarEntry(index.toFloat(), data.sent.toFloat()))
@@ -99,13 +144,15 @@ class StatisticsActivity : AppCompatActivity(), SettingDialogFragment.SettingDia
 
         sentDataSet = BarDataSet(listOf<BarEntry>(), "Tiền gửi").apply {
             color = resources.getColor(R.color.light_red)
-            valueTextSize = 12f
+            valueTextSize =
+                if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
             valueTextColor = color
         }
 
         receivedDataSet = BarDataSet(listOf<BarEntry>(), "Tiền nhận").apply {
             color = resources.getColor(R.color.blue)
-            valueTextSize = 12f
+            valueTextSize =
+                if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
             valueTextColor = color
         }
 
@@ -128,6 +175,8 @@ class StatisticsActivity : AppCompatActivity(), SettingDialogFragment.SettingDia
                 barChart.xAxis.labelCount = labels.size
                 setCenterAxisLabels(true) // Căn chỉnh cột theo nhóm
                 setAvoidFirstLastClipping(true)
+                textSize =
+                    if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
             }
 
             axisLeft.valueFormatter = valueFormatter
@@ -140,6 +189,8 @@ class StatisticsActivity : AppCompatActivity(), SettingDialogFragment.SettingDia
             invalidate()
 
             legend.textSize = 14f
+            legend.xEntrySpace = 30f   // Tăng khoảng cách ngang giữa các mục
+            legend.formSize = 14f      // Kích thước ô màu
             legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
         }
     }

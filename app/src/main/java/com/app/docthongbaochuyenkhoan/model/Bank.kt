@@ -17,7 +17,13 @@ enum class Bank(val displayName: String, val logo: Int, vararg val aliases: Stri
     ACB("ACB", R.drawable.logo_acb, "acbbanking"),
     HDBANK("HDBank", R.drawable.logo_hdbank, "hdbank"),
     MOMO("Momo", R.drawable.logo_momo, "momo", "momotransfer"),
-    VIETTELMONEY("Viettelmoney", R.drawable.logo_viettel_money, "viettelpay", "viettelmoney"),
+    VIETTELMONEY(
+        "Viettelmoney",
+        R.drawable.logo_viettel_money,
+        "vtpay",
+        "viettelpay",
+        "viettelmoney"
+    ),
     ZALOPAY("Zalopay", R.drawable.logo_zalo_pay, "zalopay");
 
     companion object {
