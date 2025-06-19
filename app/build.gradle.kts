@@ -15,8 +15,8 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "1.1"
-        archivesName = "Đọc thông báo chuyển khoản"
+        versionName = "1.2"
+        archivesName = "Đọc thông báo chuyển khoản-v$versionName"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -33,7 +33,7 @@ android {
                 variant.outputs
                     .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
                     .all { output ->
-                        output.outputFileName = "Doc thong bao chuyen khoan.apk"
+                        output.outputFileName = "${archivesName}.apk"
                         false
                     }
             }

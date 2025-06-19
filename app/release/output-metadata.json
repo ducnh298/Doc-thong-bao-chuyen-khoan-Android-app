@@ -13,7 +13,7 @@
       "attributes": [],
       "versionCode": 1,
       "versionName": "1.2",
-      "outputFile": "Đọc thông báo chuyển khoản-release.apk"
+      "outputFile": "Đọc thông báo chuyển khoản-v1.2-release.apk"
     }
   ],
   "elementType": "File",
@@ -22,14 +22,14 @@
       "minApi": 28,
       "maxApi": 30,
       "baselineProfiles": [
-        "baselineProfiles/1/Đọc thông báo chuyển khoản-release.dm"
+        "baselineProfiles/1/Đọc thông báo chuyển khoản-v1.2-release.dm"
       ]
     },
     {
       "minApi": 31,
       "maxApi": 2147483647,
       "baselineProfiles": [
-        "baselineProfiles/0/Đọc thông báo chuyển khoản-release.dm"
+        "baselineProfiles/0/Đọc thông báo chuyển khoản-v1.2-release.dm"
       ]
     }
   ],

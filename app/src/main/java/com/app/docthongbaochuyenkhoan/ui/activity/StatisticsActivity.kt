@@ -1,17 +1,18 @@
 package com.app.docthongbaochuyenkhoan.ui.activity
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.databinding.ActivityStatisticsBinding
-import com.app.docthongbaochuyenkhoan.ui.dialog.SettingDialogFragment
 import com.app.docthongbaochuyenkhoan.model.Amount
 import com.app.docthongbaochuyenkhoan.model.DailyAmount
 import com.app.docthongbaochuyenkhoan.model.MonthlyAmount
@@ -36,7 +37,7 @@ import java.util.Calendar
 import kotlin.math.abs
 
 
-class StatisticsActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogListener {
+class StatisticsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityStatisticsBinding
     private lateinit var barChart: BarChart
     private lateinit var sentDataSet: BarDataSet
@@ -132,89 +133,96 @@ class StatisticsActivity : AppCompatActivity(), SettingDialogFragment.SettingDia
     }
 
     private fun initChartData(dataList: List<Amount>) {
-        barChart = findViewById(R.id.barChart)
+        try {
+            barChart = findViewById(R.id.barChart)
 
-        barChart.clear()
+            barChart.clear()
 
-        val size = dataList.size
-        val entriesSent = mutableListOf<BarEntry>()
-        val entriesReceived = mutableListOf<BarEntry>()
-        val labels = mutableListOf<String>()
-        var totalSent = 0L
-        var totalReceived = 0L
+            val size = dataList.size
+            val entriesSent = mutableListOf<BarEntry>()
+            val entriesReceived = mutableListOf<BarEntry>()
+            val labels = mutableListOf<String>()
+            var totalSent = 0L
+            var totalReceived = 0L
 
-        dataList.forEachIndexed { index, item ->
-            labels.add(
-                item.label.substring(
-                    0,
-                    2
-                ) + (if (item is DailyAmount && size <= 7) " " + DateUtils.getDayOfWeek(item.label)
-                else if (item is MonthlyAmount && size <= 6) " " + DateUtils.getMonthOfYear(item.label)
-                else "")
-            )
+            dataList.forEachIndexed { index, item ->
+                labels.add(
+                    item.label.substring(
+                        0,
+                        2
+                    ) + (if (item is DailyAmount && size <= 7) " " + DateUtils.getDayOfWeek(item.label)
+                    else if (item is MonthlyAmount && size <= 6) " " + DateUtils.getMonthOfYear(item.label)
+                    else "")
+                )
 
-            entriesSent.add(BarEntry(index.toFloat(), item.sent.toFloat()))
-            entriesReceived.add(BarEntry(index.toFloat(), item.received.toFloat()))
+                entriesSent.add(BarEntry(index.toFloat(), item.sent.toFloat()))
+                entriesReceived.add(BarEntry(index.toFloat(), item.received.toFloat()))
 
-            totalSent += item.sent
-            totalReceived += item.received
-        }
-
-        runOnUiThread {
-            updateTvDateRange(dataList.first().label, dataList.last().label)
-            updateTotalAmount(totalSent, totalReceived)
-        }
-
-        sentDataSet = BarDataSet(listOf<BarEntry>(), "Tiền gửi").apply {
-            color = resources.getColor(R.color.light_red)
-            valueTextSize =
-                if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
-            valueTextColor = color
-        }
-
-        receivedDataSet = BarDataSet(listOf<BarEntry>(), "Tiền nhận").apply {
-            color = resources.getColor(R.color.blue)
-            valueTextSize =
-                if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
-            valueTextColor = color
-        }
-
-        sentDataSet.values = entriesSent
-        receivedDataSet.values = entriesReceived
-
-        val barData = BarData(sentDataSet, receivedDataSet).apply {
-            barWidth = 0.3f // Điều chỉnh độ rộng cột
-            setValueFormatter(valueFormatter)
-        }
-
-        barChart.apply {
-            data = barData
-            xAxis.apply {
-                valueFormatter = IndexAxisValueFormatter(labels) // Hiển thị nhãn trên trục X
-                granularity = 1f
-                axisMinimum = 0f
-                position = XAxis.XAxisPosition.BOTTOM
-                axisMaximum = labels.size.toFloat()
-                barChart.xAxis.labelCount = labels.size
-                setCenterAxisLabels(true) // Căn chỉnh cột theo nhóm
-                setAvoidFirstLastClipping(true)
-                textSize =
-                    if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
+                totalSent += item.sent
+                totalReceived += item.received
             }
 
-            axisLeft.valueFormatter = valueFormatter
-            axisRight.isEnabled = false
-            description.isEnabled = false
-            extraBottomOffset = 20f
+            runOnUiThread {
+                updateTvDateRange(dataList.first().label, dataList.last().label)
+                updateTotalAmount(totalSent, totalReceived)
+            }
 
-            setFitBars(true)
-            barChart.groupBars(0f, 0.3f, 0.05f) // Nhóm các cột gần nhau
-            invalidate()
+            sentDataSet = BarDataSet(listOf<BarEntry>(), "Tiền gửi").apply {
+                color = resources.getColor(R.color.light_red)
+                valueTextSize =
+                    if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
+                valueTextColor = color
+            }
 
-            legend.textSize = 14f
-            legend.xEntrySpace = 30f   // Tăng khoảng cách ngang giữa các mục
-            legend.formSize = 14f      // Kích thước ô màu
-            legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+            receivedDataSet = BarDataSet(listOf<BarEntry>(), "Tiền nhận").apply {
+                color = resources.getColor(R.color.blue)
+                valueTextSize =
+                    if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
+                valueTextColor = color
+            }
+
+            sentDataSet.values = entriesSent
+            receivedDataSet.values = entriesReceived
+
+            val barData = BarData(sentDataSet, receivedDataSet).apply {
+                barWidth = 0.3f // Điều chỉnh độ rộng cột
+                setValueFormatter(valueFormatter)
+            }
+
+            barChart.apply {
+                data = barData
+                xAxis.apply {
+                    valueFormatter = IndexAxisValueFormatter(labels) // Hiển thị nhãn trên trục X
+                    granularity = 1f
+                    axisMinimum = 0f
+                    position = XAxis.XAxisPosition.BOTTOM
+                    axisMaximum = labels.size.toFloat()
+                    barChart.xAxis.labelCount = labels.size
+                    setCenterAxisLabels(true) // Căn chỉnh cột theo nhóm
+                    setAvoidFirstLastClipping(true)
+                    textSize =
+                        if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
+                }
+
+                axisLeft.valueFormatter = valueFormatter
+                axisRight.isEnabled = false
+                description.isEnabled = false
+                extraBottomOffset = 20f
+
+                setFitBars(true)
+                barChart.groupBars(0f, 0.3f, 0.05f) // Nhóm các cột gần nhau
+                invalidate()
+
+                legend.textSize = 14f
+                legend.xEntrySpace = 30f   // Tăng khoảng cách ngang giữa các mục
+                legend.formSize = 14f      // Kích thước ô màu
+                legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+            }
+        } catch (e: Exception) {
+            Log.e("StatisticsActivity", "Error: ${e.message}")
+            Toast.makeText(this, "Lỗi đọc dữ liệu thống kê, vui lòng thử lại.", Toast.LENGTH_SHORT)
+                .show()
+            finish()
         }
     }
 
@@ -241,13 +249,5 @@ class StatisticsActivity : AppCompatActivity(), SettingDialogFragment.SettingDia
                 value.toInt().toString() // Hiển thị số bình thường nếu nhỏ
             }
         }
-    }
-
-    private fun showDateRangePicker() {
-
-    }
-
-    override fun onTvNotificationSoundClicked(): View.OnClickListener {
-        TODO("Not yet implemented")
     }
 }

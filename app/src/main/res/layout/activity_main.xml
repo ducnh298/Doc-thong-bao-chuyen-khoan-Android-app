@@ -108,7 +108,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="25"
-                android:background="@drawable/bg_sub_dialog"
+                android:background="@drawable/btn_statistic"
                 android:text="Thống kê"
                 android:layout_marginRight="5dp"
                 android:textAllCaps="false"
