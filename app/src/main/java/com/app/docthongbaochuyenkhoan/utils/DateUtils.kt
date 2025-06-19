@@ -8,6 +8,7 @@ class DateUtils {
     companion object{
         private val sdfDateTime = SimpleDateFormat(" HH:mm:ss - dd/MM/yyyy")
         private val sdfDate = SimpleDateFormat("dd/MM/yyyy")
+        private val sdfMonth = SimpleDateFormat("MM/yyyy")
 
         fun formatDateTime(timestamp: Long): String {
             return sdfDateTime.format(java.util.Date(timestamp))
@@ -15,6 +16,10 @@ class DateUtils {
 
         fun formatDate(timestamp: Long): String {
             return sdfDate.format(java.util.Date(timestamp))
+        }
+
+        fun formatMonth(timestamp: Long): String {
+            return sdfMonth.format(java.util.Date(timestamp))
         }
 
         fun getStartTimeOfToday(): Long {
@@ -36,6 +41,12 @@ class DateUtils {
 
             val daysOfWeek = arrayOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
             return daysOfWeek[calendar.get(Calendar.DAY_OF_WEEK) - 1]
+        }
+
+        fun getMonthOfYear(dateMonthString: String): String {
+            val date = sdfMonth.parse(dateMonthString) ?: return ""
+            val sdfOutput = SimpleDateFormat("MMM", Locale.ENGLISH)  // "MMM" -> Jan, Feb, Mar, ...
+            return sdfOutput.format(date) // Ví dụ: "Jun"
         }
     }
 }

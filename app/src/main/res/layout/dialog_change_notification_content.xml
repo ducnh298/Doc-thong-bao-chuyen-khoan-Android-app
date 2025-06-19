@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
-            android:background="@drawable/bg_btn_blue"
+            android:background="@drawable/btn_blue"
             android:padding="5dp"
             android:text="Xác nhận"
             android:textAllCaps="false"

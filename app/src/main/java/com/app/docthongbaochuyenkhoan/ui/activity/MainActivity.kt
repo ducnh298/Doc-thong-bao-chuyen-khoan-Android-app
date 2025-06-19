@@ -1,4 +1,4 @@
-package com.app.docthongbaochuyenkhoan.activity
+package com.app.docthongbaochuyenkhoan.ui.activity
 
 import android.content.Intent
 import android.media.RingtoneManager
@@ -24,9 +24,9 @@ import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.adapter.TransactionAdapter
 import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
 import com.app.docthongbaochuyenkhoan.databinding.ActivityMainBinding
-import com.app.docthongbaochuyenkhoan.dialog.DatePickerDialogFragment
-import com.app.docthongbaochuyenkhoan.dialog.RequestPermissionsDialogFragment
-import com.app.docthongbaochuyenkhoan.dialog.SettingDialogFragment
+import com.app.docthongbaochuyenkhoan.ui.dialog.DatePickerDialogFragment
+import com.app.docthongbaochuyenkhoan.ui.dialog.RequestPermissionsDialogFragment
+import com.app.docthongbaochuyenkhoan.ui.dialog.SettingDialogFragment
 import com.app.docthongbaochuyenkhoan.flow.TransactionFlowManager
 import com.app.docthongbaochuyenkhoan.model.Transaction
 import com.app.docthongbaochuyenkhoan.model.database.AppDatabase
@@ -219,6 +219,14 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
                 transactionAdapter.submitList(transactions)
                 animateTransitionRecyclerView()
                 updateTotalAmountTaskBar()
+
+                if (transactions.isEmpty()) {
+                    binding.tvNotifyNoTransaction.visibility = View.VISIBLE
+                    binding.recyclerView.visibility = View.GONE
+                } else {
+                    binding.tvNotifyNoTransaction.visibility = View.GONE
+                    binding.recyclerView.visibility = View.VISIBLE
+                }
             }
         }
     }

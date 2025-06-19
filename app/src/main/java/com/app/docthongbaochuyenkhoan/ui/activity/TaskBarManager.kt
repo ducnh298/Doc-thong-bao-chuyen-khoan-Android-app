@@ -1,4 +1,4 @@
-package com.app.docthongbaochuyenkhoan.activity
+package com.app.docthongbaochuyenkhoan.ui.activity
 
 import android.app.Activity
 import android.view.View
@@ -7,7 +7,7 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
-import com.app.docthongbaochuyenkhoan.dialog.SettingDialogFragment
+import com.app.docthongbaochuyenkhoan.ui.dialog.SettingDialogFragment
 import com.app.docthongbaochuyenkhoan.service.MyNotificationListenerService
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.google.android.material.switchmaterial.SwitchMaterial

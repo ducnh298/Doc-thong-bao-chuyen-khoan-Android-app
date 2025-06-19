@@ -1,4 +1,4 @@
-package com.app.docthongbaochuyenkhoan.dialog
+package com.app.docthongbaochuyenkhoan.ui.dialog
 
 import android.app.Dialog
 import android.content.Context
@@ -17,7 +17,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.DialogFragment
 import com.app.docthongbaochuyenkhoan.R
-import com.app.docthongbaochuyenkhoan.activity.MainActivity
+import com.app.docthongbaochuyenkhoan.ui.activity.MainActivity
 import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
 import com.app.docthongbaochuyenkhoan.databinding.DialogChangeNotificationContentBinding
 import com.app.docthongbaochuyenkhoan.databinding.DialogSettingBinding
@@ -86,7 +86,7 @@ class SettingDialogFragment : DialogFragment() {
 
         binding.switchNightMode.setOnCheckedChangeListener { _, isChecked ->
             CoroutineScope(Dispatchers.Main).launch {
-                delay(230)  // Delay 230ms for animation
+                delay(100)  // Delay 100ms for animation
                 AppCompatDelegate.setDefaultNightMode(
                     if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
                 )

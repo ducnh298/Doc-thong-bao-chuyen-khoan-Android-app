@@ -1,4 +1,4 @@
-package com.app.docthongbaochuyenkhoan.dialog
+package com.app.docthongbaochuyenkhoan.ui.dialog
 
 import android.app.Dialog
 import android.os.Build

@@ -3,6 +3,7 @@ package com.app.docthongbaochuyenkhoan.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.docthongbaochuyenkhoan.model.DailyAmount
+import com.app.docthongbaochuyenkhoan.model.MonthlyAmount
 import com.app.docthongbaochuyenkhoan.model.database.TransactionDao
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,19 +17,21 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
     private val _dailyAmounts = MutableStateFlow<List<DailyAmount>>(emptyList())
     val dailyAmounts: StateFlow<List<DailyAmount>> = _dailyAmounts.asStateFlow()
 
-    fun loadDailyAmounts(endCalendar: Calendar, numberOfDays: Int) {
+    private val _monthlyAmounts = MutableStateFlow<List<MonthlyAmount>>(emptyList())
+    val monthlyAmounts: StateFlow<List<MonthlyAmount>> = _monthlyAmounts.asStateFlow()
+
+    fun loadTransactionAmountsByDays(endCalendar: Calendar, numberOfDays: Int) {
         viewModelScope.launch {
             val endDate = endCalendar.timeInMillis
             endCalendar.add(Calendar.DAY_OF_YEAR, -numberOfDays + 1)
             val startDate = endCalendar.timeInMillis
 
-            val data = transactionDao.getAmountsForDays(startDate, endDate)
+            val data = transactionDao.getTotalReceivedAndSentByDays(startDate, endDate)
 
             if (data.isNotEmpty()) {
                 // Chuyển dữ liệu từ database thành Map để dễ xử lý
                 val dataMap = data.associateBy { it.day }
 
-                // Tạo danh sách đủ 7 ngày
                 val resultList = mutableListOf<DailyAmount>()
                 val calendar = Calendar.getInstance().apply { timeInMillis = startDate }
 
@@ -41,7 +44,35 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
                     calendar.add(Calendar.DAY_OF_YEAR, 1) // Chuyển sang ngày tiếp theo
                 }
 
-                _dailyAmounts.value = resultList
+                _dailyAmounts.emit(resultList)
+            }
+        }
+    }
+
+    fun loadTransactionAmountsByMonths(endCalendar: Calendar, numberOfMonths: Int) {
+        viewModelScope.launch {
+            val endDate = endCalendar.timeInMillis
+            endCalendar.add(Calendar.MONTH, -numberOfMonths + 1)
+            val startDate = endCalendar.timeInMillis
+
+            val data = transactionDao.getTotalReceivedAndSentByMonth(startDate, endDate)
+
+            if (data.isNotEmpty()) {
+                val dataMap = data.associateBy { it.month }
+
+                val resultList = mutableListOf<MonthlyAmount>()
+                val calendar = Calendar.getInstance().apply { timeInMillis = startDate }
+
+                for (i in 0 until numberOfMonths) {
+                    val monthKey = DateUtils.formatMonth(calendar.timeInMillis) // ví dụ "06/2025"
+                    val monthlyData = dataMap[monthKey] ?: MonthlyAmount(
+                        monthKey, 0, 0
+                    )
+                    resultList.add(monthlyData)
+                    calendar.add(Calendar.MONTH, 1)
+                }
+
+                _monthlyAmounts.emit(resultList)
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.app.docthongbaochuyenkhoan.activity
+package com.app.docthongbaochuyenkhoan.ui.activity
 
 import android.os.Bundle
 import android.view.View
@@ -11,8 +11,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.databinding.ActivityStatisticsBinding
-import com.app.docthongbaochuyenkhoan.dialog.SettingDialogFragment
+import com.app.docthongbaochuyenkhoan.ui.dialog.SettingDialogFragment
+import com.app.docthongbaochuyenkhoan.model.Amount
 import com.app.docthongbaochuyenkhoan.model.DailyAmount
+import com.app.docthongbaochuyenkhoan.model.MonthlyAmount
 import com.app.docthongbaochuyenkhoan.model.database.AppDatabase
 import com.app.docthongbaochuyenkhoan.utils.AppUtils
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
@@ -29,7 +31,6 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import kotlin.math.abs
@@ -40,19 +41,29 @@ class StatisticsActivity : AppCompatActivity(), SettingDialogFragment.SettingDia
     private lateinit var barChart: BarChart
     private lateinit var sentDataSet: BarDataSet
     private lateinit var receivedDataSet: BarDataSet
-    private val statisticsRangeOfDayList = listOf("7 ngày", "14 ngày", "1 tháng", "3 tháng")
+    private val statisticsRangeOfDayList =
+        listOf("7 ngày", "14 ngày", "1 tháng", "3 tháng", "6 tháng", "1 năm")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityStatisticsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel.loadDailyAmounts(Calendar.getInstance(), 7)    // Default get data in 7 days
+        viewModel.loadTransactionAmountsByDays(
+            Calendar.getInstance(),
+            7
+        )    // Default get data in 7 days
 
         // Quan sát dữ liệu từ ViewModel và cập nhật biểu đồ
         CoroutineScope(Dispatchers.IO).launch {
-            viewModel.dailyAmounts.collectLatest { dailyAmounts ->
+            viewModel.dailyAmounts.collect { dailyAmounts ->
                 if (dailyAmounts.isNotEmpty()) initChartData(dailyAmounts)
+            }
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            viewModel.monthlyAmounts.collect { monthlyAmounts ->
+                if (monthlyAmounts.isNotEmpty()) initChartData(monthlyAmounts)
             }
         }
 
@@ -72,27 +83,37 @@ class StatisticsActivity : AppCompatActivity(), SettingDialogFragment.SettingDia
             ) {
                 val selectedItem = parent.getItemAtPosition(position).toString()
                 when (selectedItem) {
-                    statisticsRangeOfDayList[0] -> viewModel.loadDailyAmounts(
+                    statisticsRangeOfDayList[0] -> viewModel.loadTransactionAmountsByDays(
                         Calendar.getInstance(),
                         7
                     )
 
-                    statisticsRangeOfDayList[1] -> viewModel.loadDailyAmounts(
+                    statisticsRangeOfDayList[1] -> viewModel.loadTransactionAmountsByDays(
                         Calendar.getInstance(),
                         14
                     )
 
-                    statisticsRangeOfDayList[2] -> viewModel.loadDailyAmounts(
+                    statisticsRangeOfDayList[2] -> viewModel.loadTransactionAmountsByDays(
                         Calendar.getInstance(),
                         30
                     )
 
-                    statisticsRangeOfDayList[3] -> viewModel.loadDailyAmounts(
+                    statisticsRangeOfDayList[3] -> viewModel.loadTransactionAmountsByDays(
                         Calendar.getInstance(),
                         90
                     )
 
-                    else -> viewModel.loadDailyAmounts(Calendar.getInstance(), 7)
+                    statisticsRangeOfDayList[4] -> viewModel.loadTransactionAmountsByMonths(
+                        Calendar.getInstance(),
+                        6
+                    )
+
+                    statisticsRangeOfDayList[5] -> viewModel.loadTransactionAmountsByMonths(
+                        Calendar.getInstance(),
+                        12
+                    )
+
+                    else -> viewModel.loadTransactionAmountsByDays(Calendar.getInstance(), 7)
                 }
             } // to close the onItemSelected
 
@@ -110,35 +131,37 @@ class StatisticsActivity : AppCompatActivity(), SettingDialogFragment.SettingDia
         StatisticsViewModelFactory(AppDatabase.getDatabase(this).transactionDao())
     }
 
-    private fun initChartData(dailyAmounts: List<DailyAmount>) {
+    private fun initChartData(dataList: List<Amount>) {
         barChart = findViewById(R.id.barChart)
 
         barChart.clear()
 
-        val size = dailyAmounts.size
+        val size = dataList.size
         val entriesSent = mutableListOf<BarEntry>()
         val entriesReceived = mutableListOf<BarEntry>()
         val labels = mutableListOf<String>()
         var totalSent = 0L
         var totalReceived = 0L
 
-        dailyAmounts.forEachIndexed { index, data ->
+        dataList.forEachIndexed { index, item ->
             labels.add(
-                data.day.substring(
+                item.label.substring(
                     0,
                     2
-                ) + (if (size <= 7) " " + DateUtils.getDayOfWeek(data.day) else "")
+                ) + (if (item is DailyAmount && size <= 7) " " + DateUtils.getDayOfWeek(item.label)
+                else if (item is MonthlyAmount && size <= 6) " " + DateUtils.getMonthOfYear(item.label)
+                else "")
             )
 
-            entriesSent.add(BarEntry(index.toFloat(), data.sent.toFloat()))
-            entriesReceived.add(BarEntry(index.toFloat(), data.received.toFloat()))
+            entriesSent.add(BarEntry(index.toFloat(), item.sent.toFloat()))
+            entriesReceived.add(BarEntry(index.toFloat(), item.received.toFloat()))
 
-            totalSent += data.sent
-            totalReceived += data.received
+            totalSent += item.sent
+            totalReceived += item.received
         }
 
         runOnUiThread {
-            updateTvDateRange(dailyAmounts.first().day, dailyAmounts.last().day)
+            updateTvDateRange(dataList.first().label, dataList.last().label)
             updateTotalAmount(totalSent, totalReceived)
         }
 

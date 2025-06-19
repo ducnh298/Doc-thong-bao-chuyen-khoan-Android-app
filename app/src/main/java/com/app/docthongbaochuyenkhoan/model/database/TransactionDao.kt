@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.app.docthongbaochuyenkhoan.model.DailyAmount
+import com.app.docthongbaochuyenkhoan.model.MonthlyAmount
 import com.app.docthongbaochuyenkhoan.model.Transaction
 
 @Dao
@@ -35,5 +36,17 @@ interface TransactionDao {
         GROUP BY day
         ORDER BY day ASC
     """)
-    suspend fun getAmountsForDays(startDate: Long, endDate: Long): List<DailyAmount>
+    suspend fun getTotalReceivedAndSentByDays(startDate: Long, endDate: Long): List<DailyAmount>
+
+    @Query("""
+    SELECT 
+        strftime('%m/%Y', timestamp / 1000, 'unixepoch', 'localtime') AS month,
+        SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END) AS received,
+        SUM(CASE WHEN amount < 0 THEN amount ELSE 0 END) as sent
+    FROM transactions
+    WHERE timestamp >= :startDate AND timestamp <= :endDate
+    GROUP BY month
+    ORDER BY month ASC
+""")
+    suspend fun getTotalReceivedAndSentByMonth(startDate: Long, endDate: Long): List<MonthlyAmount>
 }
