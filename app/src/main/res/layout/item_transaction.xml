@@ -40,11 +40,12 @@
             android:id="@+id/imgLogo"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
+            android:maxWidth="100dp"
             android:layout_gravity="top|right"
             android:adjustViewBounds="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/logo_mbbank" />
+            app:srcCompat="@drawable/logo_default_bank" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
