@@ -14,8 +14,8 @@ android {
         applicationId = "com.app.docthongbaochuyenkhoan"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.2"
+        versionCode = 2
+        versionName = "1.3"
         archivesName = "Đọc thông báo chuyển khoản-v$versionName"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -28,6 +28,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
 
             applicationVariants.all { variant ->
                 variant.outputs

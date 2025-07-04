@@ -50,6 +50,7 @@ class StatisticsActivity : AppCompatActivity() {
         binding = ActivityStatisticsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        barChart = findViewById(R.id.barChart)
         viewModel.loadTransactionAmountsByDays(
             Calendar.getInstance(),
             7
@@ -134,10 +135,6 @@ class StatisticsActivity : AppCompatActivity() {
 
     private fun initChartData(dataList: List<Amount>) {
         try {
-            barChart = findViewById(R.id.barChart)
-
-            barChart.clear()
-
             val size = dataList.size
             val entriesSent = mutableListOf<BarEntry>()
             val entriesReceived = mutableListOf<BarEntry>()
@@ -168,14 +165,14 @@ class StatisticsActivity : AppCompatActivity() {
             }
 
             sentDataSet = BarDataSet(listOf<BarEntry>(), "Tiền gửi").apply {
-                color = resources.getColor(R.color.light_red)
+                color = resources.getColor(R.color.text_color_amount_negative)
                 valueTextSize =
                     if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
                 valueTextColor = color
             }
 
             receivedDataSet = BarDataSet(listOf<BarEntry>(), "Tiền nhận").apply {
-                color = resources.getColor(R.color.blue)
+                color = resources.getColor(R.color.text_color_amount_positive)
                 valueTextSize =
                     if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
                 valueTextColor = color
@@ -202,11 +199,14 @@ class StatisticsActivity : AppCompatActivity() {
                     setAvoidFirstLastClipping(true)
                     textSize =
                         if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
+                    textColor = resources.getColor(R.color.text_color)
                 }
 
                 axisLeft.valueFormatter = valueFormatter
+                axisLeft.textColor = resources.getColor(R.color.text_color)
                 axisRight.isEnabled = false
                 description.isEnabled = false
+
                 extraBottomOffset = 20f
 
                 setFitBars(true)
@@ -214,6 +214,7 @@ class StatisticsActivity : AppCompatActivity() {
                 invalidate()
 
                 legend.textSize = 14f
+                legend.textColor = resources.getColor(R.color.text_color)
                 legend.xEntrySpace = 30f   // Tăng khoảng cách ngang giữa các mục
                 legend.formSize = 14f      // Kích thước ô màu
                 legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
@@ -231,10 +232,8 @@ class StatisticsActivity : AppCompatActivity() {
     }
 
     private fun updateTotalAmount(totalSent: Long, totalReceived: Long) {
-        findViewById<TextView>(R.id.tvTotalSent).text =
-            "Tổng tiền chuyển: " + AppUtils.formatCurrency(totalSent)
-        findViewById<TextView>(R.id.tvTotalReceived).text =
-            "Tổng tiền nhận: " + AppUtils.formatCurrency(totalReceived)
+        findViewById<TextView>(R.id.tvTotalSent).text = AppUtils.formatCurrency(totalSent)
+        findViewById<TextView>(R.id.tvTotalReceived).text = AppUtils.formatCurrency(totalReceived)
     }
 
     private val valueFormatter = object : ValueFormatter() {

@@ -51,6 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
+        android:gravity="center"
         android:background="@drawable/bg_spinner_statistics_time"
         android:dropDownWidth="130dp" />
 
@@ -79,20 +80,51 @@
         android:layout_marginTop="16dp"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvTotalReceived"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tổng tiền nhận: 0 VND"
-            android:textColor="@color/text_color"
-            android:textSize="18dp" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tổng tiền nhận:"
+                android:textColor="@color/text_color"
+                android:textSize="18dp"
+                />
 
-        <TextView
-            android:id="@+id/tvTotalSent"
+            <TextView
+                android:id="@+id/tvTotalReceived"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:text="0 VND"
+                android:textStyle="bold"
+                android:textColor="@color/text_color_amount_positive"
+                android:textSize="18dp" />
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tổng tiền chuyển: 0 VND"
-            android:textColor="@color/text_color"
-            android:textSize="18dp" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tổng tiền chuyển:"
+                android:textColor="@color/text_color"
+                android:textSize="18dp"
+                />
+
+            <TextView
+                android:id="@+id/tvTotalSent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:text="0 VND"
+                android:textStyle="bold"
+                android:textColor="@color/text_color_amount_negative"
+                android:textSize="18dp" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

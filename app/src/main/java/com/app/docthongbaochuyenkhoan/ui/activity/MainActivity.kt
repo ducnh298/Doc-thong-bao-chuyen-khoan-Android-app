@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.docthongbaochuyenkhoan.R
-import com.app.docthongbaochuyenkhoan.adapter.TransactionAdapter
+import com.app.docthongbaochuyenkhoan.ui.adapter.TransactionAdapter
 import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
 import com.app.docthongbaochuyenkhoan.databinding.ActivityMainBinding
 import com.app.docthongbaochuyenkhoan.ui.dialog.DatePickerDialogFragment

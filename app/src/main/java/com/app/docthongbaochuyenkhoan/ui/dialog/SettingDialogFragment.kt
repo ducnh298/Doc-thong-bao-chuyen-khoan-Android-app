@@ -17,10 +17,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.DialogFragment
 import com.app.docthongbaochuyenkhoan.R
-import com.app.docthongbaochuyenkhoan.ui.activity.MainActivity
 import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
 import com.app.docthongbaochuyenkhoan.databinding.DialogChangeNotificationContentBinding
+import com.app.docthongbaochuyenkhoan.databinding.DialogContactInfoBinding
 import com.app.docthongbaochuyenkhoan.databinding.DialogSettingBinding
+import com.app.docthongbaochuyenkhoan.ui.activity.MainActivity
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
 import kotlinx.coroutines.CoroutineScope
@@ -39,6 +40,8 @@ class SettingDialogFragment : DialogFragment() {
     private lateinit var listener: SettingDialogListener
     private var notificationSoundUri: Uri? = null
     private var dialogChangeNotificationContent: AlertDialog? = null
+    private val myEmail = "fabi0298lol@gmail.com"
+    private val myZaloPhoneNumber = "0972800125"
 
     companion object {
         fun newInstance(
@@ -140,11 +143,13 @@ class SettingDialogFragment : DialogFragment() {
         )
 
         binding.btnRestoreSetting.setOnClickListener { restoreSetting() }
+        binding.btnContactInfo.setOnClickListener { openContactInfoDialog() }
         binding.btnClose.setOnClickListener { this.dismiss() }
 
         binding.btnCheckPermission.addClickAnimation()
         binding.btnOpenTTSSetting.addClickAnimation()
         binding.btnRestoreSetting.addClickAnimation()
+        binding.btnContactInfo.addClickAnimation()
         binding.btnClose.addClickAnimation()
     }
 
@@ -237,6 +242,63 @@ class SettingDialogFragment : DialogFragment() {
                 }
             }
         }
+    }
+
+    private fun openContactInfoDialog() {
+        val builder = AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+        val bindingDialogContactInfo = DialogContactInfoBinding.inflate(layoutInflater)
+        builder.setView(bindingDialogContactInfo.root)
+
+        val dialog = builder.create()
+        dialog.let {
+            dialog.window?.setGravity(Gravity.CENTER)
+            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+            dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+            dialog.setOnDismissListener {
+                dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+            }
+            bindingDialogContactInfo.emailLayout.setOnClickListener {
+                val intent = Intent(Intent.ACTION_SENDTO).apply {
+                    data = Uri.parse("mailto:")
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf(myEmail))
+                    putExtra(Intent.EXTRA_SUBJECT, "Liên hệ từ ứng dụng Android của bạn")
+                }
+                startActivity(intent)
+
+                dialog.dismiss() // Đóng dialog sau khi click
+            }
+
+            bindingDialogContactInfo.btnZalo.setOnClickListener {
+                try {
+                    val uri = Uri.parse("https://zalo.me/${myZaloPhoneNumber}")
+                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    makeToast("Không thể mở Zalo. Vui lòng đảm bảo Zalo đã được cài đặt.", false)
+                    try {
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("market://details?id=com.zing.zalo")
+                            )
+                        )
+                    } catch (err: android.content.ActivityNotFoundException) {
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=com.zing.zalo")
+                            )
+                        )
+                    }
+                }
+                dialog.dismiss() // Đóng dialog sau khi click
+            }
+
+            bindingDialogContactInfo.btnClose.setOnClickListener {
+                dialog.dismiss()
+            }
+        }
+        dialog.show()
     }
 
     private fun notifyNotificationContentChanged() {

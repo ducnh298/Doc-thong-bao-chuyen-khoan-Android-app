@@ -9,7 +9,9 @@
     <color name="blue">#00a9ce</color>
     <color name="dark_blue">#51A7BF</color>
     <color name="green">#2fd058</color>
+    <color name="dark_green">#229A40</color>
     <color name="light_red">#ff8787</color>
+    <color name="red">#FF3131</color>
     <color name="transparent_red">#8AFF0000</color>
     <color name="transparent">#00FFFFFF</color>
 
@@ -20,9 +22,12 @@
     <color name="text_color">@color/black</color>
     <color name="text_color_dialog">@color/blue</color>
     <color name="text_color_taskbar">@color/white</color>
+    <color name="text_color_amount_positive">@color/dark_green</color>
+    <color name="text_color_amount_negative">@color/red</color>
     <color name="stroke_color">@color/black</color>
 
     <color name="button_icon_next">@color/dark_grey</color>
+    <color name="button_statistic">@color/light_grey</color>
 
     <color name="onclick_background">@color/grey</color>
 </resources>

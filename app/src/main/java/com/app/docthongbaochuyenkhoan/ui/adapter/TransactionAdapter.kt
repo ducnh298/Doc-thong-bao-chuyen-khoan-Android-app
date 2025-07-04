@@ -1,4 +1,4 @@
-package com.app.docthongbaochuyenkhoan.adapter
+package com.app.docthongbaochuyenkhoan.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.databinding.ItemTransactionBinding
 import com.app.docthongbaochuyenkhoan.model.Transaction
 import com.app.docthongbaochuyenkhoan.utils.AppUtils
@@ -28,6 +29,11 @@ class TransactionAdapter(private val listener: AdapterListener) :
             binding.tvAmount.text = if (transaction.amount > 0)
                 "+" + AppUtils.formatCurrency(transaction.amount)
             else AppUtils.formatCurrency(transaction.amount)
+
+            binding.tvAmount.setTextColor( if (transaction.amount > 0)
+                binding.root.context.getColorStateList(R.color.text_color_amount_positive)
+            else binding.root.context.getColorStateList(R.color.text_color_amount_negative)
+            )
 
             binding.tvDateTime.text = DateUtils.formatDateTime(transaction.timestamp)
 

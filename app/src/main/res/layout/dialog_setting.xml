@@ -95,7 +95,6 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="20dp"
                 android:background="@drawable/bg_layout_item_setting"
-                android:elevation="5dp"
                 android:padding="10dp">
 
                 <TextView
@@ -156,7 +155,6 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="20dp"
                 android:background="@drawable/bg_layout_item_setting"
-                android:elevation="5dp"
                 android:padding="10dp">
 
                 <TextView
@@ -197,7 +195,6 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="20dp"
                 android:background="@drawable/bg_layout_item_setting"
-                android:elevation="5dp"
                 android:padding="10dp">
 
                 <TextView
@@ -245,6 +242,23 @@
                 android:text="Khôi phục cài đặt"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
+                android:textSize="18sp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnContactInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:background="@color/transparent"
+                android:elevation="5dp"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp"
+                android:text="Thông tin liên hệ"
+                android:textAllCaps="false"
+                android:textColor="@color/text_color_dialog"
                 android:textSize="18sp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

@@ -3,7 +3,7 @@ package com.app.docthongbaochuyenkhoan.model
 import com.app.docthongbaochuyenkhoan.R
 
 enum class Bank(val displayName: String, val logo: Int, vararg val aliases: String) {
-    UNKNOWN("", 0, ""),
+    UNKNOWN("", R.drawable.logo_default_bank, ""),
     TECHCOMBANK(
         "Techcombank", R.drawable.logo_techcombank, "techcombank", "tcb", "tcbank"
     ),
