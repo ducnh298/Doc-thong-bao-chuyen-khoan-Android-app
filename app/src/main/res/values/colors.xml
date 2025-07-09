@@ -13,11 +13,13 @@
     <color name="light_red">#ff8787</color>
     <color name="red">#FF3131</color>
     <color name="transparent_red">#8AFF0000</color>
+    <color name="transparent_white">#DDFFFFFF</color>
     <color name="transparent">#00FFFFFF</color>
 
     <color name="background">@color/white</color>
-    <color name="dialog_background">@color/light_grey</color>
-    <color name="taskbar_background">@color/blue</color>
+    <color name="background_dialog">@color/light_grey</color>
+    <color name="background_taskbar">@color/blue</color>
+    <color name="background_logo_bank">@color/transparent</color>
 
     <color name="text_color">@color/black</color>
     <color name="text_color_dialog">@color/blue</color>

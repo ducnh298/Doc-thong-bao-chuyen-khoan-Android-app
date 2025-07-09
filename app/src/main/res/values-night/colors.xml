@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="background">@color/black</color>
-    <color name="dialog_background">@color/dark_grey</color>
-    <color name="taskbar_background">@color/dark_blue</color>
+    <color name="background_dialog">@color/dark_grey</color>
+    <color name="background_taskbar">@color/dark_blue</color>
+    <color name="background_logo_bank">@color/transparent_white</color>
 
     <color name="text_color">@color/white</color>
     <color name="text_color_dialog">@color/light_blue</color>

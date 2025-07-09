@@ -10,35 +10,39 @@ import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.databinding.ItemTransactionBinding
 import com.app.docthongbaochuyenkhoan.model.Transaction
 import com.app.docthongbaochuyenkhoan.utils.AppUtils
+import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
 
 class TransactionAdapter(private val listener: AdapterListener) :
     ListAdapter<Transaction, TransactionAdapter.ViewHolder>(TransactionDiffCallback()) {
 
     interface AdapterListener {
-        fun onAmountClicked(transaction: Transaction): View.OnClickListener
+        fun onBtnSpeakClicked(transaction: Transaction): View.OnClickListener
     }
 
     inner class ViewHolder(private val binding: ItemTransactionBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(transaction: Transaction) {
-            binding.tvTitle.text = transaction.title
-            binding.tvContent.text = transaction.content
+            binding.tvTitle.text = transaction.title ?: "Thông báo chuyển khoản"
+            binding.tvContent.text = transaction.content ?: "Thông báo chuyển khoản"
             binding.imgLogo.setImageResource(transaction.bank.logo)
 
             binding.tvAmount.text = if (transaction.amount > 0)
                 "+" + AppUtils.formatCurrency(transaction.amount)
             else AppUtils.formatCurrency(transaction.amount)
 
-            binding.tvAmount.setTextColor( if (transaction.amount > 0)
-                binding.root.context.getColorStateList(R.color.text_color_amount_positive)
-            else binding.root.context.getColorStateList(R.color.text_color_amount_negative)
+            binding.tvAmount.setTextColor(
+                if (transaction.amount > 0)
+                    binding.root.context.getColorStateList(R.color.text_color_amount_positive)
+                else binding.root.context.getColorStateList(R.color.text_color_amount_negative)
             )
 
             binding.tvDateTime.text = DateUtils.formatDateTime(transaction.timestamp)
 
-            binding.imgLogo.setOnClickListener(listener.onAmountClicked(transaction))
-            binding.tvAmount.setOnClickListener(listener.onAmountClicked(transaction))
+            binding.btnSpeak.setOnClickListener(listener.onBtnSpeakClicked(transaction))
+            binding.btnSpeak.addClickAnimation()
+
+            binding.tvAmount.setOnClickListener(listener.onBtnSpeakClicked(transaction))
         }
     }
 

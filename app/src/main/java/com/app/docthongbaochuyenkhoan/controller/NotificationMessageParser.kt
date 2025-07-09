@@ -104,7 +104,10 @@ class NotificationMessageParser {
         }
 
         private fun extractAmountFromTitle(title: String?, content: String?): Long? {
-            if (title == null || (!title.contains("VND") && !title.contains("₫")))
+            if (title == null || (!title.contains("VND")
+                        && !title.contains("₫")
+                        && !title.contains("đ"))
+            )
                 return null
 
             if (content.isNullOrBlank() ||
@@ -130,10 +133,10 @@ class NotificationMessageParser {
                 (!str.contains("SD", true) && !str.contains("số dư", true))
             ) return null
 
-            // Find the position of "VND" or "₫" in the notification
+            // Find the position of "VND" or "₫" or "đ" in the notification
             val vndIndex =
                 str.indexOf("VND").takeIf { it != -1 } ?: str.indexOf("₫").takeIf { it != -1 }
-                ?: return null
+                ?: str.indexOf("đ").takeIf { it != -1 } ?: return null
 
             // Get the substring from the beginning to before "VND" or "₫"
             val beforeVND = str.substring(0, vndIndex).trim()

@@ -6,7 +6,7 @@ import com.app.docthongbaochuyenkhoan.model.Bank
 class BankConverter {
     @TypeConverter
     fun fromBank(bank: Bank?): String? {
-        return bank?.displayName // Save the Enum name (name) to the DB
+        return bank?.speakName // Save the Enum name (name) to the DB
     }
 
     @TypeConverter

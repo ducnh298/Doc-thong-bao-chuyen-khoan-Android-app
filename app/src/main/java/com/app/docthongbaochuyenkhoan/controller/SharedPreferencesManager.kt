@@ -53,6 +53,22 @@ object SharedPreferencesManager {
         saveDataString(appContext.getString(R.string.notification_enabled), isEnabled.toString())
     }
 
+    fun isNotificationReceivedEnabled(): Boolean {
+        return getDataString(appContext.getString(R.string.notification_received_enabled), "true") == "true"
+    }
+
+    fun saveNotificationReceivedEnabled(isEnabled: Boolean) {
+        saveDataString(appContext.getString(R.string.notification_received_enabled), isEnabled.toString())
+    }
+
+    fun isNotificationSentEnabled(): Boolean {
+        return getDataString(appContext.getString(R.string.notification_sent_enabled), "false") == "true"
+    }
+
+    fun saveNotificationSentEnabled(isEnabled: Boolean) {
+        saveDataString(appContext.getString(R.string.notification_sent_enabled), isEnabled.toString())
+    }
+
     fun getNotificationContentReceived(): String {
         return getDataString(
             appContext.getString(R.string.notification_content_received),
@@ -91,11 +107,22 @@ object SharedPreferencesManager {
         editor.commit()
     }
 
+    fun saveNotShowAgainDialogSettingHelper(show: Boolean){
+        saveDataString(appContext.getString(R.string.not_show_again_dialog_tts_helper), show.toString())
+    }
+
+    fun getNotShowAgainDialogSettingHelper(): Boolean{
+        return getDataString(appContext.getString(R.string.not_show_again_dialog_tts_helper), "false") == "true"
+    }
+
     fun restoreSetting() {
         editor.remove(appContext.getString(R.string.night_mode_enabled))
+        editor.remove(appContext.getString(R.string.notification_received_enabled))
+        editor.remove(appContext.getString(R.string.notification_sent_enabled))
         editor.remove(appContext.getString(R.string.notification_content_received))
         editor.remove(appContext.getString(R.string.notification_content_sent))
         editor.remove(appContext.getString(R.string.notification_sound))
+        editor.remove(appContext.getString(R.string.not_show_again_dialog_tts_helper))
 
         editor.commit()
     }

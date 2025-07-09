@@ -39,7 +39,7 @@
                 android:layout_gravity="center_horizontal"
                 android:text="Cài đặt ứng dụng"
                 android:textColor="@color/text_color_dialog"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -57,35 +57,29 @@
                 android:id="@+id/btnCheckPermission"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:layout_gravity="center"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/btn_blue"
                 android:elevation="5dp"
-                android:paddingLeft="10dp"
-                android:paddingTop="5dp"
-                android:paddingRight="10dp"
-                android:paddingBottom="5dp"
+                android:paddingHorizontal="10dp"
                 android:text="Kiểm tra quyền"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnOpenTTSSetting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:layout_gravity="center"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/btn_blue"
                 android:elevation="5dp"
-                android:paddingLeft="10dp"
-                android:paddingTop="5dp"
-                android:paddingRight="10dp"
-                android:paddingBottom="5dp"
+                android:paddingHorizontal="10dp"
                 android:text="Cài đặt giọng nói"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -98,53 +92,135 @@
                 android:padding="10dp">
 
                 <TextView
-                    android:id="@+id/tvChangeNotificationContent"
+                    android:id="@+id/tvNotificationBox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:padding="5dp"
-                    android:text="Nội dung thông báo"
+                    android:text="Thông báo và nội dung thông báo"
+                    android:textAlignment="center"
                     android:textColor="@color/text_color_dialog"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/tvNotificationContentReceived"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="7dp"
-                    android:background="@drawable/bg_box_layout"
-                    android:clickable="false"
-                    android:contextClickable="true"
-                    android:padding="5dp"
-                    android:text="Đã nhận "
-                    android:textColor="@color/text_color"
-                    android:textSize="18sp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvChangeNotificationContent" />
+                    android:layout_marginTop="5dp"
+                    android:foregroundGravity="center_horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvNotificationBox">
 
-                <TextView
-                    android:id="@+id/tvNotificationContentSent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="7dp"
-                    android:background="@drawable/bg_box_layout"
-                    android:clickable="false"
-                    android:contextClickable="true"
-                    android:padding="5dp"
-                    android:text="Đã chuyển"
-                    android:textColor="@color/text_color"
-                    android:textSize="18sp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvNotificationContentReceived" />
+                    <LinearLayout
+                        android:id="@+id/llTitleNotificationBox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="80dp"
+                        android:orientation="vertical"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_gravity="center_vertical|end"
+                            android:gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:clickable="false"
+                            android:padding="5dp"
+                            android:text="Nhận tiền"
+                            android:textColor="@color/text_color_dialog"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_gravity="center_vertical|end"
+                            android:gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:clickable="false"
+                            android:padding="5dp"
+                            android:text="Chuyển tiền"
+                            android:textColor="@color/text_color_dialog"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llCheckBoxNotificationBox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="80dp"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toRightOf="@+id/llTitleNotificationBox"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/checkBoxReceivedNotification"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:buttonTint="@color/text_color_dialog"
+                            android:gravity="center" />
+
+                        <androidx.appcompat.widget.AppCompatCheckBox
+                            android:id="@+id/checkBoxSentNotification"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:buttonTint="@color/text_color_dialog"
+                            android:gravity="center" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llContentNotificationBox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="80dp"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical"
+                        android:paddingRight="10dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toRightOf="@+id/llCheckBoxNotificationBox"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:id="@+id/tvNotificationContentReceived"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_gravity="center_vertical"
+                            android:gravity="center_vertical"
+                            android:layout_marginVertical="3dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_box_layout"
+                            android:clickable="false"
+                            android:contextClickable="true"
+                            android:padding="5dp"
+                            android:text="Đã nhận "
+                            android:textColor="@color/text_color"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/tvNotificationContentSent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_gravity="center"
+                            android:gravity="center_vertical"
+                            android:layout_marginVertical="3dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_box_layout"
+                            android:clickable="false"
+                            android:contextClickable="true"
+                            android:padding="5dp"
+                            android:text="Đã chuyển"
+                            android:textColor="@color/text_color"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -165,7 +241,7 @@
                     android:padding="5dp"
                     android:text="Âm thanh thông báo"
                     android:textColor="@color/text_color_dialog"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -178,10 +254,11 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="7dp"
                     android:background="@drawable/bg_box_layout"
-                    android:padding="5dp"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="5dp"
                     android:text="Mặc định"
                     android:textColor="@color/text_color"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvChangeNotificationSound" />
@@ -206,7 +283,7 @@
                     android:text="Âm lượng thông báo"
                     android:textAllCaps="false"
                     android:textColor="@color/text_color_dialog"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -215,7 +292,7 @@
                 <androidx.appcompat.widget.AppCompatSeekBar
                     android:id="@+id/seekBarVolume"
                     android:layout_width="250dp"
-                    android:layout_height="40dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="10dp"
                     android:max="100"
@@ -228,27 +305,38 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnRestoreSetting"
+                android:id="@+id/btnShowTTSHelper"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:layout_gravity="center"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/btn_blue"
                 android:elevation="5dp"
-                android:paddingLeft="10dp"
-                android:paddingTop="5dp"
-                android:paddingRight="10dp"
-                android:paddingBottom="5dp"
+                android:paddingHorizontal="10dp"
+                android:text="Sửa lỗi không có tiếng nói"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnRestoreSetting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/btn_blue"
+                android:elevation="5dp"
+                android:paddingHorizontal="10dp"
                 android:text="Khôi phục cài đặt"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnContactInfo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:layout_gravity="center"
                 android:layout_marginTop="10dp"
                 android:background="@color/transparent"
                 android:elevation="5dp"
@@ -256,10 +344,10 @@
                 android:paddingTop="5dp"
                 android:paddingRight="10dp"
                 android:paddingBottom="5dp"
-                android:text="Thông tin liên hệ"
+                android:text="Báo lỗi"
                 android:textAllCaps="false"
                 android:textColor="@color/text_color_dialog"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

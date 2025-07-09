@@ -46,7 +46,7 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
         }
 
     fun addNotification(transaction: Transaction) {
-        val notification = StringBuilder(transaction.bank.displayName)
+        val notification = StringBuilder(transaction.bank.speakName)
 
         if (transaction.amount > 0) {
             val notificationContent = SharedPreferencesManager.getNotificationContentReceived()

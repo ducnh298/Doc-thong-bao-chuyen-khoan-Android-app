@@ -1,9 +1,11 @@
 package com.app.docthongbaochuyenkhoan.viewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.docthongbaochuyenkhoan.model.DailyAmount
 import com.app.docthongbaochuyenkhoan.model.MonthlyAmount
+import com.app.docthongbaochuyenkhoan.model.database.AppDatabase
 import com.app.docthongbaochuyenkhoan.model.database.TransactionDao
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +24,7 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
 
     fun loadTransactionAmountsByDays(endCalendar: Calendar, numberOfDays: Int) {
         viewModelScope.launch {
+
             val endDate = endCalendar.timeInMillis
             endCalendar.add(Calendar.DAY_OF_YEAR, -numberOfDays + 1)
             val startDate = endCalendar.timeInMillis

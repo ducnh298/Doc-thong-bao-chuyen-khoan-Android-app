@@ -71,6 +71,7 @@
                     android:padding="5dp">
 
                     <ImageView
+                        android:id="@+id/icNotification"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:layout_gravity="center_vertical"
@@ -118,6 +119,7 @@
                     android:padding="5dp">
 
                     <ImageView
+                        android:id="@+id/icBatteryOptimization"
                         android:layout_width="70dp"
                         android:layout_height="70dp"
                         android:layout_gravity="center_vertical"

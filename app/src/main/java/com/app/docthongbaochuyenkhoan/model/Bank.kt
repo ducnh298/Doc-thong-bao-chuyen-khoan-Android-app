@@ -2,8 +2,8 @@ package com.app.docthongbaochuyenkhoan.model
 
 import com.app.docthongbaochuyenkhoan.R
 
-enum class Bank(val displayName: String, val logo: Int, vararg val aliases: String) {
-    UNKNOWN("", R.drawable.logo_default_bank, ""),
+enum class Bank(val speakName: String, val logo: Int, vararg val aliases: String) {
+    UNKNOWN("", 0, ""),
     TECHCOMBANK(
         "Techcombank", R.drawable.logo_techcombank, "techcombank", "tcb", "tcbank"
     ),
@@ -19,7 +19,7 @@ enum class Bank(val displayName: String, val logo: Int, vararg val aliases: Stri
     HDBANK("HDBank", R.drawable.logo_hdbank, "hdbank"),
     MOMO("Momo", R.drawable.logo_momo, "momo", "momotransfer"),
     VIETTELMONEY(
-        "Viettelmoney",
+        "Viettel money",
         R.drawable.logo_viettel_money,
         "vtpay",
         "viettelpay",
@@ -29,10 +29,10 @@ enum class Bank(val displayName: String, val logo: Int, vararg val aliases: Stri
 
     companion object {
         fun fromName(name: String?): Bank? {
-            return entries.find { it.displayName.equals(name, ignoreCase = true) }
+            return entries.find { it.speakName.equals(name, ignoreCase = true) }
         }
 
-        fun fromPackageName(packageName: String): Bank {   //  Example: com.mbmobile
+        fun fromPackageName(packageName: String): Bank {
             for (bank in entries) {
                 if (bank != UNKNOWN)
                     for (alias in bank.aliases) {

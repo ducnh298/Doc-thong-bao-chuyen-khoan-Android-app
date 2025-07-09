@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.DatePicker
@@ -20,17 +21,19 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.app.docthongbaochuyenkhoan.MyCustomApplication
 import com.app.docthongbaochuyenkhoan.R
-import com.app.docthongbaochuyenkhoan.ui.adapter.TransactionAdapter
 import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
 import com.app.docthongbaochuyenkhoan.databinding.ActivityMainBinding
-import com.app.docthongbaochuyenkhoan.ui.dialog.DatePickerDialogFragment
-import com.app.docthongbaochuyenkhoan.ui.dialog.RequestPermissionsDialogFragment
-import com.app.docthongbaochuyenkhoan.ui.dialog.SettingDialogFragment
+import com.app.docthongbaochuyenkhoan.databinding.DialogTtsHelperBinding
 import com.app.docthongbaochuyenkhoan.flow.TransactionFlowManager
 import com.app.docthongbaochuyenkhoan.model.Transaction
 import com.app.docthongbaochuyenkhoan.model.database.AppDatabase
 import com.app.docthongbaochuyenkhoan.model.database.TransactionDao
+import com.app.docthongbaochuyenkhoan.ui.adapter.TransactionAdapter
+import com.app.docthongbaochuyenkhoan.ui.dialog.DatePickerDialogFragment
+import com.app.docthongbaochuyenkhoan.ui.dialog.RequestPermissionsDialogFragment
+import com.app.docthongbaochuyenkhoan.ui.dialog.SettingDialogFragment
 import com.app.docthongbaochuyenkhoan.utils.AppUtils
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
@@ -64,9 +67,12 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        window.statusBarColor = ContextCompat.getColor(this, R.color.dark_blue)
+        window.statusBarColor = ContextCompat.getColor(this, R.color.background_taskbar)
 
         if (!SharedPreferencesManager.isInitialized()) SharedPreferencesManager.init(this)
+
+        if (MyCustomApplication.isSamsungDevice() && !SharedPreferencesManager.getNotShowAgainDialogSettingHelper())
+            openDialogTTSHelper()
 
         AppCompatDelegate.setDefaultNightMode(
             if (SharedPreferencesManager.isNightModeEnabled()) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
@@ -339,9 +345,9 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         ringtonePickerLauncher.launch(intent)
     }
 
-    override fun onAmountClicked(transaction: Transaction): View.OnClickListener {
+    override fun onBtnSpeakClicked(transaction: Transaction): View.OnClickListener {
         return View.OnClickListener {
-            val notification = StringBuilder(transaction.bank.displayName)
+            val notification = StringBuilder(transaction.bank.speakName)
 
             if (transaction.amount > 0) {
                 val notificationContent = SharedPreferencesManager.getNotificationContentReceived()
@@ -358,6 +364,36 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
                 textToSpeech.speak(notification.toString(), TextToSpeech.QUEUE_FLUSH, null, null)
             }
         }
+    }
+
+    private fun openDialogTTSHelper() {
+        val builder = AlertDialog.Builder(this, R.style.CustomDialogTheme)
+        val dialogBinding = DialogTtsHelperBinding.inflate(layoutInflater)
+        builder.setView(dialogBinding.root)
+
+        val dialog = builder.create()
+        dialog.let {
+            dialog.window?.setGravity(Gravity.CENTER)
+            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+            dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+        }
+
+        dialogBinding.btnNotShowAgain.isChecked = SharedPreferencesManager.getNotShowAgainDialogSettingHelper()
+        dialogBinding.btnNotShowAgain.setOnCheckedChangeListener{ _,isChecked ->
+            SharedPreferencesManager.saveNotShowAgainDialogSettingHelper(isChecked)
+        }
+
+        dialogBinding.iBtnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnClose.setOnClickListener{
+            dialog.dismiss()
+        }
+
+        dialogBinding.iBtnClose.addClickAnimation()
+        dialogBinding.btnClose.addClickAnimation()
+        dialog.show()
     }
 
     override fun onInit(status: Int) {

@@ -21,6 +21,8 @@ import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
 import com.app.docthongbaochuyenkhoan.databinding.DialogChangeNotificationContentBinding
 import com.app.docthongbaochuyenkhoan.databinding.DialogContactInfoBinding
 import com.app.docthongbaochuyenkhoan.databinding.DialogSettingBinding
+import com.app.docthongbaochuyenkhoan.databinding.DialogTtsHelperBinding
+import com.app.docthongbaochuyenkhoan.service.MyNotificationListenerService
 import com.app.docthongbaochuyenkhoan.ui.activity.MainActivity
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
@@ -89,7 +91,7 @@ class SettingDialogFragment : DialogFragment() {
 
         binding.switchNightMode.setOnCheckedChangeListener { _, isChecked ->
             CoroutineScope(Dispatchers.Main).launch {
-                delay(100)  // Delay 100ms for animation
+                delay(250)  // Delay 220ms for animation
                 AppCompatDelegate.setDefaultNightMode(
                     if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
                 )
@@ -101,6 +103,21 @@ class SettingDialogFragment : DialogFragment() {
 
         binding.btnOpenTTSSetting.setOnClickListener { openTextToSpeechSetting() }
 
+        val notificationReceivedEnabled = SharedPreferencesManager.isNotificationReceivedEnabled()
+        binding.checkBoxReceivedNotification.isChecked = notificationReceivedEnabled
+        binding.checkBoxReceivedNotification.setOnCheckedChangeListener { _, isChecked ->
+            SharedPreferencesManager.saveNotificationReceivedEnabled(isChecked)
+            MyNotificationListenerService.isNotificationReceivedEnabled = isChecked
+            makeToast("Đã ${if (isChecked) "bật" else "tắt"} thông báo khi nhận tiền.", false)
+        }
+
+        val notificationSentEnabled = SharedPreferencesManager.isNotificationSentEnabled()
+        binding.checkBoxSentNotification.isChecked = notificationSentEnabled
+        binding.checkBoxSentNotification.setOnCheckedChangeListener { _, isChecked ->
+            SharedPreferencesManager.saveNotificationSentEnabled(isChecked)
+            MyNotificationListenerService.isNotificationSentEnabled = isChecked
+            makeToast("Đã ${if (isChecked) "bật" else "tắt"} thông báo khi chuyển tiền.", false)
+        }
         val notificationContentReceived = SharedPreferencesManager.getNotificationContentReceived()
         binding.tvNotificationContentReceived.text = notificationContentReceived
         binding.tvNotificationContentReceived.setOnClickListener {
@@ -144,12 +161,14 @@ class SettingDialogFragment : DialogFragment() {
 
         binding.btnRestoreSetting.setOnClickListener { restoreSetting() }
         binding.btnContactInfo.setOnClickListener { openContactInfoDialog() }
+        binding.btnShowTTSHelper.setOnClickListener { openDialogTTSHelper() }
         binding.btnClose.setOnClickListener { this.dismiss() }
 
         binding.btnCheckPermission.addClickAnimation()
         binding.btnOpenTTSSetting.addClickAnimation()
         binding.btnRestoreSetting.addClickAnimation()
         binding.btnContactInfo.addClickAnimation()
+        binding.btnShowTTSHelper.addClickAnimation()
         binding.btnClose.addClickAnimation()
     }
 
@@ -257,6 +276,7 @@ class SettingDialogFragment : DialogFragment() {
             dialog.setOnDismissListener {
                 dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
             }
+            bindingDialogContactInfo.tvEmail.text = myEmail
             bindingDialogContactInfo.emailLayout.setOnClickListener {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {
                     data = Uri.parse("mailto:")
@@ -294,10 +314,49 @@ class SettingDialogFragment : DialogFragment() {
                 dialog.dismiss() // Đóng dialog sau khi click
             }
 
+            bindingDialogContactInfo.iBtnClose.setOnClickListener{
+                dialog.dismiss()
+            }
+
             bindingDialogContactInfo.btnClose.setOnClickListener {
                 dialog.dismiss()
             }
+
+            bindingDialogContactInfo.btnZalo.addClickAnimation()
+            bindingDialogContactInfo.iBtnClose.addClickAnimation()
+            bindingDialogContactInfo.btnClose.addClickAnimation()
         }
+        dialog.show()
+    }
+
+    private fun openDialogTTSHelper() {
+        val builder = AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+        val dialogBinding = DialogTtsHelperBinding.inflate(layoutInflater)
+        builder.setView(dialogBinding.root)
+
+        val dialog = builder.create()
+        dialog.let {
+            dialog.window?.setGravity(Gravity.CENTER)
+            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+            dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+        }
+
+        dialogBinding.btnNotShowAgain.isChecked =
+            SharedPreferencesManager.getNotShowAgainDialogSettingHelper()
+        dialogBinding.btnNotShowAgain.setOnCheckedChangeListener { _, isChecked ->
+            SharedPreferencesManager.saveNotShowAgainDialogSettingHelper(isChecked)
+        }
+
+        dialogBinding.iBtnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.iBtnClose.addClickAnimation()
+        dialogBinding.btnClose.addClickAnimation()
         dialog.show()
     }
 
@@ -334,7 +393,4 @@ class SettingDialogFragment : DialogFragment() {
             .show()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
 }

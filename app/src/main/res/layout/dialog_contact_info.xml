@@ -6,7 +6,7 @@
     android:background="@color/transparent">
 
     <ImageButton
-        android:id="@+id/btnClose"
+        android:id="@+id/iBtnClose"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:background="@color/transparent"
@@ -18,16 +18,16 @@
         app:srcCompat="@drawable/ic_close_light" />
 
     <LinearLayout
-        android:layout_width="340dp"
+        android:layout_width="wrap_content"
         android:layout_height="300dp"
         android:background="@drawable/bg_dialog"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
+        android:paddingVertical="20dp"
+        android:paddingHorizontal="30dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnClose">
+        app:layout_constraintTop_toBottomOf="@+id/iBtnClose">
 
         <TextView
             android:layout_width="wrap_content"
@@ -56,13 +56,14 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_email"
-                android:tint="@color/text_color" />
+                app:tint="@color/text_color" />
 
             <TextView
+                android:id="@+id/tvEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="fabi0298lol@example.com"
+                android:text="fabi0298lol@gmail.com"
                 android:textColor="@color/text_color"
                 android:textIsSelectable="true"
                 android:textSize="16sp" />
@@ -77,7 +78,7 @@
             android:background="@drawable/ic_zalo" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_close"
+            android:id="@+id/btnClose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"

@@ -13,9 +13,9 @@ android {
     defaultConfig {
         applicationId = "com.app.docthongbaochuyenkhoan"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 2
-        versionName = "1.3"
+        targetSdk = 35
+        versionCode = 5
+        versionName = "1.4"
         archivesName = "Đọc thông báo chuyển khoản-v$versionName"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -23,7 +23,11 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // Enables code-related app optimization.
+            isMinifyEnabled = true
+
+            // Enables resource shrinking.
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

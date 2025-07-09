@@ -5,7 +5,6 @@ import android.content.ComponentName
 import android.content.pm.PackageManager
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import android.util.Log
 import com.app.docthongbaochuyenkhoan.controller.NotificationMessageParser
 import com.app.docthongbaochuyenkhoan.controller.NotificationReader
 import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
@@ -22,6 +21,8 @@ class MyNotificationListenerService : NotificationListenerService() {
 
     companion object {
         var isNotificationListenerEnabled: Boolean = true
+        var isNotificationReceivedEnabled: Boolean = true
+        var isNotificationSentEnabled: Boolean = true
     }
 
     override fun onCreate() {
@@ -30,6 +31,8 @@ class MyNotificationListenerService : NotificationListenerService() {
         if (!SharedPreferencesManager.isInitialized())
             SharedPreferencesManager.init(applicationContext)
         isNotificationListenerEnabled = SharedPreferencesManager.isNotificationListenerEnabled()
+        isNotificationReceivedEnabled = SharedPreferencesManager.isNotificationReceivedEnabled()
+        isNotificationSentEnabled = SharedPreferencesManager.isNotificationSentEnabled()
     }
 
     private var notificationReader: NotificationReader? = null
@@ -45,10 +48,10 @@ class MyNotificationListenerService : NotificationListenerService() {
                     val title = extras.getString(Notification.EXTRA_TITLE).toString()
                     val content = extras.getCharSequence(Notification.EXTRA_TEXT).toString()
 
-                    Log.d(
-                        "NotificationListener",
-                        "onNotificationPosted: packageName:$packageName\nTitle: $title\nContent: $content"
-                    )
+//                    Log.d(
+//                        "NotificationListener",
+//                        "onNotificationPosted: packageName:$packageName\nTitle: $title\nContent: $content"
+//                    )
 
                     if (packageName.isNullOrBlank() || title.isBlank() || content.isBlank())
                         return@launch
@@ -65,8 +68,6 @@ class MyNotificationListenerService : NotificationListenerService() {
             }
         }
     }
-
-    // com.mbmobile, vn.com.techcombank.bb.app, com.VCB
 
     private fun isBankNotification(packageName: String): Boolean {
         return Bank.entries.any { bank ->
@@ -90,7 +91,8 @@ class MyNotificationListenerService : NotificationListenerService() {
             emitTransactionFlow(transaction)
             saveTransactionToDatabase(transaction)
 
-            notificationReader?.addNotification(transaction)
+            if ((transaction.amount > 0 && isNotificationReceivedEnabled) || (transaction.amount < 0 && isNotificationSentEnabled))
+                notificationReader?.addNotification(transaction)
         }
     }
 
@@ -129,7 +131,7 @@ class MyNotificationListenerService : NotificationListenerService() {
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
             PackageManager.DONT_KILL_APP
         )
-        Log.d("NotificationListener", "NotificationListenerService restarted")
+//        Log.d("NotificationListener", "NotificationListenerService restarted")
     }
 
     override fun onDestroy() {
