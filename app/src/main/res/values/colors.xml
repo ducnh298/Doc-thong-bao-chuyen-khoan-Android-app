@@ -2,7 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="light_grey">#EDEDED</color>
+    <color name="light_grey">#E0E0E0</color>
     <color name="grey">#D4D4D4</color>
     <color name="dark_grey">#606060</color>
     <color name="light_blue">#7BC1D0</color>
@@ -28,8 +28,8 @@
     <color name="text_color_amount_negative">@color/red</color>
     <color name="stroke_color">@color/black</color>
 
-    <color name="button_icon_next">@color/dark_grey</color>
-    <color name="button_statistic">@color/light_grey</color>
+    <color name="button_icon_next">@color/grey</color>
+    <color name="button_statistic">@color/blue</color>
 
     <color name="onclick_background">@color/grey</color>
 </resources>

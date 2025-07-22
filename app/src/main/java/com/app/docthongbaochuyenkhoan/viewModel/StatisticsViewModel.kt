@@ -22,6 +22,33 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
     private val _monthlyAmounts = MutableStateFlow<List<MonthlyAmount>>(emptyList())
     val monthlyAmounts: StateFlow<List<MonthlyAmount>> = _monthlyAmounts.asStateFlow()
 
+    fun loadTransactionAmountsFromDayToDay(startDate: Long, endDate: Long) {
+        viewModelScope.launch {
+
+            val data = transactionDao.getTotalReceivedAndSentByDays(startDate, endDate)
+
+            if (data.isNotEmpty()) {
+                // Chuyển dữ liệu từ database thành Map để dễ xử lý
+                val dataMap = data.associateBy { it.day }
+
+                val resultList = mutableListOf<DailyAmount>()
+                val calendar = Calendar.getInstance().apply { timeInMillis = startDate }
+                val numberOfDays = DateUtils.getDaysBetweenDates(startDate, endDate)
+
+                for (i in 0 until numberOfDays) {
+                    val dateKey = DateUtils.formatDate(calendar.timeInMillis)
+                    val dailyData = dataMap[dateKey] ?: DailyAmount(
+                        dateKey, 0, 0
+                    ) // Nếu không có thì mặc định 0
+                    resultList.add(dailyData)
+                    calendar.add(Calendar.DAY_OF_YEAR, 1) // Chuyển sang ngày tiếp theo
+                }
+
+                _dailyAmounts.emit(resultList)
+            }
+        }
+    }
+
     fun loadTransactionAmountsByDays(endCalendar: Calendar, numberOfDays: Int) {
         viewModelScope.launch {
 

@@ -39,12 +39,11 @@
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/btnSpeak"
-            android:layout_width="40dp"
-            android:layout_height="35dp"
-            android:layout_marginStart="5dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:adjustViewBounds="true"
             android:background="@color/transparent"
-            android:paddingVertical="5dp"
+            android:paddingVertical="6dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_speaker"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -17,6 +17,7 @@ import com.app.docthongbaochuyenkhoan.model.Amount
 import com.app.docthongbaochuyenkhoan.model.DailyAmount
 import com.app.docthongbaochuyenkhoan.model.MonthlyAmount
 import com.app.docthongbaochuyenkhoan.model.database.AppDatabase
+import com.app.docthongbaochuyenkhoan.ui.dialog.DatePickerDialogStatisticFragment
 import com.app.docthongbaochuyenkhoan.utils.AppUtils
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
@@ -37,13 +38,14 @@ import java.util.Calendar
 import kotlin.math.abs
 
 
-class StatisticsActivity : AppCompatActivity() {
+class StatisticsActivity : AppCompatActivity(),
+    DatePickerDialogStatisticFragment.DatePickerDialogStatisticListener {
     private lateinit var binding: ActivityStatisticsBinding
     private lateinit var barChart: BarChart
     private lateinit var sentDataSet: BarDataSet
     private lateinit var receivedDataSet: BarDataSet
     private val statisticsRangeOfDayList =
-        listOf("7 ngày", "14 ngày", "1 tháng", "3 tháng", "6 tháng", "1 năm")
+        listOf("7 ngày", "14 ngày", "1 tháng", "3 tháng", "6 tháng", "1 năm", "Tự chọn")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,6 +117,8 @@ class StatisticsActivity : AppCompatActivity() {
                         12
                     )
 
+                    statisticsRangeOfDayList[6] -> openDatePickerStatisticDialog()
+
                     else -> viewModel.loadTransactionAmountsByDays(Calendar.getInstance(), 7)
                 }
             } // to close the onItemSelected
@@ -123,9 +127,19 @@ class StatisticsActivity : AppCompatActivity() {
 
             }
         }
+
+        binding.tvDateRange.setOnClickListener{
+            openDatePickerStatisticDialog()
+        }
+        binding.btnChooseDateRange.setOnClickListener {
+            openDatePickerStatisticDialog()
+        }
+
         binding.btnBack.setOnClickListener {
             finish()
         }
+
+        binding.btnChooseDateRange.addClickAnimation()
         binding.btnBack.addClickAnimation()
     }
 
@@ -227,6 +241,22 @@ class StatisticsActivity : AppCompatActivity() {
         }
     }
 
+    private fun openDatePickerStatisticDialog() {
+        val fragment = supportFragmentManager.findFragmentByTag("DatePickerDialogStatisticFragment")
+
+        if (fragment != null && fragment is DatePickerDialogStatisticFragment) {
+            // If fragment has been added
+            if (fragment.isVisible) {
+                fragment.dismiss() // Make sure the fragment is deleted before displaying it again
+                fragment.show(supportFragmentManager, "DatePickerDialogStatisticFragment")
+            }
+        } else {
+            // If the fragment does not exist, create a new one and display it
+            val dialog = DatePickerDialogStatisticFragment.newInstance(this)
+            dialog.show(supportFragmentManager, "DatePickerDialogStatisticFragment")
+        }
+    }
+
     private fun updateTvDateRange(startDate: String, endDate: String) {
         findViewById<TextView>(R.id.tvDateRange).text = "$startDate - $endDate"
     }
@@ -248,5 +278,12 @@ class StatisticsActivity : AppCompatActivity() {
                 value.toInt().toString() // Hiển thị số bình thường nếu nhỏ
             }
         }
+    }
+
+    override fun onConfirmClicked(startDate: Long, endDate: Long) {
+        binding.spinnerTime.setSelection(6)
+        findViewById<TextView>(R.id.tvDateRange).text =
+            "${DateUtils.formatDate(startDate)} - ${DateUtils.formatDate(endDate)}"
+        viewModel.loadTransactionAmountsFromDayToDay(startDate, endDate)
     }
 }

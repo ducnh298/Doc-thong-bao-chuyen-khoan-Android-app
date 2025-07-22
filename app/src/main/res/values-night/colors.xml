@@ -12,8 +12,8 @@
     <color name="text_color_amount_negative">@color/light_red</color>
     <color name="stroke_color">@color/white</color>
 
-    <color name="button_icon_next">@color/dark_grey</color>
-    <color name="button_statistic">@color/dark_grey</color>
+    <color name="button_icon_next">@color/light_grey</color>
+    <color name="button_statistic">@color/dark_blue</color>
 
     <color name="onclick_background">@color/light_grey</color>
 </resources>

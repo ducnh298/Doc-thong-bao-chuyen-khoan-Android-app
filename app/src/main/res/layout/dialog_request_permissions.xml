@@ -111,7 +111,7 @@
                 <LinearLayout
                     android:id="@+id/llIgnoreBatteryOptimizationSetting"
                     android:layout_width="match_parent"
-                    android:layout_height="130dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="5dp"
                     android:background="@drawable/bg_layout_permission"
@@ -128,7 +128,7 @@
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:orientation="vertical">
 
@@ -148,8 +148,18 @@
                             android:paddingLeft="5dp"
                             android:paddingTop="2dp"
                             android:paddingRight="2dp"
-                            android:paddingBottom="2dp"
                             android:text="Cho phép ứng dụng hoạt động ổn định ngay cả khi ở chế độ tiết kiệm pin."
+                            android:textColor="@color/text_color"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="2dp"
+                            android:paddingBottom="2dp"
+                            android:text="*Khuyến nghị bật để đảm bảo hoạt động ổn định, đặc biệt trên máy cấu hình thấp."
                             android:textColor="@color/text_color"
                             android:textSize="14sp" />
                     </LinearLayout>

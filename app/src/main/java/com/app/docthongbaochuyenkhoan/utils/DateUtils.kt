@@ -48,5 +48,16 @@ class DateUtils {
             val sdfOutput = SimpleDateFormat("MMM", Locale.ENGLISH)  // "MMM" -> Jan, Feb, Mar, ...
             return sdfOutput.format(date) // Ví dụ: "Jun"
         }
+
+        fun getDaysBetweenDates(startDate: Long, endDate: Long): Long {
+            // 1. Tính khoảng thời gian chênh lệch (đơn vị: mili giây)
+            val difference = endDate - startDate
+
+            // 2. Định nghĩa số mili giây trong một ngày
+            val millisecondsPerDay = 1000 * 60 * 60 * 24
+
+            // 3. Chuyển đổi mili giây sang ngày và trả về
+            return difference / millisecondsPerDay
+        }
     }
 }

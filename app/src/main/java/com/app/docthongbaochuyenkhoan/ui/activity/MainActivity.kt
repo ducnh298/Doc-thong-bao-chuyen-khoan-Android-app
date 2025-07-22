@@ -127,10 +127,10 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
         // Save selectedDay value into Bundle
         outState.putLong("selectedDay", selectedDay)
+
+        super.onSaveInstanceState(outState)
     }
 
     private fun initTVRequestNotificationAccessPermission() {
@@ -171,7 +171,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
     private fun initLayoutChooseDate() {
         binding.tvDate.let {
-            it.text = DateUtils.formatDate(today)
+            it.text = DateUtils.formatDate(if (selectedDay > 0) selectedDay else today)
             it.setOnClickListener { openDatePickerDialog() }
         }
 
@@ -196,14 +196,16 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
         binding.btnNext.addClickAnimation()
         binding.btnPrev.addClickAnimation()
+
+        updateLayoutChooseDateButtonVisibility()
     }
 
     private fun initLayoutTotalTransactions() {
-        binding.btnStatistics.setOnClickListener {
+        binding.btnStatistic.setOnClickListener {
             val intent = Intent(this, StatisticsActivity::class.java)
             startActivity(intent)
         }
-        binding.btnStatistics.addClickAnimation()
+        binding.btnStatistic.addClickAnimation()
     }
 
     private fun updateLayoutChooseDateButtonVisibility() {
@@ -378,8 +380,9 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
             dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
         }
 
-        dialogBinding.btnNotShowAgain.isChecked = SharedPreferencesManager.getNotShowAgainDialogSettingHelper()
-        dialogBinding.btnNotShowAgain.setOnCheckedChangeListener{ _,isChecked ->
+        dialogBinding.btnNotShowAgain.isChecked =
+            SharedPreferencesManager.getNotShowAgainDialogSettingHelper()
+        dialogBinding.btnNotShowAgain.setOnCheckedChangeListener { _, isChecked ->
             SharedPreferencesManager.saveNotShowAgainDialogSettingHelper(isChecked)
         }
 
@@ -387,7 +390,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
             dialog.dismiss()
         }
 
-        dialogBinding.btnClose.setOnClickListener{
+        dialogBinding.btnClose.setOnClickListener {
             dialog.dismiss()
         }
 
