@@ -1,11 +1,11 @@
 package com.app.docthongbaochuyenkhoan.viewModel
 
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.docthongbaochuyenkhoan.model.DailyAmount
 import com.app.docthongbaochuyenkhoan.model.MonthlyAmount
-import com.app.docthongbaochuyenkhoan.model.database.AppDatabase
 import com.app.docthongbaochuyenkhoan.model.database.TransactionDao
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,6 +45,34 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
                 }
 
                 _dailyAmounts.emit(resultList)
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun loadTransactionAmountsFromDayToDayByMonths(startDate: Long, endDate: Long) {
+        viewModelScope.launch {
+          val  firstDayOfMonth = DateUtils.getFirstDayOfMonth(startDate)
+
+            val data = transactionDao.getTotalReceivedAndSentByMonth(firstDayOfMonth, endDate)
+
+            if (data.isNotEmpty()) {
+                val dataMap = data.associateBy { it.month }
+
+                val resultList = mutableListOf<MonthlyAmount>()
+                val calendar = Calendar.getInstance().apply { timeInMillis = firstDayOfMonth }
+                val numberOfMonths = DateUtils.getMonthsBetweenDates(firstDayOfMonth, endDate)
+
+                for (i in 0 until numberOfMonths + 1) {
+                    val monthKey = DateUtils.formatMonth(calendar.timeInMillis) // ví dụ "06/2025"
+                    val monthlyData = dataMap[monthKey] ?: MonthlyAmount(
+                        monthKey, 0, 0
+                    )
+                    resultList.add(monthlyData)
+                    calendar.add(Calendar.MONTH, 1)
+                }
+
+                _monthlyAmounts.emit(resultList)
             }
         }
     }

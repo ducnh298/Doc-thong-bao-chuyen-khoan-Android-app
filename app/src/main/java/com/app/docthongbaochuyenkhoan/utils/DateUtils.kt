@@ -1,6 +1,12 @@
 package com.app.docthongbaochuyenkhoan.utils
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalAdjusters
 import java.util.Calendar
 import java.util.Locale
 
@@ -59,5 +65,41 @@ class DateUtils {
             // 3. Chuyển đổi mili giây sang ngày và trả về
             return difference / millisecondsPerDay
         }
+
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun getMonthsBetweenDates(startDate: Long, endDate: Long, zoneId: ZoneId = ZoneId.systemDefault()): Long {
+            // 1. Chuyển đổi Long (mili giây) thành Instant
+            val startInstant = Instant.ofEpochMilli(startDate)
+            val endInstant = Instant.ofEpochMilli(endDate)
+
+            // 2. Chuyển đổi Instant thành LocalDate bằng múi giờ cụ thể.
+            // Việc này là cần thiết vì "tháng" là một khái niệm trong lịch, không phải là khoảng thời gian thuần túy.
+            val startLocalDate = startInstant.atZone(zoneId).toLocalDate()
+            val endLocalDate = endInstant.atZone(zoneId).toLocalDate()
+
+            // 3. Sử dụng ChronoUnit.MONTHS để tính số tháng
+            // ChronoUnit.MONTHS.between() tính số tháng đầy đủ đã trôi qua.
+            return ChronoUnit.MONTHS.between(startLocalDate, endLocalDate)
+        }
+
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun getFirstDayOfMonth(startDateMillis: Long, zoneId: ZoneId = ZoneId.systemDefault()): Long {
+            // 1. Chuyển đổi Long (mili giây) thành Instant
+            val instant = Instant.ofEpochMilli(startDateMillis)
+
+            // 2. Chuyển đổi Instant thành LocalDate bằng múi giờ cụ thể.
+            // Việc này là cần thiết để xác định ngày, tháng, năm theo lịch.
+            val localDate = instant.atZone(zoneId).toLocalDate()
+
+            // 3. Sử dụng TemporalAdjusters.firstDayOfMonth() để lấy ngày đầu tiên của tháng
+            val firstDayOfMonth = localDate.with(TemporalAdjusters.firstDayOfMonth())
+
+            // 4. Chuyển đổi LocalDate (ngày đầu tháng) trở lại thành Instant (đầu ngày)
+            // và sau đó thành mili giây từ Epoch.
+            // Chúng ta cần chỉ định múi giờ để chuyển đổi LocalDate thành ZonedDateTime,
+            // sau đó mới sang Instant.
+            return firstDayOfMonth.atStartOfDay(zoneId).toInstant().toEpochMilli()
+        }
+
     }
 }

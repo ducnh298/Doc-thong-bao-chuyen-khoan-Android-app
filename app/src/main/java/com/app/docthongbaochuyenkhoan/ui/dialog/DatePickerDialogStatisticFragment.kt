@@ -14,12 +14,13 @@ import java.util.Calendar
 
 class DatePickerDialogStatisticFragment : DialogFragment() {
     interface DatePickerDialogStatisticListener {
-        fun onConfirmClicked(startDate: Long, endDate: Long)
+        fun onConfirmClicked(startDate: Long, endDate: Long, isStatisticByMonth: Boolean)
     }
 
     private var selectedStartDate = 0L
     private var selectedEndDate = 0L
     private var isSelectStartDate = true
+    private var isStatisticByMonth = false // false: ngày, true: tuần
     private lateinit var listener: DatePickerDialogStatisticListener
 
     companion object {
@@ -81,6 +82,10 @@ class DatePickerDialogStatisticFragment : DialogFragment() {
                 it.maxDate = System.currentTimeMillis()
             }
 
+            binding.switchDayMonth.setOnCheckedChangeListener { _, isChecked ->
+                isStatisticByMonth = isChecked
+            }
+
             binding.btnConfirm.setOnClickListener {
                 if (selectedStartDate > 0 && selectedEndDate > 0) {
                     if (selectedStartDate > selectedEndDate)
@@ -90,7 +95,7 @@ class DatePickerDialogStatisticFragment : DialogFragment() {
                             Toast.LENGTH_SHORT
                         ).show()
                     else {
-                        listener.onConfirmClicked(selectedStartDate, selectedEndDate)
+                        listener.onConfirmClicked(selectedStartDate, selectedEndDate,isStatisticByMonth )
                         dialog.dismiss()
                     }
                 } else Toast.makeText(

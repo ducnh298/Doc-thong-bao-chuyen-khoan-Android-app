@@ -1,5 +1,6 @@
 package com.app.docthongbaochuyenkhoan.ui.activity
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,6 +11,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.databinding.ActivityStatisticsBinding
@@ -128,7 +130,7 @@ class StatisticsActivity : AppCompatActivity(),
             }
         }
 
-        binding.tvDateRange.setOnClickListener{
+        binding.tvDateRange.setOnClickListener {
             openDatePickerStatisticDialog()
         }
         binding.btnChooseDateRange.setOnClickListener {
@@ -280,10 +282,13 @@ class StatisticsActivity : AppCompatActivity(),
         }
     }
 
-    override fun onConfirmClicked(startDate: Long, endDate: Long) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onConfirmClicked(startDate: Long, endDate: Long, isStatisticByMonth: Boolean) {
         binding.spinnerTime.setSelection(6)
-        findViewById<TextView>(R.id.tvDateRange).text =
-            "${DateUtils.formatDate(startDate)} - ${DateUtils.formatDate(endDate)}"
-        viewModel.loadTransactionAmountsFromDayToDay(startDate, endDate)
+
+        if (isStatisticByMonth)
+            viewModel.loadTransactionAmountsFromDayToDayByMonths(startDate, endDate)
+        else
+            viewModel.loadTransactionAmountsFromDayToDay(startDate, endDate)
     }
 }
