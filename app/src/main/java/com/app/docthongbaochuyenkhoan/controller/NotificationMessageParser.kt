@@ -23,7 +23,7 @@ class NotificationMessageParser {
 
             Log.d("MainActivity", "Amount: $amount")
 
-            return if (amount != null && amount != 0L && bank != null)
+            return if (amount != null && amount != 0L)
                 Transaction(
                     bank = bank,
                     title = title,
@@ -104,33 +104,38 @@ class NotificationMessageParser {
         }
 
         private fun extractAmountFromTitle(title: String?, content: String?): Long? {
-            if (title.isNullOrBlank())
+            if (title.isNullOrBlank() || content.isNullOrBlank())
                 return null
 
             // Bước 1: Kiểm tra các dấu hiệu của đơn vị tiền tệ trong tiêu đề
             val hasCurrencyUnit = title.contains("VND", ignoreCase = true) ||
-                    title.contains("₫") ||
-                    title.contains("đ")
+                    title.contains("₫")
 
             if (!hasCurrencyUnit)
+                return null
+
+            val isTransactionMessage =
+                content.contains("SD", ignoreCase = true) ||
+                        content.contains("số dư", ignoreCase = true)
+            if (!isTransactionMessage)
                 return null
 
             // Bước 2: Xác định loại giao dịch (cộng hay trừ) dựa trên các từ khóa phổ biến trong tiêu đề.
             // Ưu tiên các từ khóa chỉ rõ dấu hiệu tiền ra/tiền vào.
             val isCredit = title.contains("+", ignoreCase = true) ||
-                    title.contains(  "nhận", ignoreCase = true) ||
+                    title.contains("nhận", ignoreCase = true) ||
                     title.contains("cộng", ignoreCase = true) ||
-                    title.contains("được cộng", ignoreCase = true) ||
-                    title.contains("tăng", ignoreCase = true) ||
                     title.contains("nạp", ignoreCase = true)
 
             val isDebit = title.contains("-", ignoreCase = true) ||
                     title.contains("trừ", ignoreCase = true) ||
                     title.contains("chuyển", ignoreCase = true) ||
                     title.contains("thanh toán", ignoreCase = true) ||
-                    title.contains("giảm", ignoreCase = true) ||
                     title.contains("chi", ignoreCase = true) ||
-                    title.contains("giao dịch", ignoreCase = true) // 'giao dịch' có thể là cả 2, nhưng thường là tiền ra nếu không có 'nhận/cộng'
+                    title.contains(
+                        "giao dịch",
+                        ignoreCase = true
+                    ) // 'giao dịch' có thể là cả 2, nhưng thường là tiền ra nếu không có 'nhận/cộng'
 
             // Bước 3: Trích xuất số tiền.
             // Regex tìm số có thể có dấu +/- ở đầu, dấu phân cách hàng nghìn (chấm/phẩy) và phần thập phân.
@@ -148,13 +153,15 @@ class NotificationMessageParser {
             // Lấy số tiền lớn nhất hoặc số cuối cùng trong tiêu đề có vẻ là số tiền
             // Thường số tiền sẽ là số lớn nhất hoặc là số cuối cùng xuất hiện trong chuỗi
             val bestMatch = allMatches
-                .maxByOrNull { it.groupValues[2].replace("[.,]".toRegex(), "").toLongOrNull() ?: 0L }
+                .maxByOrNull {
+                    it.groupValues[2].replace("[.,]".toRegex(), "").toLongOrNull() ?: 0L
+                }
                 ?: allMatches.lastOrNull() // Nếu không tìm thấy max, lấy match cuối cùng
 
             val amountStrWithSeparators = bestMatch?.groupValues?.get(2) ?: run {
                 return null
             }
-            var cleanAmountStr =
+            val cleanAmountStr =
                 amountStrWithSeparators.replace("[.,]".toRegex(), "") // Loại bỏ dấu phân cách
 
             val signFromRegex = bestMatch.groupValues[1] // Dấu lấy được từ regex (+/-)
@@ -182,15 +189,16 @@ class NotificationMessageParser {
 
             // Bước 1: Kiểm tra xem chuỗi có phải là một tin nhắn giao dịch hay không.
             // Thêm các từ khóa chỉ báo giao dịch.
-            val isTransactionMessage = str.contains("SD", ignoreCase = true) ||
-                    str.contains("số dư", ignoreCase = true) ||
-                    str.contains("nhận", ignoreCase = true) ||
-                    str.contains("chuyển", ignoreCase = true) ||
-                    str.contains("giao dịch", ignoreCase = true) ||
-                    str.contains(
-                        "biến động",
-                        ignoreCase = true
-                    ) // Thêm các từ khóa liên quan đến giao dịch
+            val isTransactionMessage =
+                str.contains("SD", ignoreCase = true) ||
+                        str.contains("số dư", ignoreCase = true) ||
+                        str.contains("nhận", ignoreCase = true) ||
+                        str.contains("chuyển", ignoreCase = true) ||
+                        str.contains("giao dịch", ignoreCase = true) ||
+                        str.contains(
+                            "biến động",
+                            ignoreCase = true
+                        ) // Thêm các từ khóa liên quan đến giao dịch
 
             if (!isTransactionMessage) {
                 // Nếu không có các từ khóa chỉ báo giao dịch, không phải là tin nhắn giao dịch
@@ -199,7 +207,7 @@ class NotificationMessageParser {
 
             // Bước 2: Tìm vị trí của đơn vị tiền tệ ("VND", "₫", "đ")
             val vndRegex =
-                Regex("""(VND|₫|đ)""", RegexOption.IGNORE_CASE) // Regex để tìm VND hoặc ₫/đ
+                Regex("""(VND|₫)""", RegexOption.IGNORE_CASE) // Regex để tìm VND hoặc ₫/đ
             val matchResult =
                 vndRegex.find(str) ?: return null // Tìm vị trí đầu tiên của đơn vị tiền tệ
 

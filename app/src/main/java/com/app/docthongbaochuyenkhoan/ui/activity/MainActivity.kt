@@ -12,12 +12,12 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.DatePicker
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        window.statusBarColor = ContextCompat.getColor(this, R.color.background_taskbar)
+        enableEdgeToEdge()
 
         if (!SharedPreferencesManager.isInitialized()) SharedPreferencesManager.init(this)
 

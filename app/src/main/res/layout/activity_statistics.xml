@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutTaskBar"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="65dp"
         android:background="@color/background_taskbar"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -18,15 +18,16 @@
         <ImageView
             android:id="@+id/icStatistic"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:background="@color/transparent"
+            android:layout_marginBottom="5dp"
             android:foregroundGravity="center"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_statistic"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+ />
 
         <TextView
             android:id="@+id/textView"
@@ -37,23 +38,23 @@
             android:textColor="@color/text_color_taskbar"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:layout_marginBottom="10dp"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/icStatistic"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_percent="0.63" />
 
         <ImageButton
             android:id="@+id/btnBack"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_gravity="right"
+            android:layout_gravity="end"
             android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
             android:background="@color/transparent"
             android:scaleType="fitEnd"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/btn_back" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -61,6 +62,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:gravity="center"
         android:orientation="horizontal"
@@ -115,7 +117,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="16dp"
         android:orientation="vertical">
 
@@ -130,16 +132,16 @@
                 android:layout_height="wrap_content"
                 android:text="Tổng tiền nhận:"
                 android:textColor="@color/text_color"
-                android:textSize="18dp" />
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/tvTotalReceived"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
                 android:text="0 VND"
                 android:textColor="@color/text_color_amount_positive"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -154,16 +156,16 @@
                 android:layout_height="wrap_content"
                 android:text="Tổng tiền chuyển:"
                 android:textColor="@color/text_color"
-                android:textSize="18dp" />
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/tvTotalSent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
                 android:text="0 VND"
                 android:textColor="@color/text_color_amount_negative"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
