@@ -110,7 +110,6 @@ class NotificationMessageParser {
             // Bước 1: Kiểm tra các dấu hiệu của đơn vị tiền tệ trong tiêu đề
             val hasCurrencyUnit = title.contains("VND", ignoreCase = true) ||
                     title.contains("₫")
-
             if (!hasCurrencyUnit)
                 return null
 
@@ -122,20 +121,9 @@ class NotificationMessageParser {
 
             // Bước 2: Xác định loại giao dịch (cộng hay trừ) dựa trên các từ khóa phổ biến trong tiêu đề.
             // Ưu tiên các từ khóa chỉ rõ dấu hiệu tiền ra/tiền vào.
-            val isCredit = title.contains("+", ignoreCase = true) ||
-                    title.contains("nhận", ignoreCase = true) ||
-                    title.contains("cộng", ignoreCase = true) ||
-                    title.contains("nạp", ignoreCase = true)
+            val isCredit = title.contains("+", ignoreCase = true)
 
-            val isDebit = title.contains("-", ignoreCase = true) ||
-                    title.contains("trừ", ignoreCase = true) ||
-                    title.contains("chuyển", ignoreCase = true) ||
-                    title.contains("thanh toán", ignoreCase = true) ||
-                    title.contains("chi", ignoreCase = true) ||
-                    title.contains(
-                        "giao dịch",
-                        ignoreCase = true
-                    ) // 'giao dịch' có thể là cả 2, nhưng thường là tiền ra nếu không có 'nhận/cộng'
+            val isDebit = title.contains("-", ignoreCase = true)
 
             // Bước 3: Trích xuất số tiền.
             // Regex tìm số có thể có dấu +/- ở đầu, dấu phân cách hàng nghìn (chấm/phẩy) và phần thập phân.
@@ -191,14 +179,7 @@ class NotificationMessageParser {
             // Thêm các từ khóa chỉ báo giao dịch.
             val isTransactionMessage =
                 str.contains("SD", ignoreCase = true) ||
-                        str.contains("số dư", ignoreCase = true) ||
-                        str.contains("nhận", ignoreCase = true) ||
-                        str.contains("chuyển", ignoreCase = true) ||
-                        str.contains("giao dịch", ignoreCase = true) ||
-                        str.contains(
-                            "biến động",
-                            ignoreCase = true
-                        ) // Thêm các từ khóa liên quan đến giao dịch
+                        str.contains("số dư", ignoreCase = true)
 
             if (!isTransactionMessage) {
                 // Nếu không có các từ khóa chỉ báo giao dịch, không phải là tin nhắn giao dịch
