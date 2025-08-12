@@ -14,7 +14,7 @@ android {
         applicationId = "com.app.docthongbaochuyenkhoan"
         minSdk = 24
         targetSdk = 35
-        versionCode = 7
+        versionCode = 9
         versionName = "1.5"
         archivesName = "Đọc thông báo chuyển khoản-v$versionName"
 

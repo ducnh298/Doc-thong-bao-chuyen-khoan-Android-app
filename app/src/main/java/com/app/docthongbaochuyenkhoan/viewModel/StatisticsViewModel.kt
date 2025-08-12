@@ -1,6 +1,7 @@
 package com.app.docthongbaochuyenkhoan.viewModel
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,6 +22,9 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
 
     private val _monthlyAmounts = MutableStateFlow<List<MonthlyAmount>>(emptyList())
     val monthlyAmounts: StateFlow<List<MonthlyAmount>> = _monthlyAmounts.asStateFlow()
+
+    private val _statusMessage = MutableStateFlow<String>("")
+    val statusMessage: StateFlow<String> = _statusMessage.asStateFlow()
 
     fun loadTransactionAmountsFromDayToDay(startDate: Long, endDate: Long) {
         viewModelScope.launch {
@@ -46,6 +50,8 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
 
                 _dailyAmounts.emit(resultList)
             }
+            else
+                _statusMessage.emit("Không có dữ liệu thống kê trong khoảng thời gian này")
         }
     }
 
@@ -73,7 +79,8 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
                 }
 
                 _monthlyAmounts.emit(resultList)
-            }
+            } else
+                _statusMessage.emit("Không có dữ liệu thống kê trong khoảng thời gian này")
         }
     }
 
@@ -103,7 +110,8 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
                 }
 
                 _dailyAmounts.emit(resultList)
-            }
+            } else
+                _statusMessage.emit("Không có dữ liệu thống kê trong khoảng thời gian này")
         }
     }
 
@@ -131,7 +139,8 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
                 }
 
                 _monthlyAmounts.emit(resultList)
-            }
+            } else
+                _statusMessage.emit("Không có dữ liệu thống kê trong khoảng thời gian này")
         }
     }
 }

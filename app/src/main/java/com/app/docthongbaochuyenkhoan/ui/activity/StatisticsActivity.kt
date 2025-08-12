@@ -1,5 +1,6 @@
 package com.app.docthongbaochuyenkhoan.ui.activity
 
+import android.graphics.Paint
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -7,10 +8,8 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +26,7 @@ import com.app.docthongbaochuyenkhoan.utils.DateUtils
 import com.app.docthongbaochuyenkhoan.viewModel.StatisticsViewModel
 import com.app.docthongbaochuyenkhoan.viewModel.StatisticsViewModelFactory
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.Chart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -37,6 +37,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import kotlin.math.abs
 
@@ -54,9 +55,10 @@ class StatisticsActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         binding = ActivityStatisticsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        enableEdgeToEdge()
 
         barChart = findViewById(R.id.barChart)
+        barChart.setDoubleTapToZoomEnabled(false)
+
         viewModel.loadTransactionAmountsByDays(
             Calendar.getInstance(),
             7
@@ -75,7 +77,24 @@ class StatisticsActivity : AppCompatActivity(),
             }
         }
 
-        val spinnerTime = findViewById<Spinner>(R.id.spinnerTime)
+        CoroutineScope(Dispatchers.IO).launch {
+            viewModel.statusMessage.collect { s ->
+                withContext(Dispatchers.Main) {
+                    binding.barChart.let { chart ->
+                        chart.setNoDataText(s)
+                        chart.setNoDataTextColor(resources.getColor(R.color.text_color_dialog))
+
+                        val p: Paint = chart.getPaint(Chart.PAINT_INFO)
+                        p.textSize = 40F
+                        p.isFakeBoldText = true
+
+                        chart.invalidate()
+                    }
+                }
+            }
+        }
+
+        val spinnerTime = binding.spinnerTime
         val adapter = ArrayAdapter(
             this,
             R.layout.item_spinner_statistics_time,
@@ -89,42 +108,7 @@ class StatisticsActivity : AppCompatActivity(),
                 position: Int,
                 id: Long
             ) {
-                val selectedItem = parent.getItemAtPosition(position).toString()
-                when (selectedItem) {
-                    statisticsRangeOfDayList[0] -> viewModel.loadTransactionAmountsByDays(
-                        Calendar.getInstance(),
-                        7
-                    )
-
-                    statisticsRangeOfDayList[1] -> viewModel.loadTransactionAmountsByDays(
-                        Calendar.getInstance(),
-                        14
-                    )
-
-                    statisticsRangeOfDayList[2] -> viewModel.loadTransactionAmountsByDays(
-                        Calendar.getInstance(),
-                        30
-                    )
-
-                    statisticsRangeOfDayList[3] -> viewModel.loadTransactionAmountsByDays(
-                        Calendar.getInstance(),
-                        90
-                    )
-
-                    statisticsRangeOfDayList[4] -> viewModel.loadTransactionAmountsByMonths(
-                        Calendar.getInstance(),
-                        6
-                    )
-
-                    statisticsRangeOfDayList[5] -> viewModel.loadTransactionAmountsByMonths(
-                        Calendar.getInstance(),
-                        12
-                    )
-
-                    statisticsRangeOfDayList[6] -> openDatePickerStatisticDialog()
-
-                    else -> viewModel.loadTransactionAmountsByDays(Calendar.getInstance(), 7)
-                }
+                loadDataBySelectedOptionPosition(position)
             } // to close the onItemSelected
 
             override fun onNothingSelected(parent: AdapterView<*>) {
@@ -141,6 +125,18 @@ class StatisticsActivity : AppCompatActivity(),
 
         binding.btnBack.setOnClickListener {
             finish()
+        }
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            CoroutineScope(Dispatchers.Main).launch {
+                binding.barChart.let { chart ->
+                    chart.setFitBars(true)
+                    chart.fitScreen()
+                    chart.invalidate()
+                }
+                binding.swipeRefreshLayout.isRefreshing =
+                    false // Turn off refresh when completed
+            }
         }
 
         binding.btnChooseDateRange.addClickAnimation()
@@ -292,5 +288,44 @@ class StatisticsActivity : AppCompatActivity(),
             viewModel.loadTransactionAmountsFromDayToDayByMonths(startDate, endDate)
         else
             viewModel.loadTransactionAmountsFromDayToDay(startDate, endDate)
+    }
+
+    fun loadDataBySelectedOptionPosition(position: Int) {
+        val selectedItem = binding.spinnerTime.getItemAtPosition(position).toString()
+        when (selectedItem) {
+            statisticsRangeOfDayList[0] -> viewModel.loadTransactionAmountsByDays(
+                Calendar.getInstance(),
+                7
+            )
+
+            statisticsRangeOfDayList[1] -> viewModel.loadTransactionAmountsByDays(
+                Calendar.getInstance(),
+                14
+            )
+
+            statisticsRangeOfDayList[2] -> viewModel.loadTransactionAmountsByDays(
+                Calendar.getInstance(),
+                30
+            )
+
+            statisticsRangeOfDayList[3] -> viewModel.loadTransactionAmountsByDays(
+                Calendar.getInstance(),
+                90
+            )
+
+            statisticsRangeOfDayList[4] -> viewModel.loadTransactionAmountsByMonths(
+                Calendar.getInstance(),
+                6
+            )
+
+            statisticsRangeOfDayList[5] -> viewModel.loadTransactionAmountsByMonths(
+                Calendar.getInstance(),
+                12
+            )
+
+            statisticsRangeOfDayList[6] -> openDatePickerStatisticDialog()
+
+            else -> viewModel.loadTransactionAmountsByDays(Calendar.getInstance(), 7)
+        }
     }
 }

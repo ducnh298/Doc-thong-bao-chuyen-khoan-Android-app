@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mainLayoutTaskBar"
     android:layout_width="match_parent"
-    android:layout_height="65dp"
+    android:layout_height="45dp"
     android:background="@color/background_taskbar">
 
     <TextView
