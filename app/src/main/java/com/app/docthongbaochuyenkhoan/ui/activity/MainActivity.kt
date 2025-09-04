@@ -12,13 +12,11 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.DatePicker
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -116,6 +114,16 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
                     )
                 }
             }
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        today = DateUtils.getStartTimeOfToday()
+        selectedDay = today
+
+        getTransactionFromDateAndDisplay()
+        binding.tvDate.text = DateUtils.formatDate(if (selectedDay > 0) selectedDay else today)
+        updateLayoutChooseDateButtonVisibility()
     }
 
     override fun onResume() {
