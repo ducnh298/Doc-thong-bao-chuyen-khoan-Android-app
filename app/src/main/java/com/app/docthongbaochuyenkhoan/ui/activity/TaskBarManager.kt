@@ -13,9 +13,17 @@ import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class TaskbarManager(private val activity: Activity) {
+
+    interface TaskBarListener {
+        fun onSwitchNotificationClicked(isChecked: Boolean)
+    }
+
     private var taskbarView: View = activity.findViewById(R.id.task_bar)
+    lateinit var taskBarListener: TaskBarListener
 
     init {
+        if(activity !== null)
+             taskBarListener = ((activity as? TaskBarListener)!!)
         val switchNotification = taskbarView.findViewById<SwitchMaterial>(R.id.switchNotification)
         val btnSetting = taskbarView.findViewById<ImageButton>(R.id.btnSetting)
 
@@ -26,7 +34,7 @@ class TaskbarManager(private val activity: Activity) {
             it.setOnCheckedChangeListener { _, isChecked ->
                 MyNotificationListenerService.isNotificationListenerEnabled = isChecked
                 SharedPreferencesManager.saveNotificationListenerEnabled(isChecked)
-
+                taskBarListener.onSwitchNotificationClicked(isChecked)
                 Toast.makeText(
                     activity,
                     if (isChecked) "Đã bật tính năng đọc thông báo chuyển khoản" else "Đã tắt tính năng đọc thông báo chuyển khoản",

@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogListener,
     DatePickerDialogFragment.DatePickerDialogListener, TransactionAdapter.AdapterListener,
-    TextToSpeech.OnInitListener {
+    TextToSpeech.OnInitListener, TaskbarManager.TaskBarListener {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private lateinit var binding: ActivityMainBinding
     private lateinit var taskbarManager: TaskbarManager
@@ -132,6 +132,8 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         binding.recyclerView.scrollToPosition(0)
         binding.tvRequestNotificationAccessPermission.visibility =
             if (checkNotificationAccessEnabled()) View.GONE else View.VISIBLE
+
+        binding.tvAppHelper.visibility = if (SharedPreferencesManager.isNotificationListenerEnabled()) View.GONE else View.VISIBLE
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -424,5 +426,9 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
     private fun makeToast(msg: String, isLongToast: Boolean) {
         Toast.makeText(this, msg, if (isLongToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onSwitchNotificationClicked(isChecked: Boolean) {
+        binding.tvAppHelper.visibility = if (SharedPreferencesManager.isNotificationListenerEnabled()) View.GONE else View.VISIBLE
     }
 }

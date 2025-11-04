@@ -45,6 +45,31 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/btnNotShowAgain"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:buttonTint="@color/text_color_dialog"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="Không hiển thị lại"
+                    android:textColor="@color/text_color_dialog"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
             <ImageView
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
@@ -126,31 +151,6 @@
                 android:background="@color/blue"
                 android:padding="2dp"
                 android:src="@drawable/img_setting_helper_step_5" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginBottom="10dp"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <androidx.appcompat.widget.AppCompatCheckBox
-                    android:id="@+id/btnNotShowAgain"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:buttonTint="@color/text_color_dialog"
-                    android:gravity="center" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="Không hiển thị lại"
-                    android:textColor="@color/text_color_dialog"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
 
 
             <androidx.appcompat.widget.AppCompatButton
