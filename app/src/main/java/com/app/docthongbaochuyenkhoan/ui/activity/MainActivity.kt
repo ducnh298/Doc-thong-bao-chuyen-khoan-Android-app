@@ -37,6 +37,10 @@ import com.app.docthongbaochuyenkhoan.utils.AppUtils
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
 import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -50,6 +54,8 @@ import java.util.concurrent.TimeUnit
 class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogListener,
     DatePickerDialogFragment.DatePickerDialogListener, TransactionAdapter.AdapterListener,
     TextToSpeech.OnInitListener, TaskbarManager.TaskBarListener {
+    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
+    private val MY_REQUEST_CODE = 290800
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private lateinit var binding: ActivityMainBinding
     private lateinit var taskbarManager: TaskbarManager
@@ -124,6 +130,12 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         getTransactionFromDateAndDisplay()
         binding.tvDate.text = DateUtils.formatDate(if (selectedDay > 0) selectedDay else today)
         updateLayoutChooseDateButtonVisibility()
+
+        // (Chỉ cần thiết cho Flexible Update)
+        checkPendingFlexibleUpdate()
+
+        // Bắt đầu kiểm tra và yêu cầu cập nhật
+        checkForAppUpdate()
     }
 
     override fun onResume() {
@@ -407,6 +419,62 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         dialogBinding.iBtnClose.addClickAnimation()
         dialogBinding.btnClose.addClickAnimation()
         dialog.show()
+    }
+
+    private fun checkForAppUpdate() {
+        // Tạo Task để kiểm tra xem có cập nhật khả dụng không
+        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
+                // Có bản cập nhật khả dụng
+
+                // 1. Kiểm tra luồng Immediate (Bắt buộc)
+                if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                    // Nếu là bản cập nhật quan trọng, hiển thị ngay lập tức
+                    startAppUpdate(appUpdateInfo, AppUpdateType.IMMEDIATE)
+
+                    // 2. Kiểm tra luồng Flexible (Linh hoạt)
+                } else if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                    // Nếu là bản cập nhật không bắt buộc, hiển thị tùy chọn linh hoạt
+                    startAppUpdate(appUpdateInfo, AppUpdateType.FLEXIBLE)
+                }
+            }
+        }
+    }
+
+    private fun startAppUpdate(appUpdateInfo: com.google.android.play.core.appupdate.AppUpdateInfo, updateType: Int) {
+        appUpdateManager.startUpdateFlowForResult(
+            appUpdateInfo,
+            updateType,
+            this,
+            MY_REQUEST_CODE
+        )
+    }
+
+    private fun checkPendingFlexibleUpdate() {
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            // 1. Kiểm tra trạng thái: Cập nhật có sẵn (đã tải xong)
+            // Dùng InstallStatus.DOWNLOADED để biết bản cập nhật Flexible đã hoàn tất tải xuống.
+            if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+
+                // 2. Tự động cài đặt cập nhật đã tải xong
+                // Hành động này sẽ hiển thị một thông báo toàn màn hình (full-screen) ngắn
+                // để người dùng biết ứng dụng đang khởi động lại để cài đặt.
+                appUpdateManager.completeUpdate()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == MY_REQUEST_CODE) {
+            if (resultCode != RESULT_OK) {
+                // Cập nhật bị hủy hoặc thất bại
+                Log.e("AppUpdate", "Update flow failed! Result code: $resultCode")
+            }
+        }
     }
 
     override fun onInit(status: Int) {

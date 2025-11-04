@@ -14,7 +14,7 @@ android {
         applicationId = "com.app.docthongbaochuyenkhoan"
         minSdk = 24
         targetSdk = 35
-        versionCode = 11
+        versionCode = 12
         versionName = "1.5"
         archivesName = "Đọc thông báo chuyển khoản-v$versionName.$versionCode"
 
@@ -68,6 +68,8 @@ dependencies {
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    implementation("com.google.android.play:app-update-ktx:2.1.0")  // For update notification
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
