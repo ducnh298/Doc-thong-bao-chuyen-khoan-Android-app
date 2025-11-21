@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.databinding.ActivityStatisticsBinding
 import com.app.docthongbaochuyenkhoan.model.Amount
@@ -65,19 +66,19 @@ class StatisticsActivity : AppCompatActivity(),
         )    // Default get data in 7 days
 
         // Quan sát dữ liệu từ ViewModel và cập nhật biểu đồ
-        CoroutineScope(Dispatchers.IO).launch {
+       lifecycleScope.launch {
             viewModel.dailyAmounts.collect { dailyAmounts ->
                 if (dailyAmounts.isNotEmpty()) initChartData(dailyAmounts)
             }
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch {
             viewModel.monthlyAmounts.collect { monthlyAmounts ->
                 if (monthlyAmounts.isNotEmpty()) initChartData(monthlyAmounts)
             }
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch {
             viewModel.statusMessage.collect { s ->
                 withContext(Dispatchers.Main) {
                     binding.barChart.let { chart ->
@@ -327,5 +328,15 @@ class StatisticsActivity : AppCompatActivity(),
 
             else -> viewModel.loadTransactionAmountsByDays(Calendar.getInstance(), 7)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        binding.tvDateRange.setOnClickListener {null}
+        binding.btnChooseDateRange.setOnClickListener {null}
+
+        binding.btnBack.setOnClickListener {null}
+        binding.swipeRefreshLayout.setOnRefreshListener {null}
     }
 }

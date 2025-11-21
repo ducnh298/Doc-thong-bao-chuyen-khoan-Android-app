@@ -306,6 +306,22 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnRateApp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="32dp"
+                android:text="Đánh giá ứng dụng (5 sao!)"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:textAllCaps="false"
+                android:elevation="5dp"
+                android:paddingHorizontal="10dp"
+                android:textColor="@color/white"
+                android:background="@drawable/btn_blue"
+                android:textSize="16sp"
+                app:iconGravity="textStart"/>
+
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnShowTTSHelper"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -1,6 +1,7 @@
 package com.app.docthongbaochuyenkhoan.ui.dialog
 
 import android.app.Dialog
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
@@ -30,6 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
 
 
 class SettingDialogFragment : DialogFragment() {
@@ -162,11 +164,13 @@ class SettingDialogFragment : DialogFragment() {
         binding.btnRestoreSetting.setOnClickListener { restoreSetting() }
         binding.btnContactInfo.setOnClickListener { openContactInfoDialog() }
         binding.btnShowTTSHelper.setOnClickListener { openDialogTTSHelper() }
+        binding.btnRateApp.setOnClickListener { openPlayStoreForRating() }
         binding.btnClose.setOnClickListener { this.dismiss() }
 
         binding.btnCheckPermission.addClickAnimation()
         binding.btnOpenTTSSetting.addClickAnimation()
         binding.btnRestoreSetting.addClickAnimation()
+        binding.btnRateApp.addClickAnimation()
         binding.btnContactInfo.addClickAnimation()
         binding.btnShowTTSHelper.addClickAnimation()
         binding.btnClose.addClickAnimation()
@@ -279,7 +283,7 @@ class SettingDialogFragment : DialogFragment() {
             bindingDialogContactInfo.tvEmail.text = myEmail
             bindingDialogContactInfo.emailLayout.setOnClickListener {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {
-                    data = Uri.parse("mailto:")
+                    data = "mailto:".toUri()
                     putExtra(Intent.EXTRA_EMAIL, arrayOf(myEmail))
                     putExtra(Intent.EXTRA_SUBJECT, "Liên hệ từ ứng dụng Android của bạn")
                 }
@@ -290,7 +294,7 @@ class SettingDialogFragment : DialogFragment() {
 
             bindingDialogContactInfo.btnZalo.setOnClickListener {
                 try {
-                    val uri = Uri.parse("https://zalo.me/${myZaloPhoneNumber}")
+                    val uri = "https://zalo.me/${myZaloPhoneNumber}".toUri()
                     val intent = Intent(Intent.ACTION_VIEW, uri)
                     startActivity(intent)
                 } catch (e: Exception) {
@@ -299,14 +303,14 @@ class SettingDialogFragment : DialogFragment() {
                         startActivity(
                             Intent(
                                 Intent.ACTION_VIEW,
-                                Uri.parse("market://details?id=com.zing.zalo")
+                                "market://details?id=com.zing.zalo".toUri()
                             )
                         )
                     } catch (err: android.content.ActivityNotFoundException) {
                         startActivity(
                             Intent(
                                 Intent.ACTION_VIEW,
-                                Uri.parse("https://play.google.com/store/apps/details?id=com.zing.zalo")
+                                "https://play.google.com/store/apps/details?id=com.zing.zalo".toUri()
                             )
                         )
                     }
@@ -372,7 +376,7 @@ class SettingDialogFragment : DialogFragment() {
     private fun getNotificationSound() {
         val notificationSound = SharedPreferencesManager.getNotificationSound()
         notificationSoundUri = if (notificationSound.isNotBlank())
-            Uri.parse(notificationSound)
+            notificationSound.toUri()
         else null
     }
 
@@ -384,6 +388,21 @@ class SettingDialogFragment : DialogFragment() {
         newDialogFragment.show(requireFragmentManager(), "SettingDialogFragment")
     }
 
+    private fun openPlayStoreForRating() {
+        val appPackageName = "com.app.docthongbaochuyenkhoan" // Lấy package name của ứng dụng hiện tại
+        try {
+            // Cố gắng mở Play Store trực tiếp
+            startActivity(Intent(Intent.ACTION_VIEW, "market://details?id=$appPackageName".toUri()))
+        } catch (e: ActivityNotFoundException) {
+            // Nếu Play Store không có, mở bằng trình duyệt
+            startActivity(Intent(Intent.ACTION_VIEW,
+                "https://play.google.com/store/apps/details?id=$appPackageName".toUri()))
+        }
+
+        // Thông báo cho người dùng, nếu cần
+        makeToast( "Đánh giá ứng dụng 5 sao bạn nhé!", false)
+    }
+
     private fun makeToast(msg: String, isLongToast: Boolean) {
         Toast.makeText(
             requireContext(),
@@ -393,4 +412,13 @@ class SettingDialogFragment : DialogFragment() {
             .show()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        binding.btnRestoreSetting.setOnClickListener { null }
+        binding.btnContactInfo.setOnClickListener { null }
+        binding.btnShowTTSHelper.setOnClickListener { null }
+        binding.btnRateApp.setOnClickListener { null }
+        binding.btnClose.setOnClickListener { null }
+    }
 }

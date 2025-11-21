@@ -407,6 +407,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         dialogBinding.btnNotShowAgain.setOnCheckedChangeListener { _, isChecked ->
             SharedPreferencesManager.saveNotShowAgainDialogSettingHelper(isChecked)
         }
+        dialogBinding.tvNotShowAgain.setOnClickListener { dialogBinding.btnNotShowAgain.performClick()}
 
         dialogBinding.iBtnClose.setOnClickListener {
             dialog.dismiss()

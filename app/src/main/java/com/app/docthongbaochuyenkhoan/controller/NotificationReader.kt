@@ -15,9 +15,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
+import androidx.core.net.toUri
 
 class NotificationReader(private var context: Context) : TextToSpeech.OnInitListener {
-    private var textToSpeech: TextToSpeech = TextToSpeech(context, this)
+    private var textToSpeech: TextToSpeech = TextToSpeech(
+        context,{},
+        "com.google.android.tts"
+    )
     private var vibrator: Vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
     private var notificationSoundUri: Uri? = null
@@ -27,14 +31,14 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
 
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
-            textToSpeech.language = Locale("vi")
+            textToSpeech.language = Locale("vi", "VN")
             textToSpeech.setOnUtteranceCompletedListener {
                 isReading = false
             }
             isSuccessFullyInit = true
         }
 
-        notificationSoundUri = Uri.parse(SharedPreferencesManager.getNotificationSound())
+        notificationSoundUri = SharedPreferencesManager.getNotificationSound().toUri()
 
         SharedPreferencesManager.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
@@ -42,7 +46,7 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
     private val preferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key == context.getString(R.string.notification_sound))
-                notificationSoundUri = Uri.parse(SharedPreferencesManager.getNotificationSound())
+                notificationSoundUri = SharedPreferencesManager.getNotificationSound().toUri()
         }
 
     fun addNotification(transaction: Transaction) {
