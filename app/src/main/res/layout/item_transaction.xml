@@ -59,14 +59,14 @@
             android:layout_height="30dp"
             android:layout_gravity="top|end"
             android:adjustViewBounds="true"
+            android:background="@drawable/bg_logo_bank"
+            android:maxWidth="100dp"
             android:paddingHorizontal="5dp"
             android:paddingVertical="2dp"
-            android:maxWidth="100dp"
-            android:background="@drawable/bg_logo_bank"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/logo_momo" />
+            app:srcCompat="@drawable/bg_logo_bank" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View

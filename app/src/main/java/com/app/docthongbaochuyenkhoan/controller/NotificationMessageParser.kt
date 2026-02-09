@@ -18,6 +18,7 @@ class NotificationMessageParser {
             val amount: Long? =
                 when (bank) {
                     Bank.MOMO -> extractAmountMomo(content)
+                    Bank.SHINHANBANK -> extractAmountShinhanbank(content)
                     else -> extractAmount(title, content)
                 }
 
@@ -31,46 +32,6 @@ class NotificationMessageParser {
                     amount = amount,
                 )
             else null
-        }
-
-        private fun extractAmountTechComBank(title: String?): Long? {
-            if (title == null)
-                return null
-
-            val amount =
-                title.replace("[^0-9]".toRegex(), "").trim() // Loại bỏ ký tự không phải số
-
-            return if (amount.startsWith("+")) amount.toLong() else -amount.toLong()
-        }
-
-        private fun extractAmountMBBank(content: String?): String? {
-            if (content == null)
-                return null
-
-            val amount = content.substringAfter("GD: ").substringBefore("VND").trim()
-
-            return amount
-        }
-
-        private fun extractAmountVietComBank(content: String?): String? {
-            if (content == null)
-                return null
-
-            val amount: String = if (content.contains("+"))
-                "+" + content.substringAfter("+").substringBefore(" VND").trim()
-            else "-" + content.substringAfter("-").substringBefore(" VND").trim()
-
-            return amount
-        }
-
-        private fun extractAmountVPBank(title: String?): String? {
-            if (title == null)
-                return null
-
-            val amount =
-                title.replace("[^0-9]".toRegex(), "") // Loại bỏ ký tự không phải số và dấu phẩy
-
-            return "${title.first()} $amount"
         }
 
         private fun extractAmountMomo(content: String?): Long? {
@@ -96,6 +57,26 @@ class NotificationMessageParser {
                     return amount.toLong()
                 }
             } else return null
+        }
+
+        private fun extractAmountShinhanbank(content: String?): Long? {
+            if (content.isNullOrBlank()) return null
+
+            val regex = Regex(
+                """thay đổi\s*([+-])\s*VND\s*([\d.,]+)""",
+                RegexOption.IGNORE_CASE
+            )
+
+            val match = regex.find(content) ?: return null
+
+            val sign = match.groupValues[1]   // "+" hoặc "-"
+            val amountStr = match.groupValues[2]
+                .replace(",", "")
+                .replace(".", "")
+
+            val amount = amountStr.toLongOrNull() ?: return null
+
+            return if (sign == "-") -amount else amount
         }
 
         private fun extractAmount(title: String?, content: String?): Long? {
@@ -232,4 +213,44 @@ class NotificationMessageParser {
             }
         }
     }
+
+//    private fun extractAmountTechComBank(title: String?): Long? {
+//        if (title == null)
+//            return null
+//
+//        val amount =
+//            title.replace("[^0-9]".toRegex(), "").trim() // Loại bỏ ký tự không phải số
+//
+//        return if (amount.startsWith("+")) amount.toLong() else -amount.toLong()
+//    }
+//
+//    private fun extractAmountMBBank(content: String?): String? {
+//        if (content == null)
+//            return null
+//
+//        val amount = content.substringAfter("GD: ").substringBefore("VND").trim()
+//
+//        return amount
+//    }
+//
+//    private fun extractAmountVietComBank(content: String?): String? {
+//        if (content == null)
+//            return null
+//
+//        val amount: String = if (content.contains("+"))
+//            "+" + content.substringAfter("+").substringBefore(" VND").trim()
+//        else "-" + content.substringAfter("-").substringBefore(" VND").trim()
+//
+//        return amount
+//    }
+//
+//    private fun extractAmountVPBank(title: String?): String? {
+//        if (title == null)
+//            return null
+//
+//        val amount =
+//            title.replace("[^0-9]".toRegex(), "") // Loại bỏ ký tự không phải số và dấu phẩy
+//
+//        return "${title.first()} $amount"
+//    }
 }

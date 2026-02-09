@@ -112,7 +112,7 @@ object SharedPreferencesManager {
     }
 
     fun getNotShowAgainDialogSettingHelper(): Boolean{
-        return getDataString(appContext.getString(R.string.not_show_again_dialog_tts_helper), "false") == "true"
+        return getDataString(appContext.getString(R.string.not_show_again_dialog_tts_helper), "true") == "true"
     }
 
     fun restoreSetting() {
