@@ -16,6 +16,7 @@ import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
@@ -26,12 +27,12 @@ import com.app.docthongbaochuyenkhoan.databinding.DialogTtsHelperBinding
 import com.app.docthongbaochuyenkhoan.service.MyNotificationListenerService
 import com.app.docthongbaochuyenkhoan.ui.activity.MainActivity
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
+import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.getAppVersionInfo
 import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import androidx.core.net.toUri
 
 
 class SettingDialogFragment : DialogFragment() {
@@ -161,13 +162,17 @@ class SettingDialogFragment : DialogFragment() {
             }
         )
 
+        binding.btnBackupRestore.setOnClickListener { openDialogBackupRestore() }
         binding.btnRestoreSetting.setOnClickListener { restoreSetting() }
         binding.btnContactInfo.setOnClickListener { openContactInfoDialog() }
         binding.btnShowTTSHelper.setOnClickListener { openDialogTTSHelper() }
         binding.btnRateApp.setOnClickListener { openPlayStoreForRating() }
         binding.btnClose.setOnClickListener { this.dismiss() }
+        val (versionName, versionCode) = requireContext().getAppVersionInfo()
+        binding.tvVersion.text = "V$versionName ($versionCode)"
 
         binding.btnCheckPermission.addClickAnimation()
+        binding.btnBackupRestore.addClickAnimation()
         binding.btnOpenTTSSetting.addClickAnimation()
         binding.btnRestoreSetting.addClickAnimation()
         binding.btnRateApp.addClickAnimation()
@@ -179,6 +184,11 @@ class SettingDialogFragment : DialogFragment() {
     private fun openDialogRequestPermissions(autoClose: Boolean) {
         val dialog = RequestPermissionsDialogFragment.newInstance(autoClose)
         dialog.show(requireActivity().supportFragmentManager, "RequestPermissionsDialogFragment")
+    }
+
+    private fun openDialogBackupRestore() {
+        val dialog = BackupRestoreDialogFragment.newInstance()
+        dialog.show(parentFragmentManager, "BackupRestoreDialogFragment")
     }
 
     private fun openTextToSpeechSetting() {

@@ -306,6 +306,23 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnBackupRestore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="32dp"
+                android:text="Sao lưu / Khôi phục dữ liệu"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:textAllCaps="false"
+                android:elevation="5dp"
+                android:visibility="gone"
+                android:paddingHorizontal="10dp"
+                android:textColor="@color/white"
+                android:background="@drawable/btn_blue"
+                android:textSize="16sp"
+                app:iconGravity="textStart"/>
+
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnRateApp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -365,6 +382,20 @@
                 android:textAllCaps="false"
                 android:textColor="@color/text_color_dialog"
                 android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvVersion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|end"
+                android:layout_marginTop="5dp"
+                android:background="@color/transparent"
+                android:elevation="5dp"
+                android:paddingRight="10dp"
+                android:text="Version: "
+                android:textAllCaps="false"
+                android:textColor="@color/text_color_dialog"
+                android:textSize="12sp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

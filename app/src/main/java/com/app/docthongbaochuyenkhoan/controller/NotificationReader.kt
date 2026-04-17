@@ -18,10 +18,7 @@ import java.util.Locale
 import androidx.core.net.toUri
 
 class NotificationReader(private var context: Context) : TextToSpeech.OnInitListener {
-    private var textToSpeech: TextToSpeech = TextToSpeech(
-        context,{},
-        "com.google.android.tts"
-    )
+    private var textToSpeech: TextToSpeech = TextToSpeech(context, this)
     private var vibrator: Vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
     private var notificationSoundUri: Uri? = null
@@ -31,7 +28,7 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
 
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
-            textToSpeech.language = Locale("vi", "VN")
+            textToSpeech.language = Locale("vi")
             textToSpeech.setOnUtteranceCompletedListener {
                 isReading = false
             }

@@ -13,3 +13,13 @@ data class Transaction(
     val amount: Long,
     val timestamp: Long = System.currentTimeMillis(),
 ) : Serializable
+
+fun Transaction.uniqueKey(): String {
+    return "${bank}_${amount}_${timestamp}_${content.hashCode()}"
+}
+
+@kotlinx.serialization.Serializable
+data class TransactionExport(
+    val version: Int,
+    val transactions: List<Transaction>
+)

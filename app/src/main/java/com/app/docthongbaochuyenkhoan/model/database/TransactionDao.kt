@@ -14,6 +14,9 @@ interface TransactionDao {
     @Insert
     fun insert(transaction: Transaction)
 
+    @Insert
+    fun insertAll(transactions: List<Transaction>)
+
     @Update
     fun update(transaction: Transaction)
 

@@ -67,6 +67,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     private var selectedDay = 0L
     private lateinit var ringtonePickerLauncher: ActivityResultLauncher<Intent>
     private lateinit var textToSpeech: TextToSpeech
+    private var needShowGuideStatisticfunction: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +78,10 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
         if (MyCustomApplication.isSamsungDevice() && !SharedPreferencesManager.getNotShowAgainDialogSettingHelper())
             openDialogTTSHelper()
+
+        needShowGuideStatisticfunction = SharedPreferencesManager.getGuideStatisticfunction()
+        if (needShowGuideStatisticfunction)
+            showGuideStatisticfunction()
 
         AppCompatDelegate.setDefaultNightMode(
             if (SharedPreferencesManager.isNightModeEnabled()) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
@@ -140,6 +145,9 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
     override fun onResume() {
         super.onResume()
+
+        if(DateUtils.getStartTimeOfToday() != today)
+            onRestart()
 
         binding.recyclerView.scrollToPosition(0)
         binding.tvRequestNotificationAccessPermission.visibility =
@@ -226,6 +234,12 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         binding.btnStatistic.setOnClickListener {
             val intent = Intent(this, StatisticsActivity::class.java)
             startActivity(intent)
+
+            if(needShowGuideStatisticfunction) {
+                needShowGuideStatisticfunction = false
+                showGuideStatisticfunction()
+                SharedPreferencesManager.setGuideStatisticfunction(false)
+            }
         }
         binding.btnStatistic.addClickAnimation()
     }
@@ -308,6 +322,10 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         makeToast("Tìm và chọn ứng dụng \"Đọc thông báo chuyển khoản\"", true)
         val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
         startActivity(intent)
+    }
+
+    private fun showGuideStatisticfunction(){
+        binding.guideStatisticfunction.visibility = if (needShowGuideStatisticfunction) View.VISIBLE else View.GONE
     }
 
     private fun checkNotificationAccessEnabled(): Boolean {
@@ -486,6 +504,10 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
     override fun onDestroy() {
         super.onDestroy()
+
+        textToSpeech.stop()
+        textToSpeech.shutdown()
+
         binding.tvDate.setOnClickListener(null)
         binding.btnNext.setOnClickListener(null)
         binding.btnPrev.setOnClickListener(null)

@@ -73,6 +73,21 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvRequestNotificationAccessPermission" />
 
+
+    <TextView
+        android:id="@+id/guideStatisticfunction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:padding="10dp"
+        android:textColor="@color/text_color_dialog"
+        android:elevation="10dp"
+        android:visibility="gone"
+        android:text="Chức năng thống kê ⬇"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btnStatistic"/>
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"

@@ -3,6 +3,7 @@ package com.app.docthongbaochuyenkhoan.utils
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
+import android.content.Context
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -61,6 +62,21 @@ class AppUtils {
                 (activity.resources.displayMetrics.widthPixels * 0.95).toInt() // 90% of screen width
             lp.height = ViewGroup.LayoutParams.WRAP_CONTENT
             return lp
+        }
+
+        fun Context.getAppVersionInfo(): Pair<String, Long> {
+            val packageInfo = packageManager.getPackageInfo(packageName, 0)
+
+            val versionName = packageInfo.versionName ?: ""
+
+            val versionCode = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                packageInfo.longVersionCode
+            } else {
+                @Suppress("DEPRECATION")
+                packageInfo.versionCode.toLong()
+            }
+
+            return versionName to versionCode
         }
     }
 }

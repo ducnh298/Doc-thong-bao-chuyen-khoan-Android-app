@@ -72,6 +72,8 @@ dependencies {
 
     implementation("com.google.android.play:app-update-ktx:2.1.0")  // For update notification
 
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3") // JSON
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

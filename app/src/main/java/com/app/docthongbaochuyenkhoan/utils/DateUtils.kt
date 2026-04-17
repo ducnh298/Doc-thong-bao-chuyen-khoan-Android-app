@@ -15,6 +15,7 @@ class DateUtils {
         private val sdfDateTime = SimpleDateFormat(" HH:mm:ss - dd/MM/yyyy")
         private val sdfDate = SimpleDateFormat("dd/MM/yyyy")
         private val sdfMonth = SimpleDateFormat("MM/yyyy")
+        private val sdfRawDate = SimpleDateFormat("ddMMyyyy")
 
         fun formatDateTime(timestamp: Long): String {
             return sdfDateTime.format(java.util.Date(timestamp))
@@ -26,6 +27,10 @@ class DateUtils {
 
         fun formatMonth(timestamp: Long): String {
             return sdfMonth.format(java.util.Date(timestamp))
+        }
+
+        fun formatRawDate(timestamp: Long): String {
+            return sdfRawDate.format(java.util.Date(timestamp))
         }
 
         fun getStartTimeOfToday(): Long {

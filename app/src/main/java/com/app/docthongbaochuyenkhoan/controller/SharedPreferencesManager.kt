@@ -115,6 +115,14 @@ object SharedPreferencesManager {
         return getDataString(appContext.getString(R.string.not_show_again_dialog_tts_helper), "true") == "true"
     }
 
+    fun setGuideStatisticfunction(show: Boolean){
+        saveDataString(appContext.getString(R.string.guide_statistic_function), show.toString())
+    }
+
+    fun getGuideStatisticfunction(): Boolean{
+        return getDataString(appContext.getString(R.string.guide_statistic_function), "true") == "true"
+    }
+
     fun restoreSetting() {
         editor.remove(appContext.getString(R.string.night_mode_enabled))
         editor.remove(appContext.getString(R.string.notification_received_enabled))

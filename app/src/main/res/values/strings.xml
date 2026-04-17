@@ -20,6 +20,7 @@
     <integer name="notification_volume_default">100</integer>
 
     <string name="not_show_again_dialog_tts_helper">not_show_again_dialog_tts_helper</string>
+    <string name="guide_statistic_function">guide_statistic_function</string>
 
     <string name="text_size_title">34sp</string>
     <string name="text_size_sub_title">26sp</string>
