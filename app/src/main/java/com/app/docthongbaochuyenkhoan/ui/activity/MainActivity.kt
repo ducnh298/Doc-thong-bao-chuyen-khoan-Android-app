@@ -17,6 +17,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,10 +29,8 @@ import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
 import com.app.docthongbaochuyenkhoan.databinding.ActivityMainBinding
 import com.app.docthongbaochuyenkhoan.databinding.DialogTtsHelperBinding
-import com.app.docthongbaochuyenkhoan.flow.TransactionFlowManager
 import com.app.docthongbaochuyenkhoan.model.Transaction
 import com.app.docthongbaochuyenkhoan.model.database.AppDatabase
-import com.app.docthongbaochuyenkhoan.model.database.TransactionDao
 import com.app.docthongbaochuyenkhoan.ui.adapter.TransactionAdapter
 import com.app.docthongbaochuyenkhoan.ui.dialog.DatePickerDialogFragment
 import com.app.docthongbaochuyenkhoan.ui.dialog.RequestPermissionsDialogFragment
@@ -37,34 +39,29 @@ import com.app.docthongbaochuyenkhoan.utils.AppUtils
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
 import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
+import com.app.docthongbaochuyenkhoan.viewModel.MainViewModel
+import com.app.docthongbaochuyenkhoan.viewModel.MainViewModelFactory
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogListener,
     DatePickerDialogFragment.DatePickerDialogListener, TransactionAdapter.AdapterListener,
     TextToSpeech.OnInitListener, TaskbarManager.TaskBarListener {
+
     private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
     private val MY_REQUEST_CODE = 290800
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
     private lateinit var binding: ActivityMainBinding
+    private lateinit var viewModel: MainViewModel
     private lateinit var taskbarManager: TaskbarManager
     private lateinit var dialogRequestPermissions: RequestPermissionsDialogFragment
-    private lateinit var transactionDao: TransactionDao
     private lateinit var transactionAdapter: TransactionAdapter
-    private var transactionList = mutableListOf<Transaction>()
-    private var today = 0L
-    private var selectedDay = 0L
     private lateinit var ringtonePickerLauncher: ActivityResultLauncher<Intent>
     private lateinit var textToSpeech: TextToSpeech
     private var needShowGuideStatisticfunction: Boolean = false
@@ -86,79 +83,74 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         )
 
         taskbarManager = TaskbarManager(this)
-
-        transactionDao = AppDatabase.getDatabase(this).transactionDao()
         textToSpeech = TextToSpeech(this, this)
 
-        today = DateUtils.getStartTimeOfToday()
-
-        selectedDay = savedInstanceState?.getLong("selectedDay", today) ?: today
+        val dao = AppDatabase.getDatabase(this).transactionDao()
+        viewModel = ViewModelProvider(this, MainViewModelFactory(dao))[MainViewModel::class.java]
 
         initTVRequestNotificationAccessPermission()
         initRecyclerView()
         initLayoutChooseDate()
         initLayoutTotalTransactions()
+        observeViewModel()
 
         if (!checkNotificationAccessEnabled()) openDialogRequestPermissions(true)
-        else {
-            coroutineScope.launch {
-                TransactionFlowManager.transactionFlow.collectLatest { transaction ->
-                    addNewTransaction(transaction)
-                }
-            }
-        }
 
         ringtonePickerLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    val data = result.data
-                    val selectedRingtoneUri =
-                        data?.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-
-                    Log.d("TAG", "Selected Ringtone URI: $selectedRingtoneUri")
-
-                    // Save the ringtone URI to SharedPreferences
-                    if (selectedRingtoneUri != null) SharedPreferencesManager.saveNotificationSound(
-                        selectedRingtoneUri.toString()
-                    )
+                    val uri = result.data?.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+                    if (uri != null) SharedPreferencesManager.saveNotificationSound(uri.toString())
                 }
             }
     }
 
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.transactions.collect { transactions ->
+                        transactionAdapter.submitList(transactions) {
+                            binding.recyclerView.scrollToPosition(0)
+                        }
+                        animateTransitionRecyclerView()
+                        updateTotalAmountTaskBar(transactions)
+                        binding.tvNotifyNoTransaction.visibility =
+                            if (transactions.isEmpty()) View.VISIBLE else View.GONE
+                        binding.recyclerView.visibility =
+                            if (transactions.isEmpty()) View.GONE else View.VISIBLE
+                    }
+                }
+                launch {
+                    viewModel.selectedDay.collect { day ->
+                        binding.tvDate.text = DateUtils.formatDate(day)
+                        binding.btnNext.isEnabled = viewModel.canGoNext
+                    }
+                }
+                launch {
+                    viewModel.isLoading.collect { loading ->
+                        binding.swipeRefreshLayout.isRefreshing = loading
+                    }
+                }
+            }
+        }
+    }
+
     override fun onRestart() {
         super.onRestart()
-        today = DateUtils.getStartTimeOfToday()
-        selectedDay = today
-
-        getTransactionFromDateAndDisplay()
-        binding.tvDate.text = DateUtils.formatDate(if (selectedDay > 0) selectedDay else today)
-        updateLayoutChooseDateButtonVisibility()
-
-        // (Chỉ cần thiết cho Flexible Update)
+        viewModel.resetToToday()
         checkPendingFlexibleUpdate()
-
-        // Bắt đầu kiểm tra và yêu cầu cập nhật
         checkForAppUpdate()
     }
 
     override fun onResume() {
         super.onResume()
-
-        if(DateUtils.getStartTimeOfToday() != today)
-            onRestart()
-
+        viewModel.onAppForeground()
         binding.recyclerView.scrollToPosition(0)
         binding.tvRequestNotificationAccessPermission.visibility =
             if (checkNotificationAccessEnabled()) View.GONE else View.VISIBLE
-
-        binding.tvAppHelper.visibility = if (SharedPreferencesManager.isNotificationListenerEnabled()) View.GONE else View.VISIBLE
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        // Save selectedDay value into Bundle
-        outState.putLong("selectedDay", selectedDay)
-
-        super.onSaveInstanceState(outState)
+        binding.tvAppHelper.visibility =
+            if (SharedPreferencesManager.isNotificationListenerEnabled()) View.GONE else View.VISIBLE
     }
 
     private fun initTVRequestNotificationAccessPermission() {
@@ -172,68 +164,33 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = transactionAdapter
-        }
-
-        binding.recyclerView.setHasFixedSize(true)
-
-        binding.recyclerView.itemAnimator = object : DefaultItemAnimator() {
-            override fun animateAdd(holder: RecyclerView.ViewHolder?): Boolean {
-                holder?.itemView?.alpha = 0f
-                holder?.itemView?.animate()?.alpha(1f)?.setDuration(300)?.start()
-                return super.animateAdd(holder)
-            }
-        }
-
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            coroutineScope.launch {
-                getTransactionFromDateAndDisplay()
-                withContext(Dispatchers.Main) {
-                    binding.swipeRefreshLayout.isRefreshing =
-                        false // Turn off refresh when completed
+            setHasFixedSize(true)
+            itemAnimator = object : DefaultItemAnimator() {
+                override fun animateAdd(holder: RecyclerView.ViewHolder?): Boolean {
+                    holder?.itemView?.alpha = 0f
+                    holder?.itemView?.animate()?.alpha(1f)?.setDuration(300)?.start()
+                    return super.animateAdd(holder)
                 }
             }
         }
 
-        getTransactionFromDateAndDisplay()
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.loadTransactions()
+        }
     }
 
     private fun initLayoutChooseDate() {
-        binding.tvDate.let {
-            it.text = DateUtils.formatDate(if (selectedDay > 0) selectedDay else today)
-            it.setOnClickListener { openDatePickerDialog() }
-        }
-
-        binding.btnNext.let {
-            it.isEnabled = false
-            it.setOnClickListener {
-                selectedDay += TimeUnit.DAYS.toMillis(1)
-                binding.tvDate.text = DateUtils.formatDate(selectedDay)
-                getTransactionFromDateAndDisplay()
-
-                updateLayoutChooseDateButtonVisibility()
-            }
-        }
-
-        binding.btnPrev.setOnClickListener {
-            selectedDay -= TimeUnit.DAYS.toMillis(1)
-            binding.tvDate.text = DateUtils.formatDate(selectedDay)
-            getTransactionFromDateAndDisplay()
-
-            updateLayoutChooseDateButtonVisibility()
-        }
-
+        binding.tvDate.setOnClickListener { openDatePickerDialog() }
+        binding.btnNext.setOnClickListener { viewModel.nextDay() }
+        binding.btnPrev.setOnClickListener { viewModel.prevDay() }
         binding.btnNext.addClickAnimation()
         binding.btnPrev.addClickAnimation()
-
-        updateLayoutChooseDateButtonVisibility()
     }
 
     private fun initLayoutTotalTransactions() {
         binding.btnStatistic.setOnClickListener {
-            val intent = Intent(this, StatisticsActivity::class.java)
-            startActivity(intent)
-
-            if(needShowGuideStatisticfunction) {
+            startActivity(Intent(this, StatisticsActivity::class.java))
+            if (needShowGuideStatisticfunction) {
                 needShowGuideStatisticfunction = false
                 showGuideStatisticfunction()
                 SharedPreferencesManager.setGuideStatisticfunction(false)
@@ -242,70 +199,19 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         binding.btnStatistic.addClickAnimation()
     }
 
-    private fun updateLayoutChooseDateButtonVisibility() {
-        if (selectedDay == today) binding.btnNext.isEnabled = false
-        else if (selectedDay < today) binding.btnNext.isEnabled = true
-    }
-
-    private fun getTransactionFromDateAndDisplay() {
-        coroutineScope.launch {
-
-            val transactions = transactionDao.getTransactionsForToday(
-                selectedDay,                                      // Start of the day
-                selectedDay + TimeUnit.DAYS.toMillis(1)    // End of the day
-            )
-
-            transactionList = transactions.toMutableList()
-
-            withContext(Dispatchers.Main) {
-                transactionAdapter.submitList(transactions)
-                animateTransitionRecyclerView()
-                updateTotalAmountTaskBar()
-
-                if (transactions.isEmpty()) {
-                    binding.tvNotifyNoTransaction.visibility = View.VISIBLE
-                    binding.recyclerView.visibility = View.GONE
-                } else {
-                    binding.tvNotifyNoTransaction.visibility = View.GONE
-                    binding.recyclerView.visibility = View.VISIBLE
-                }
-            }
-        }
-    }
-
-    private fun addNewTransaction(newTransaction: Transaction) {
-        coroutineScope.launch {
-            if (selectedDay == today) {
-                transactionList.add(0, newTransaction)
-                val newList = ArrayList(transactionList)
-
-                withContext(Dispatchers.Main) {
-                    transactionAdapter.submitList(newList) {
-                        binding.recyclerView.post {
-                            binding.recyclerView.scrollToPosition(0)
-                        }
-                    }
-                    updateTotalAmountTaskBar()
-                }
-            }
-        }
-    }
-
     private fun animateTransitionRecyclerView() {
         val animation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation_slide)
         binding.recyclerView.layoutAnimation = animation
     }
 
-    private fun updateTotalAmountTaskBar() {
+    private fun updateTotalAmountTaskBar(transactions: List<Transaction>) {
         var totalAmountReceived = 0L
         var totalAmountSent = 0L
-
-        for (transaction in transactionList) {
+        for (transaction in transactions) {
             if (transaction.amount > 0) totalAmountReceived += transaction.amount
             else totalAmountSent += transaction.amount
         }
-
-        binding.tvTotalTransactions.text = "Tổng giao dịch trong ngày : " + transactionList.size
+        binding.tvTotalTransactions.text = "Tổng giao dịch trong ngày : " + transactions.size
         binding.tvTotalAmountReceived.text = AppUtils.formatCurrency(totalAmountReceived)
         binding.tvTotalAmountSent.text = AppUtils.formatCurrency(totalAmountSent)
     }
@@ -318,55 +224,41 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
     private fun requestNotificationAccess() {
         makeToast("Tìm và chọn ứng dụng \"Đọc thông báo chuyển khoản\"", true)
-        val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
-        startActivity(intent)
+        startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))
     }
 
-    private fun showGuideStatisticfunction(){
-        binding.guideStatisticfunction.visibility = if (needShowGuideStatisticfunction) View.VISIBLE else View.GONE
+    private fun showGuideStatisticfunction() {
+        binding.guideStatisticfunction.visibility =
+            if (needShowGuideStatisticfunction) View.VISIBLE else View.GONE
     }
 
     private fun checkNotificationAccessEnabled(): Boolean {
-        val enabledListeners = Settings.Secure.getString(
-            contentResolver, "enabled_notification_listeners"
-        )
+        val enabledListeners = Settings.Secure.getString(contentResolver, "enabled_notification_listeners")
         return enabledListeners != null && enabledListeners.contains(packageName)
     }
 
     private fun openDatePickerDialog() {
         val fragment = supportFragmentManager.findFragmentByTag("DatePickerDialogFragment")
-
         if (fragment != null && fragment is DatePickerDialogFragment) {
-            // If fragment has been added
             if (fragment.isVisible) {
-                fragment.dismiss() // Make sure the fragment is deleted before displaying it again
+                fragment.dismiss()
                 fragment.show(supportFragmentManager, "DatePickerDialogFragment")
             }
         } else {
-            // If the fragment does not exist, create a new one and display it
-            val dialog = DatePickerDialogFragment.newInstance(today, selectedDay, this)
-            dialog.show(supportFragmentManager, "DatePickerDialogFragment")
+            DatePickerDialogFragment
+                .newInstance(viewModel.today, viewModel.selectedDay.value, this)
+                .show(supportFragmentManager, "DatePickerDialogFragment")
         }
     }
 
-    override fun onDateChanged(
-        dialog: AlertDialog
-    ): DatePicker.OnDateChangedListener {
+    override fun onDateChanged(dialog: AlertDialog): DatePicker.OnDateChangedListener {
         return DatePicker.OnDateChangedListener { _, year, month, day ->
             if (dialog.isShowing) {
                 val calendar = Calendar.getInstance().apply {
                     set(year, month, day, 0, 0, 0)
                     set(Calendar.MILLISECOND, 0)
                 }
-
-                // Update selectedDay value
-                selectedDay = calendar.timeInMillis
-
-                // Update UI
-                binding.tvDate.text = DateUtils.formatDate(selectedDay)
-                updateLayoutChooseDateButtonVisibility()
-                getTransactionFromDateAndDisplay()
-
+                viewModel.selectDay(calendar.timeInMillis)
                 dialog.dismiss()
             }
         }
@@ -388,17 +280,13 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     override fun onBtnSpeakClicked(transaction: Transaction): View.OnClickListener {
         return View.OnClickListener {
             val notification = StringBuilder(transaction.bank.speakName)
-
             if (transaction.amount > 0) {
-                val notificationContent = SharedPreferencesManager.getNotificationContentReceived()
-                notification.append(" $notificationContent")
+                notification.append(" ${SharedPreferencesManager.getNotificationContentReceived()}")
                 notification.append(" ${AppUtils.formatCurrency(transaction.amount)}")
             } else {
-                val notificationContent = SharedPreferencesManager.getNotificationContentSent()
-                notification.append(" $notificationContent")
+                notification.append(" ${SharedPreferencesManager.getNotificationContentSent()}")
                 notification.append(" ${AppUtils.formatCurrency(-transaction.amount)}")
             }
-
             if (!textToSpeech.isSpeaking) {
                 MediaPlayerUtils.playMedia(this, null)
                 textToSpeech.speak(notification.toString(), TextToSpeech.QUEUE_FLUSH, null, null)
@@ -412,72 +300,46 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         builder.setView(dialogBinding.root)
 
         val dialog = builder.create()
-        dialog.let {
-            dialog.window?.setGravity(Gravity.CENTER)
-            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-            dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
-        }
+        dialog.window?.setGravity(Gravity.CENTER)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
 
         dialogBinding.btnNotShowAgain.isChecked =
             SharedPreferencesManager.getNotShowAgainDialogSettingHelper()
         dialogBinding.btnNotShowAgain.setOnCheckedChangeListener { _, isChecked ->
             SharedPreferencesManager.saveNotShowAgainDialogSettingHelper(isChecked)
         }
-        dialogBinding.tvNotShowAgain.setOnClickListener { dialogBinding.btnNotShowAgain.performClick()}
-
-        dialogBinding.iBtnClose.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialogBinding.btnClose.setOnClickListener {
-            dialog.dismiss()
-        }
-
+        dialogBinding.tvNotShowAgain.setOnClickListener { dialogBinding.btnNotShowAgain.performClick() }
+        dialogBinding.iBtnClose.setOnClickListener { dialog.dismiss() }
+        dialogBinding.btnClose.setOnClickListener { dialog.dismiss() }
         dialogBinding.iBtnClose.addClickAnimation()
         dialogBinding.btnClose.addClickAnimation()
         dialog.show()
     }
 
     private fun checkForAppUpdate() {
-        // Tạo Task để kiểm tra xem có cập nhật khả dụng không
-        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
-
-        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
-            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
-                // Có bản cập nhật khả dụng
-
-                // 1. Kiểm tra luồng Immediate (Bắt buộc)
-                if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-                    // Nếu là bản cập nhật quan trọng, hiển thị ngay lập tức
-                    startAppUpdate(appUpdateInfo, AppUpdateType.IMMEDIATE)
-
-                    // 2. Kiểm tra luồng Flexible (Linh hoạt)
-                } else if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
-                    // Nếu là bản cập nhật không bắt buộc, hiển thị tùy chọn linh hoạt
-                    startAppUpdate(appUpdateInfo, AppUpdateType.FLEXIBLE)
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
+            if (info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
+                when {
+                    info.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) ->
+                        startAppUpdate(info, AppUpdateType.IMMEDIATE)
+                    info.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE) ->
+                        startAppUpdate(info, AppUpdateType.FLEXIBLE)
                 }
             }
         }
     }
 
-    private fun startAppUpdate(appUpdateInfo: com.google.android.play.core.appupdate.AppUpdateInfo, updateType: Int) {
-        appUpdateManager.startUpdateFlowForResult(
-            appUpdateInfo,
-            updateType,
-            this,
-            MY_REQUEST_CODE
-        )
+    private fun startAppUpdate(
+        appUpdateInfo: com.google.android.play.core.appupdate.AppUpdateInfo,
+        updateType: Int
+    ) {
+        appUpdateManager.startUpdateFlowForResult(appUpdateInfo, updateType, this, MY_REQUEST_CODE)
     }
 
     private fun checkPendingFlexibleUpdate() {
-        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
-            // 1. Kiểm tra trạng thái: Cập nhật có sẵn (đã tải xong)
-            // Dùng InstallStatus.DOWNLOADED để biết bản cập nhật Flexible đã hoàn tất tải xuống.
-            if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
-
-                // 2. Tự động cài đặt cập nhật đã tải xong
-                // Hành động này sẽ hiển thị một thông báo toàn màn hình (full-screen) ngắn
-                // để người dùng biết ứng dụng đang khởi động lại để cài đặt.
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
+            if (info.installStatus() == InstallStatus.DOWNLOADED) {
                 appUpdateManager.completeUpdate()
             }
         }
@@ -485,12 +347,8 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == MY_REQUEST_CODE) {
-            if (resultCode != RESULT_OK) {
-                // Cập nhật bị hủy hoặc thất bại
-                Log.e("AppUpdate", "Update flow failed! Result code: $resultCode")
-            }
+        if (requestCode == MY_REQUEST_CODE && resultCode != RESULT_OK) {
+            Log.e("AppUpdate", "Update flow failed! Result code: $resultCode")
         }
     }
 
@@ -502,14 +360,11 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
     override fun onDestroy() {
         super.onDestroy()
-
         textToSpeech.stop()
         textToSpeech.shutdown()
-
         binding.tvDate.setOnClickListener(null)
         binding.btnNext.setOnClickListener(null)
         binding.btnPrev.setOnClickListener(null)
-
         taskbarManager.release()
     }
 
@@ -518,6 +373,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     }
 
     override fun onSwitchNotificationClicked(isChecked: Boolean) {
-        binding.tvAppHelper.visibility = if (SharedPreferencesManager.isNotificationListenerEnabled()) View.GONE else View.VISIBLE
+        binding.tvAppHelper.visibility =
+            if (SharedPreferencesManager.isNotificationListenerEnabled()) View.GONE else View.VISIBLE
     }
 }
