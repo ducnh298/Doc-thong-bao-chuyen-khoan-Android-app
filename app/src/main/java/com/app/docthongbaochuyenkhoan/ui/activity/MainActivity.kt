@@ -74,8 +74,6 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (!SharedPreferencesManager.isInitialized()) SharedPreferencesManager.init(this)
-
         if (MyCustomApplication.isSamsungDevice() && !SharedPreferencesManager.getNotShowAgainDialogSettingHelper())
             openDialogTTSHelper()
 

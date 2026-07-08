@@ -16,10 +16,6 @@ object SharedPreferencesManager {
         editor = sharedPreferences.edit()
     }
 
-    fun isInitialized(): Boolean {
-        return this::sharedPreferences.isInitialized
-    }
-
     private fun getDataString(key: String, defaultValue: String): String {
         return sharedPreferences.getString(key, defaultValue) ?: defaultValue
     }

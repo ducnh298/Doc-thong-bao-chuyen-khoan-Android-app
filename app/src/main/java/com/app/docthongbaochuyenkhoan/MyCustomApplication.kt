@@ -8,6 +8,7 @@ import android.os.Looper
 import android.os.Process
 import android.util.Log
 import android.widget.Toast
+import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
 import com.app.docthongbaochuyenkhoan.ui.activity.MainActivity
 import kotlin.system.exitProcess
 
@@ -15,6 +16,7 @@ class MyCustomApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        SharedPreferencesManager.init(this)
 
         //Set UncaughtExceptionHandler globally
         Thread.setDefaultUncaughtExceptionHandler { thread, exception ->

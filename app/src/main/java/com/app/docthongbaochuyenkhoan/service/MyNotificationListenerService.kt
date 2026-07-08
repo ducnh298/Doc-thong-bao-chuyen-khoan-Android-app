@@ -15,6 +15,7 @@ import com.app.docthongbaochuyenkhoan.model.database.AppDatabase
 import com.app.docthongbaochuyenkhoan.model.database.TransactionDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 class MyNotificationListenerService : NotificationListenerService() {
@@ -27,9 +28,6 @@ class MyNotificationListenerService : NotificationListenerService() {
 
     override fun onCreate() {
         super.onCreate()
-
-        if (!SharedPreferencesManager.isInitialized())
-            SharedPreferencesManager.init(applicationContext)
         isNotificationListenerEnabled = SharedPreferencesManager.isNotificationListenerEnabled()
         isNotificationReceivedEnabled = SharedPreferencesManager.isNotificationReceivedEnabled()
         isNotificationSentEnabled = SharedPreferencesManager.isNotificationSentEnabled()
@@ -37,7 +35,8 @@ class MyNotificationListenerService : NotificationListenerService() {
 
     private var notificationReader: NotificationReader? = null
     private var transactionDao: TransactionDao? = null
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val job = SupervisorJob()
+    private val coroutineScope = CoroutineScope(Dispatchers.IO + job)
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         coroutineScope.launch {
@@ -88,23 +87,12 @@ class MyNotificationListenerService : NotificationListenerService() {
             )
 
         if (transaction != null) {
-            emitTransactionFlow(transaction)
-            saveTransactionToDatabase(transaction)
-
-            if ((transaction.amount > 0 && isNotificationReceivedEnabled) || (transaction.amount < 0 && isNotificationSentEnabled))
-                notificationReader?.addNotification(transaction)
-        }
-    }
-
-    private fun emitTransactionFlow(transaction: Transaction) {
-        coroutineScope.launch {
-            TransactionFlowManager.emitTransaction(transaction)
-        }
-    }
-
-    private fun saveTransactionToDatabase(transaction: Transaction) {
-        coroutineScope.launch {
-            transactionDao?.insert(transaction)
+            coroutineScope.launch {
+                TransactionFlowManager.emitTransaction(transaction)
+                transactionDao?.insert(transaction)
+                if ((transaction.amount > 0 && isNotificationReceivedEnabled) || (transaction.amount < 0 && isNotificationSentEnabled))
+                    notificationReader?.addNotification(transaction)
+            }
         }
     }
 
@@ -136,6 +124,7 @@ class MyNotificationListenerService : NotificationListenerService() {
 
     override fun onDestroy() {
         super.onDestroy()
+        job.cancel()
         notificationReader?.onDestroy()
     }
 }
