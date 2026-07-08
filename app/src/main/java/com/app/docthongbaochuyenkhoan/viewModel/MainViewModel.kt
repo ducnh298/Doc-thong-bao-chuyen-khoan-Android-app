@@ -42,13 +42,16 @@ class MainViewModel(private val dao: TransactionDao) : ViewModel() {
     }
 
     fun loadTransactions() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _isLoading.value = true
-            _transactions.value = dao.getTransactionsForToday(
-                _selectedDay.value,
-                _selectedDay.value + TimeUnit.DAYS.toMillis(1)
-            )
-            _isLoading.value = false
+            try {
+                _transactions.value = dao.getTransactionsForToday(
+                    _selectedDay.value,
+                    _selectedDay.value + TimeUnit.DAYS.toMillis(1)
+                )
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 

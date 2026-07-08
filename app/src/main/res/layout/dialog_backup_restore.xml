@@ -19,13 +19,14 @@
 
     <LinearLayout
         android:id="@+id/mainLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_dialog"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingHorizontal="30dp"
-        android:paddingVertical="20dp"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/iBtnClose">
@@ -33,101 +34,116 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="Sao lưu và Khôi phục dữ liệu"
+            android:layout_marginBottom="20dp"
+            android:text="Sao lưu &amp; Khôi phục"
             android:textColor="@color/text_color_dialog"
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <!-- Nút Sao lưu -->
         <LinearLayout
+            android:id="@+id/exportLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_height="64dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/btn_blue"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_export"
+                app:tint="@color/white" />
 
             <LinearLayout
-                android:id="@+id/exportLayout"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="vertical"
-                android:paddingVertical="8dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp">
-
-                <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_export"
-                    app:tint="@color/text_color" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Sao lưu"
-                    android:textColor="@color/text_color"
-                    android:textIsSelectable="true"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="30dp"
-                android:layout_height="match_parent"
+                android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                />
-
-            <LinearLayout
-                android:id="@+id/importLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="vertical"
-                android:paddingVertical="8dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp">
-
-                <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_import"
-                    app:tint="@color/text_color" />
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Khôi phục"
-                    android:textColor="@color/text_color"
-                    android:textIsSelectable="true"
-                    android:textSize="16sp" />
+                    android:text="Sao lưu"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Xuất dữ liệu ra file"
+                    android:textColor="@color/transparent_white"
+                    android:textSize="12sp" />
             </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Nút Khôi phục -->
+        <LinearLayout
+            android:id="@+id/importLayout"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/btn_blue"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_import"
+                app:tint="@color/white" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Khôi phục"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nhập dữ liệu từ file"
+                    android:textColor="@color/transparent_white"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <TextView
             android:id="@+id/tvResultStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_gravity="center"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            android:text=""
             android:textColor="@color/text_color"
-            android:textSize="16sp"
-            android:text="" />
+            android:textSize="14sp"
+            android:visibility="gone" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnClose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_blue"
-            android:layout_marginTop="20dp"
             android:text="Đóng"
             android:textColor="@color/white" />
 

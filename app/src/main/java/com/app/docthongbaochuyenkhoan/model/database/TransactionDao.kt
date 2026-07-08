@@ -27,7 +27,7 @@ interface TransactionDao {
     fun getAllTransactions(): List<Transaction>
 
     @Query("SELECT * FROM transactions WHERE timestamp >= :startOfDay AND timestamp < :endOfDay ORDER BY timestamp DESC")
-    fun getTransactionsForToday(startOfDay: Long, endOfDay: Long): List<Transaction>
+    suspend fun getTransactionsForToday(startOfDay: Long, endOfDay: Long): List<Transaction>
 
     @Query("""
         SELECT 

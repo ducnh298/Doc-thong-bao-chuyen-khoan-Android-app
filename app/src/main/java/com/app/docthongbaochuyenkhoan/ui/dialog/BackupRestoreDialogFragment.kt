@@ -1,6 +1,5 @@
 package com.app.docthongbaochuyenkhoan.ui.dialog
 
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
@@ -12,105 +11,92 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.databinding.DialogBackupRestoreBinding
 import com.app.docthongbaochuyenkhoan.model.UiEvent
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
 import com.app.docthongbaochuyenkhoan.viewModel.ExportDialogViewModel
-import kotlinx.coroutines.delay
+import com.app.docthongbaochuyenkhoan.viewModel.MainViewModel
+import com.app.docthongbaochuyenkhoan.viewModel.MainViewModelFactory
+import com.app.docthongbaochuyenkhoan.model.database.AppDatabase
 import kotlinx.coroutines.launch
 
-class BackupRestoreDialogFragment() : DialogFragment() {
-    lateinit var bindingBackupRestoreDialog: DialogBackupRestoreBinding
+class BackupRestoreDialogFragment : DialogFragment() {
+
+    private lateinit var binding: DialogBackupRestoreBinding
+    private lateinit var viewModel: ExportDialogViewModel
+    private lateinit var mainViewModel: MainViewModel
 
     companion object {
-        fun newInstance(
-        ): BackupRestoreDialogFragment {
-            val fragment = BackupRestoreDialogFragment()
-            return fragment
-        }
+        fun newInstance() = BackupRestoreDialogFragment()
     }
-
-    lateinit var viewModel: ExportDialogViewModel
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        viewModel = ViewModelProvider(
-            requireActivity()
-        )[ExportDialogViewModel::class.java]
+        viewModel = ViewModelProvider(requireActivity())[ExportDialogViewModel::class.java]
+        val dao = AppDatabase.getDatabase(context).transactionDao()
+        mainViewModel = ViewModelProvider(
+            requireActivity(),
+            MainViewModelFactory(dao)
+        )[MainViewModel::class.java]
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
-        bindingBackupRestoreDialog = DialogBackupRestoreBinding.inflate(layoutInflater)
-        builder.setView(bindingBackupRestoreDialog.root)
+        binding = DialogBackupRestoreBinding.inflate(layoutInflater)
 
-        val dialog = builder.create()
-        dialog.let { dialog ->
-            dialog.window?.setGravity(Gravity.CENTER)
-            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-            dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+        val dialog = AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+            .setView(binding.root)
+            .create()
 
-            bindingBackupRestoreDialog.exportLayout.setOnClickListener {
-                onExportClick()
-            }
+        dialog.window?.setGravity(Gravity.CENTER)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
 
-            bindingBackupRestoreDialog.importLayout.setOnClickListener {
-                onImportClick()
-            }
+        binding.exportLayout.setOnClickListener { onExportClick() }
+        binding.importLayout.setOnClickListener { onImportClick() }
+        binding.exportLayout.addClickAnimation()
+        binding.importLayout.addClickAnimation()
+        binding.iBtnClose.addClickAnimation()
+        binding.iBtnClose.setOnClickListener { dialog.dismiss() }
+        binding.btnClose.addClickAnimation()
+        binding.btnClose.setOnClickListener { dialog.dismiss() }
 
-            bindingBackupRestoreDialog.exportLayout.addClickAnimation()
-            bindingBackupRestoreDialog.importLayout.addClickAnimation()
-            bindingBackupRestoreDialog.iBtnClose.addClickAnimation()
-            bindingBackupRestoreDialog.iBtnClose.setOnClickListener { dialog.dismiss() }
-            bindingBackupRestoreDialog.btnClose.addClickAnimation()
-            bindingBackupRestoreDialog.btnClose.setOnClickListener { dialog.dismiss() }
-        }
         return dialog
     }
 
-    @SuppressLint("SetTextI18n")
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    // onViewCreated không được gọi khi dùng onCreateDialog.
+    // Dùng onStart để đảm bảo observe luôn được thiết lập,
+    // kể cả sau khi file picker trả về (lifecycle restart).
+    override fun onStart() {
+        super.onStart()
+        observeViewModel()
+    }
 
+    private fun observeViewModel() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiEvent.collect { event ->
-                    bindingBackupRestoreDialog.tvResultStatus.visibility = View.VISIBLE
-                    when (event) {
-                        UiEvent.Exporting -> {
-                            delay(200)
-                            showToast("Đang thực hiện…")
-                            bindingBackupRestoreDialog.tvResultStatus.text = "Đang thực hiện…"
-                        }
-
-                        UiEvent.ExportSuccess -> {
-                            delay(200)
-                            showToast("Xuất file thành công")
-                            bindingBackupRestoreDialog.tvResultStatus.text =
-                                "Xuất file thành công"
-                        }
-
-                        is UiEvent.ImportSuccess -> {
-                            delay(200)
-                            showToast("Import thành công ${event.count} giao dịch")
-                            bindingBackupRestoreDialog.tvResultStatus.text =
-                                "Import thành công ${event.count} giao dịch"
-                        }
-
-                        is UiEvent.Error -> {
-                            delay(200)
-                            showToast(
-                                ("Xuất file thất bại" + event.message) ?: "Xuất file thất bại"
-                            )
-                            bindingBackupRestoreDialog.tvResultStatus.text =
-                                ("Xuất file thất bại" + event.message)
-                        }
+            viewModel.uiEvent.collect { event ->
+                if (!isAdded) return@collect
+                binding.tvResultStatus.visibility = View.VISIBLE
+                when (event) {
+                    UiEvent.Exporting -> {
+                        binding.tvResultStatus.text = "Đang thực hiện…"
+                    }
+                    UiEvent.ExportSuccess -> {
+                        binding.tvResultStatus.text = "Xuất file thành công"
+                        showToast("Xuất file thành công")
+                    }
+                    is UiEvent.ImportSuccess -> {
+                        binding.tvResultStatus.text = "Nhập thành công ${event.count} giao dịch"
+                        showToast("Nhập thành công ${event.count} giao dịch")
+                        mainViewModel.loadTransactions()
+                    }
+                    is UiEvent.Error -> {
+                        val msg = event.message ?: "Thao tác thất bại"
+                        binding.tvResultStatus.text = msg
+                        showToast(msg)
                     }
                 }
             }
@@ -118,41 +104,32 @@ class BackupRestoreDialogFragment() : DialogFragment() {
     }
 
     private fun onExportClick() {
-        val fileName =
-            "transactions_${DateUtils.formatRawDate(System.currentTimeMillis())}.json"
-
+        val fileName = "sao_luu_${DateUtils.formatFileDate(System.currentTimeMillis())}.json"
         createFileLauncher.launch(fileName)
     }
 
     private fun onImportClick() {
-        openFileLauncher.launch(arrayOf("application/json"))
+        openFileLauncher.launch(arrayOf("application/json", "*/*"))
     }
 
     private val createFileLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.CreateDocument("application/json")
-        ) { uri: Uri? ->
-            uri?.let {
-                viewModel.exportToZip(requireContext(), it)
-            }
+        registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+            uri?.let { viewModel.exportToZip(requireContext(), it) }
         }
 
     private val openFileLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.OpenDocument()
-        ) { uri: Uri? ->
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             uri?.let {
                 requireContext().contentResolver.takePersistableUriPermission(
                     it,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
-
                 viewModel.importFromZip(requireContext(), it)
             }
         }
 
     private fun showToast(message: String) {
-        if (!isAdded) return   // an toàn cho DialogFragment
+        if (!isAdded) return
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 }
