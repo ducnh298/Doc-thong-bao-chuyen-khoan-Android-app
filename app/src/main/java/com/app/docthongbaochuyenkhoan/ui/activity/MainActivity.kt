@@ -41,7 +41,9 @@ import com.app.docthongbaochuyenkhoan.utils.DateUtils
 import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
 import com.app.docthongbaochuyenkhoan.viewModel.MainViewModel
 import com.app.docthongbaochuyenkhoan.viewModel.MainViewModelFactory
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
@@ -56,6 +58,15 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
     private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
     private val MY_REQUEST_CODE = 290800
+    private val DAYS_FOR_IMMEDIATE_UPDATE = 7
+
+    // Lắng nghe trạng thái tải xuống bản cập nhật Flexible
+    private val installStateListener = InstallStateUpdatedListener { state ->
+        when (state.installStatus()) {
+            InstallStatus.DOWNLOADED -> showUpdateReadySnackbar()
+            else -> {}
+        }
+    }
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
@@ -318,31 +329,49 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     }
 
     private fun checkForAppUpdate() {
+        appUpdateManager.registerListener(installStateListener)
         appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
-            if (info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
-                when {
-                    info.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) ->
-                        startAppUpdate(info, AppUpdateType.IMMEDIATE)
-                    info.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE) ->
-                        startAppUpdate(info, AppUpdateType.FLEXIBLE)
+            when (info.updateAvailability()) {
+                UpdateAvailability.UPDATE_AVAILABLE -> {
+                    // IMMEDIATE chỉ khi app đã lỗi thời >= DAYS_FOR_IMMEDIATE_UPDATE ngày
+                    val staleDays = info.clientVersionStalenessDays() ?: 0
+                    val updateType = when {
+                        staleDays >= DAYS_FOR_IMMEDIATE_UPDATE &&
+                                info.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) ->
+                            AppUpdateType.IMMEDIATE
+                        info.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE) ->
+                            AppUpdateType.FLEXIBLE
+                        else -> return@addOnSuccessListener
+                    }
+                    appUpdateManager.startUpdateFlowForResult(info, updateType, this, MY_REQUEST_CODE)
                 }
+                // Tiếp tục IMMEDIATE đang dở dang (app bị tắt giữa chừng)
+                UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
+                    appUpdateManager.startUpdateFlowForResult(
+                        info, AppUpdateType.IMMEDIATE, this, MY_REQUEST_CODE
+                    )
+                }
+                else -> {}
             }
         }
-    }
-
-    private fun startAppUpdate(
-        appUpdateInfo: com.google.android.play.core.appupdate.AppUpdateInfo,
-        updateType: Int
-    ) {
-        appUpdateManager.startUpdateFlowForResult(appUpdateInfo, updateType, this, MY_REQUEST_CODE)
     }
 
     private fun checkPendingFlexibleUpdate() {
         appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
             if (info.installStatus() == InstallStatus.DOWNLOADED) {
-                appUpdateManager.completeUpdate()
+                showUpdateReadySnackbar()
             }
         }
+    }
+
+    private fun showUpdateReadySnackbar() {
+        Snackbar.make(
+            binding.root,
+            "Phiên bản mới đã tải xong!",
+            Snackbar.LENGTH_INDEFINITE
+        ).setAction("Cài ngay") {
+            appUpdateManager.completeUpdate()
+        }.show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -360,6 +389,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
     override fun onDestroy() {
         super.onDestroy()
+        appUpdateManager.unregisterListener(installStateListener)
         textToSpeech.stop()
         textToSpeech.shutdown()
         binding.tvDate.setOnClickListener(null)
