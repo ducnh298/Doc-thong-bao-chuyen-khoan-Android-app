@@ -39,38 +39,23 @@ class MyNotificationListenerService : NotificationListenerService() {
     private val coroutineScope = CoroutineScope(Dispatchers.IO + job)
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
+        if (!isNotificationListenerEnabled) return
+
+        // Đọc dữ liệu ngay trước khi launch coroutine — sbn có thể bị recycle sau callback
+        val packageName = sbn.packageName ?: return
+        val extras = sbn.notification?.extras ?: return
+        val title = extras.getString(Notification.EXTRA_TITLE) ?: return
+        val content = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString() ?: return
+
+        if (packageName.isBlank() || title.isBlank() || content.isBlank()) return
+
         coroutineScope.launch {
-            sbn.notification?.let {
-                if (isNotificationListenerEnabled) {
-                    val packageName = sbn.packageName
-                    val extras = sbn.notification.extras
-                    val title = extras.getString(Notification.EXTRA_TITLE).toString()
-                    val content = extras.getCharSequence(Notification.EXTRA_TEXT).toString()
+            if (transactionDao == null)
+                transactionDao = AppDatabase.getDatabase(applicationContext).transactionDao()
+            if (notificationReader == null)
+                notificationReader = NotificationReader(applicationContext)
 
-//                    Log.d(
-//                        "NotificationListener",
-//                        "onNotificationPosted: packageName:$packageName\nTitle: $title\nContent: $content"
-//                    )
-
-                    if (packageName.isNullOrBlank() || title.isBlank() || content.isBlank())
-                        return@launch
-
-                    if (transactionDao == null)
-                        transactionDao =
-                            AppDatabase.getDatabase(applicationContext).transactionDao()
-
-                    if (notificationReader == null)
-                        notificationReader = NotificationReader(applicationContext)
-
-                    processNotification(packageName, title, content)
-                }
-            }
-        }
-    }
-
-    private fun isBankNotification(packageName: String): Boolean {
-        return Bank.entries.any { bank ->
-            bank.aliases.any { alias -> packageName.contains(alias, ignoreCase = true) }
+            processNotification(packageName, title, content)
         }
     }
 
@@ -87,8 +72,8 @@ class MyNotificationListenerService : NotificationListenerService() {
             )
 
         if (transaction != null) {
+            TransactionFlowManager.emitTransaction(transaction)
             coroutineScope.launch {
-                TransactionFlowManager.emitTransaction(transaction)
                 transactionDao?.insert(transaction)
                 if ((transaction.amount > 0 && isNotificationReceivedEnabled) || (transaction.amount < 0 && isNotificationSentEnabled))
                     notificationReader?.addNotification(transaction)

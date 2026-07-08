@@ -52,13 +52,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver
-            android:name=".service.DebugReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.app.docthongbaochuyenkhoan.DEBUG_NOTIFICATION" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>
