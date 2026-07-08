@@ -2,7 +2,9 @@ package com.app.docthongbaochuyenkhoan.model
 
 import com.app.docthongbaochuyenkhoan.R
 import java.io.Serializable
+import kotlinx.serialization.Serializable as KtxSerializable
 
+@KtxSerializable
 enum class Bank(val speakName: String, val logo: Int, vararg val aliases: String): Serializable {
     UNKNOWN("", 0, ""),
     TECHCOMBANK(

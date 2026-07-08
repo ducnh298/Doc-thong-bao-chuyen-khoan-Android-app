@@ -3,7 +3,9 @@ package com.app.docthongbaochuyenkhoan.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.io.Serializable
+import kotlinx.serialization.Serializable as KtxSerializable
 
+@KtxSerializable
 @Entity(tableName = "transactions")
 data class Transaction(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -18,7 +20,7 @@ fun Transaction.uniqueKey(): String {
     return "${bank}_${amount}_${timestamp}_${content.hashCode()}"
 }
 
-@kotlinx.serialization.Serializable
+@KtxSerializable
 data class TransactionExport(
     val version: Int,
     val transactions: List<Transaction>
