@@ -37,6 +37,7 @@ import com.app.docthongbaochuyenkhoan.ui.dialog.RequestPermissionsDialogFragment
 import com.app.docthongbaochuyenkhoan.ui.dialog.SettingDialogFragment
 import com.app.docthongbaochuyenkhoan.utils.AppUtils
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
+import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.getAppVersionInfo
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
 import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
 import com.app.docthongbaochuyenkhoan.viewModel.MainViewModel
@@ -81,6 +82,8 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        showWhatsNewIfUpdated()
 
         if (MyCustomApplication.isSamsungDevice() && !SharedPreferencesManager.getNotShowAgainDialogSettingHelper())
             openDialogTTSHelper()
@@ -303,6 +306,32 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
                 textToSpeech.speak(notification.toString(), TextToSpeech.QUEUE_FLUSH, null, null)
             }
         }
+    }
+
+    private fun showWhatsNewIfUpdated() {
+        val (versionName, versionCode) = getAppVersionInfo()
+        val lastSeen = SharedPreferencesManager.getLastSeenVersionCode()
+        if (versionCode <= lastSeen) return
+        SharedPreferencesManager.saveLastSeenVersionCode(versionCode)
+
+        val message = """
+            🎨 Thiết kế giao diện hoàn toàn mới
+            • Bảng màu sáng/tối blue-grey chuyên nghiệp
+            • Cài đặt: nhóm row items có icon thay vì các button rời
+
+            🗑️ Thêm tính năng Xoá toàn bộ dữ liệu giao dịch
+
+            🔧 Sửa lỗi
+            • Crash khi ngân hàng không xác định
+            • ANR (đơ màn hình) khi mở cài đặt
+            • Sao lưu/Khôi phục bị lỗi non-null
+        """.trimIndent()
+
+        AlertDialog.Builder(this, R.style.CustomDialogTheme)
+            .setTitle("Có gì mới trong v$versionName")
+            .setMessage(message)
+            .setPositiveButton("Đã hiểu", null)
+            .show()
     }
 
     private fun openDialogTTSHelper() {
