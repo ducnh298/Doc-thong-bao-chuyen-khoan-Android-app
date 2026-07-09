@@ -37,7 +37,6 @@ import com.app.docthongbaochuyenkhoan.ui.dialog.RequestPermissionsDialogFragment
 import com.app.docthongbaochuyenkhoan.ui.dialog.SettingDialogFragment
 import com.app.docthongbaochuyenkhoan.utils.AppUtils
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
-import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.getAppVersionInfo
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
 import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
 import com.app.docthongbaochuyenkhoan.viewModel.MainViewModel
@@ -82,8 +81,6 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        showWhatsNewIfUpdated()
 
         if (MyCustomApplication.isSamsungDevice() && !SharedPreferencesManager.getNotShowAgainDialogSettingHelper())
             openDialogTTSHelper()
@@ -306,25 +303,6 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
                 textToSpeech.speak(notification.toString(), TextToSpeech.QUEUE_FLUSH, null, null)
             }
         }
-    }
-
-    private fun showWhatsNewIfUpdated() {
-        val (versionName, versionCode) = getAppVersionInfo()
-        val lastSeen = SharedPreferencesManager.getLastSeenVersionCode()
-        if (versionCode <= lastSeen) return
-        SharedPreferencesManager.saveLastSeenVersionCode(versionCode)
-
-        val message = """
-            🎨 Giao diện mới: dark/light mode, cài đặt được tổ chức lại
-            🗑️ Thêm tính năng xoá toàn bộ dữ liệu giao dịch
-            🔧 Sửa lỗi crash, đơ màn hình khi mở cài đặt
-        """.trimIndent()
-
-        AlertDialog.Builder(this, R.style.CustomDialogTheme)
-            .setTitle("Có gì mới trong v$versionName")
-            .setMessage(message)
-            .setPositiveButton("Đã hiểu", null)
-            .show()
     }
 
     private fun openDialogTTSHelper() {

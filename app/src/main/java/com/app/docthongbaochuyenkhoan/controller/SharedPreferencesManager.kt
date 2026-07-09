@@ -119,15 +119,6 @@ object SharedPreferencesManager {
         return getDataString(appContext.getString(R.string.guide_statistic_function), "true") == "true"
     }
 
-    fun getLastSeenVersionCode(): Long {
-        return sharedPreferences.getLong(appContext.getString(R.string.last_seen_version_code), 0L)
-    }
-
-    fun saveLastSeenVersionCode(versionCode: Long) {
-        editor.putLong(appContext.getString(R.string.last_seen_version_code), versionCode)
-        editor.apply()
-    }
-
     fun restoreSetting() {
         editor.remove(appContext.getString(R.string.night_mode_enabled))
         editor.remove(appContext.getString(R.string.notification_received_enabled))
