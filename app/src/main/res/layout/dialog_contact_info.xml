@@ -18,13 +18,14 @@
         app:srcCompat="@drawable/ic_close_light" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="300dp"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
         android:background="@drawable/bg_dialog"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingVertical="20dp"
-        android:paddingHorizontal="30dp"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/iBtnClose">
@@ -32,58 +33,116 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:text="Liên hệ với tôi"
             android:textColor="@color/text_color_dialog"
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <LinearLayout
-            android:id="@+id/email_layout"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_layout_item_setting"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:orientation="vertical"
-            android:paddingVertical="8dp">
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
+            android:text="Nhấn vào để liên hệ trực tiếp"
+            android:textColor="@color/text_color"
+            android:textSize="13sp" />
 
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_email"
-                app:tint="@color/text_color" />
+        <!-- Email + Zalo side by side -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/tvEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="fabi0298lol@gmail.com"
-                android:textColor="@color/text_color"
-                android:textIsSelectable="true"
-                android:textSize="16sp" />
+            <!-- Email card -->
+            <LinearLayout
+                android:id="@+id/email_layout"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_layout_item_setting"
+                android:clickable="true"
+                android:elevation="2dp"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="14dp">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_email"
+                    app:tint="@color/text_color_dialog" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Email"
+                    android:textColor="@color/text_color_dialog"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="ducnhuu0298@gmail.com"
+                    android:textColor="@color/text_color"
+                    android:textIsSelectable="true"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="10dp"
+                android:layout_height="match_parent" />
+
+            <!-- Zalo card -->
+            <LinearLayout
+                android:id="@+id/btnZalo"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_layout_item_setting"
+                android:clickable="true"
+                android:elevation="2dp"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="14dp">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_zalo"
+                    android:scaleType="fitCenter" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Zalo"
+                    android:textColor="@color/text_color_dialog"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
         </LinearLayout>
-
-        <ImageButton
-            android:id="@+id/btnZalo"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/ic_zalo" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnClose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/btn_blue"
+            android:paddingHorizontal="24dp"
             android:text="Đóng"
+            android:textAllCaps="false"
             android:textColor="@color/white" />
 
     </LinearLayout>

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="background">@color/black</color>
-    <color name="background_dialog">@color/dark_grey</color>
-    <color name="background_taskbar">@color/dark_blue</color>
+    <color name="background">@color/dark_background</color>
+    <color name="background_dialog">@color/dark_dialog_background</color>
+    <color name="background_card">@color/dark_dialog_background</color>
+    <color name="background_switch_card">#18FFFFFF</color>
+    <color name="background_taskbar">@color/dark_taskbar</color>
     <color name="background_logo_bank">@color/transparent_white</color>
 
     <color name="text_color">@color/white</color>
@@ -10,10 +12,12 @@
     <color name="text_color_taskbar">@color/white</color>
     <color name="text_color_amount_positive">@color/green</color>
     <color name="text_color_amount_negative">@color/light_red</color>
-    <color name="stroke_color">@color/white</color>
+    <color name="stroke_color">#60FFFFFF</color>
 
     <color name="button_icon_next">@color/light_grey</color>
     <color name="button_statistic">@color/dark_blue</color>
+    <color name="button_primary">@color/blue</color>
+    <color name="button_primary_pressed">@color/dark_blue</color>
 
     <color name="onclick_background">@color/light_grey</color>
 </resources>

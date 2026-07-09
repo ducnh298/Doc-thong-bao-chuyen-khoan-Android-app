@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import android.view.Gravity
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -107,44 +108,25 @@ class RequestPermissionsDialogFragment : DialogFragment() {
     }
 
     private fun checkEnabledSettings() {
-        val notificationAccessEnabled = checkNotificationAccessEnabled()
-        val ignoreBatteryOptimizationEnabled = checkIgnoreBatteryOptimizationEnabled()
+        val notificationGranted = checkNotificationAccessEnabled()
+        val batteryGranted = checkIgnoreBatteryOptimizationEnabled()
 
-        binding.tvNotificationAccessSetting.text =
-            if (notificationAccessEnabled) "Quyền truy cập thông báo (* Bắt buộc) - Đã cho phép"
-            else "Quyền truy cập thông báo (* Bắt buộc)"
-
-        binding.tvNotificationAccessSetting.setTextColor(
-            if (notificationAccessEnabled) requireContext().getColor(R.color.green) else requireContext().getColor(
-                R.color.text_color
-            )
-        )
-
+        binding.tvNotificationAccessSetting.visibility =
+            if (notificationGranted) View.VISIBLE else View.GONE
         DrawableCompat.setTint(
             binding.icNotification.drawable, ContextCompat.getColor(
                 requireContext(),
-                if (notificationAccessEnabled) R.color.green else R.color.text_color
+                if (notificationGranted) R.color.green else R.color.text_color
             )
         )
 
-        binding.tvIgnoreBatteryOptimizationSetting.text =
-            if (ignoreBatteryOptimizationEnabled) "Bỏ giới hạn sử dụng pin của ứng dụng (Không bắt buộc) - Đã cho phép"
-            else "Bỏ giới hạn sử dụng pin của ứng dụng (Không bắt buộc)"
-
-        binding.tvIgnoreBatteryOptimizationSetting.setTextColor(
-            if (ignoreBatteryOptimizationEnabled) requireContext().getColor(R.color.green) else requireContext().getColor(
-                R.color.text_color
-            )
-        )
-
+        binding.tvIgnoreBatteryOptimizationSetting.visibility =
+            if (batteryGranted) View.VISIBLE else View.GONE
         DrawableCompat.setTint(
             binding.icBatteryOptimization.drawable, ContextCompat.getColor(
                 requireContext(),
-                if (ignoreBatteryOptimizationEnabled) R.color.green else R.color.text_color
+                if (batteryGranted) R.color.green else R.color.text_color
             )
         )
-
-//        if (autoClose && notificationAccessEnabled && ignoreBatteryOptimizationEnabled)
-//            dialogRequestPermissions.dismiss()
     }
 }

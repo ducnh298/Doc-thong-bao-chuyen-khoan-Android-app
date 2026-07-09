@@ -13,19 +13,20 @@
         android:elevation="5dp"
         android:padding="10dp"
         android:scaleType="fitCenter"
-        app:layout_constraintEnd_toEndOf="@+id/mainLayout"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_close_light" />
 
     <LinearLayout
         android:id="@+id/mainLayout"
-        android:layout_width="300dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minWidth="280dp"
         android:background="@drawable/bg_dialog"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:paddingHorizontal="20dp"
-        android:paddingTop="20dp"
+        android:paddingTop="16dp"
         android:paddingBottom="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -34,35 +35,35 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="16dp"
             android:text="Sao lưu &amp; Khôi phục"
             android:textColor="@color/text_color_dialog"
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <!-- Nút Sao lưu -->
         <LinearLayout
             android:id="@+id/exportLayout"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_marginBottom="12dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/btn_blue"
             android:clickable="true"
             android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingHorizontal="20dp">
+            android:paddingHorizontal="16dp">
 
             <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:src="@drawable/ic_export"
                 app:tint="@color/white" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="14dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -71,7 +72,7 @@
                     android:layout_height="wrap_content"
                     android:text="Sao lưu"
                     android:textColor="@color/white"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -81,32 +82,31 @@
                     android:textColor="@color/transparent_white"
                     android:textSize="12sp" />
             </LinearLayout>
-
         </LinearLayout>
 
-        <!-- Nút Khôi phục -->
         <LinearLayout
             android:id="@+id/importLayout"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_marginBottom="16dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="14dp"
             android:background="@drawable/btn_blue"
             android:clickable="true"
             android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingHorizontal="20dp">
+            android:paddingHorizontal="16dp">
 
             <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:src="@drawable/ic_import"
                 app:tint="@color/white" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="14dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -115,7 +115,7 @@
                     android:layout_height="wrap_content"
                     android:text="Khôi phục"
                     android:textColor="@color/white"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -125,7 +125,6 @@
                     android:textColor="@color/transparent_white"
                     android:textSize="12sp" />
             </LinearLayout>
-
         </LinearLayout>
 
         <TextView
@@ -133,7 +132,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_layout_item_setting"
             android:gravity="center"
+            android:padding="10dp"
             android:text=""
             android:textColor="@color/text_color"
             android:textSize="14sp"
@@ -144,7 +145,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_blue"
+            android:paddingHorizontal="20dp"
             android:text="Đóng"
+            android:textAllCaps="false"
             android:textColor="@color/white" />
 
     </LinearLayout>

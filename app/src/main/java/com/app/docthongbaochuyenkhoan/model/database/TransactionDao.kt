@@ -26,6 +26,9 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions ORDER BY timestamp DESC")
     fun getAllTransactions(): List<Transaction>
 
+    @Query("DELETE FROM transactions")
+    fun deleteAll()
+
     @Query("SELECT * FROM transactions WHERE timestamp >= :startOfDay AND timestamp < :endOfDay ORDER BY timestamp DESC")
     suspend fun getTransactionsForToday(startOfDay: Long, endOfDay: Long): List<Transaction>
 

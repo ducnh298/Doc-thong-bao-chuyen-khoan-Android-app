@@ -10,165 +10,171 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:background="@color/transparent"
+        android:contentDescription="close"
         android:elevation="5dp"
         android:padding="10dp"
         android:scaleType="fitCenter"
-        android:contentDescription="close"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_close_light" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="40dp"
         android:background="@drawable/bg_dialog"
-        android:padding="2dp"
+        android:orientation="vertical"
+        android:paddingBottom="14dp"
         app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="12dp"
+            android:paddingBottom="4dp"
+            android:text="Chọn khoảng thời gian"
+            android:textColor="@color/text_color_dialog"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <DatePicker
             android:id="@+id/datePicker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:background="@color/background_dialog"
             android:datePickerMode="calendar"
-            android:theme="@style/DatePickerTheme"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:theme="@style/DatePickerTheme" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="12dp"
+            android:background="@color/stroke_color"
+            android:alpha="0.3" />
+
+        <!-- Date range display -->
         <LinearLayout
-            android:id="@+id/llStart"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="-30dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/datePicker">
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|end"
-                android:clickable="false"
-                android:gravity="center_vertical"
-                android:padding="5dp"
-                android:text="Từ ngày:"
-                android:textColor="@color/text_color"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvStart"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Từ ngày"
+                    android:textColor="@color/text_color_dialog"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvStart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_tv_date"
+                    android:gravity="center"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="5dp"
+                    android:text="....."
+                    android:textColor="@color/text_color"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="8dp"
+                android:background="@color/stroke_color"
+                android:alpha="0.3" />
+
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|end"
-                android:layout_marginStart="10dp"
-                android:clickable="false"
-                android:gravity="center_vertical"
-                android:padding="5dp"
-                android:text="....."
-                android:textColor="@color/text_color"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvTitleEnd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đến ngày"
+                    android:textColor="@color/text_color_dialog"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvEnd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_tv_date"
+                    android:gravity="center"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="5dp"
+                    android:text="....."
+                    android:textColor="@color/text_color"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/linearLayout2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/llStart">
-
-            <TextView
-                android:id="@+id/tvTitleEnd"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|end"
-                android:clickable="false"
-                android:gravity="center_vertical"
-                android:padding="5dp"
-                android:text="Đến ngày:"
-                android:textColor="@color/text_color"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvEnd"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|end"
-                android:layout_marginStart="5dp"
-                android:clickable="false"
-                android:gravity="center_vertical"
-                android:padding="5dp"
-                android:text="....."
-                android:textColor="@color/text_color"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
+        <!-- Day / Month toggle -->
         <TextView
             android:id="@+id/tvStatisticDayMonth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:clickable="false"
-            android:gravity="center_vertical"
-            android:padding="5dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="12dp"
             android:text="Thống kê theo"
-            android:textColor="@color/text_color"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+            android:textColor="@color/text_color_dialog"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:id="@+id/llSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_dialog"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_switch_card"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="5dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvStatisticDayMonth">
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="6dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:clickable="false"
-                android:gravity="center_vertical"
-                android:padding="5dp"
                 android:text="Ngày"
                 android:textColor="@color/text_color"
-                android:textSize="18sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switchDayMonth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center" />
+                android:layout_marginHorizontal="8dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:clickable="false"
-                android:gravity="center_vertical"
-                android:padding="5dp"
                 android:text="Tháng"
                 android:textColor="@color/text_color"
-                android:textSize="18sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -176,18 +182,15 @@
             android:id="@+id/btnConfirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="12dp"
             android:background="@drawable/btn_blue"
             android:elevation="5dp"
+            android:paddingHorizontal="24dp"
             android:text="Xác nhận"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/llSwitch" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:textSize="16sp" />
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

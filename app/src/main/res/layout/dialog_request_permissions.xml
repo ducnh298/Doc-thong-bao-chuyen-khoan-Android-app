@@ -27,8 +27,9 @@
             android:layout_marginTop="40dp"
             android:background="@drawable/bg_sub_dialog"
             android:orientation="vertical"
-            android:padding="15dp"
-            app:layout_constraintTop_toTopOf="parent">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
 
             <TextView
                 android:id="@+id/textView3"
@@ -38,131 +39,165 @@
                 android:text="Yêu cầu quyền truy cập"
                 android:textAlignment="center"
                 android:textColor="@color/text_color_dialog"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textView6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:text="Để sử dụng đầy đủ các chức năng, vui lòng cấp quyền sau:"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="8dp"
+                android:text="Nhấn vào từng mục để cấp quyền:"
                 android:textColor="@color/text_color"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
+            <!-- Notification permission -->
             <LinearLayout
+                android:id="@+id/llNotificationAccessSetting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="-5dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="-5dp"
                 android:layout_marginBottom="10dp"
-                android:orientation="vertical">
+                android:background="@drawable/bg_layout_permission"
+                android:foreground="?attr/selectableItemBackground"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <ImageView
+                    android:id="@+id/icNotification"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="12dp"
+                    app:srcCompat="@drawable/ic_permission_read_notifications" />
 
                 <LinearLayout
-                    android:id="@+id/llNotificationAccessSetting"
-                    android:layout_width="match_parent"
-                    android:layout_height="130dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_layout_permission"
-                    android:orientation="horizontal"
-                    android:padding="5dp">
-
-                    <ImageView
-                        android:id="@+id/icNotification"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_margin="10dp"
-                        app:srcCompat="@drawable/ic_permission_read_notifications" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginLeft="7dp"
-                        android:gravity="center_vertical"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/tvNotificationAccessSetting"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Quyền truy cập thông báo (* Bắt buộc)"
-                            android:textColor="@color/text_color"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:paddingLeft="5dp"
-                            android:paddingTop="2dp"
-                            android:paddingRight="2dp"
-                            android:paddingBottom="2dp"
-                            android:text="Truy cập thông báo của thiết bị và ứng dụng để cung cấp dịch vụ"
-                            android:textColor="@color/text_color"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/llIgnoreBatteryOptimizationSetting"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:background="@drawable/bg_layout_permission"
-                    android:orientation="horizontal"
-                    android:padding="5dp">
-
-                    <ImageView
-                        android:id="@+id/icBatteryOptimization"
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_margin="10dp"
-                        app:srcCompat="@drawable/ic_permission_ignore_battery_optimization" />
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:orientation="vertical">
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Quyền truy cập thông báo"
+                            android:textColor="@color/text_color"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvNotificationAccessSetting"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_badge_granted"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="2dp"
+                            android:text="✓ Đã cấp"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Bắt buộc"
+                        android:textColor="@color/red"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Cho phép ứng dụng đọc thông báo"
+                        android:textColor="@color/text_color"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Battery optimization permission -->
+            <LinearLayout
+                android:id="@+id/llIgnoreBatteryOptimizationSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_layout_permission"
+                android:foreground="?attr/selectableItemBackground"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <ImageView
+                    android:id="@+id/icBatteryOptimization"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="12dp"
+                    app:srcCompat="@drawable/ic_permission_ignore_battery_optimization" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Bỏ giới hạn pin"
+                            android:textColor="@color/text_color"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/tvIgnoreBatteryOptimizationSetting"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Bỏ giới hạn sử dụng pin của ứng dụng (Không bắt buộc)"
-                            android:textColor="@color/text_color"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:paddingLeft="5dp"
-                            android:paddingTop="2dp"
-                            android:paddingRight="2dp"
-                            android:text="Cho phép ứng dụng hoạt động ổn định ngay cả khi ở chế độ tiết kiệm pin."
-                            android:textColor="@color/text_color"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:paddingLeft="5dp"
-                            android:paddingRight="2dp"
-                            android:paddingBottom="2dp"
-                            android:text="*Khuyến nghị bật để đảm bảo hoạt động ổn định, đặc biệt trên máy cấu hình thấp."
-                            android:textColor="@color/text_color"
-                            android:textSize="14sp" />
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_badge_granted"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="2dp"
+                            android:text="✓ Đã cấp"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
                     </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Tùy chọn (khuyến nghị)"
+                        android:textColor="@color/dark_grey"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Giúp app chạy ổn định khi ở chế độ tiết kiệm pin"
+                        android:textColor="@color/text_color"
+                        android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -170,11 +205,11 @@
                 android:id="@+id/textView9"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="5dp"
-                android:text="* Nếu không cấp quyền bắt buộc, ứng dụng sẽ không thể hoạt động đầy đủ."
+                android:layout_marginTop="10dp"
+                android:text="* Nếu không cấp quyền bắt buộc, ứng dụng sẽ không thể hoạt động."
                 android:textColor="@color/text_color"
-                android:textSize="16sp" />
+                android:textSize="13sp" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

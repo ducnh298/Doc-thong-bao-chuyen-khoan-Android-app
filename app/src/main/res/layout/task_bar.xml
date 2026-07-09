@@ -3,54 +3,54 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mainLayoutTaskBar"
     android:layout_width="match_parent"
-    android:layout_height="45dp"
-    android:background="@color/background_taskbar">
+    android:layout_height="52dp"
+    android:background="@color/background_taskbar"
+    android:elevation="6dp"
+    android:paddingStart="12dp"
+    android:paddingEnd="8dp">
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginBottom="10dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:text="Đọc thông báo chuyển khoản"
         android:textColor="@color/text_color_taskbar"
-        android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constrainedWidth="true"
+        app:autoSizeMaxTextSize="18sp"
+        app:autoSizeMinTextSize="12sp"
+        app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/switchNotification"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintWidth_percent="0.63" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/switchNotification"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginBottom="7dp"
+        android:layout_marginEnd="20dp"
         android:checked="false"
         android:elevation="10dp"
-        android:scaleX="1.55"
+        android:scaleX="1.7"
         android:scaleY="1.7"
-        android:textSize="16sp"
-        android:textStyle="bold"
         android:thumb="@drawable/ic_thumb_switch_noti_on"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView"
-        app:layout_constraintWidth_percent="0.22"
+        app:layout_constraintEnd_toStartOf="@+id/btnSetting"
+        app:layout_constraintTop_toTopOf="parent"
         app:track="@drawable/bg_track_switch_noti_on" />
 
     <ImageButton
         android:id="@+id/btnSetting"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="end"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_marginEnd="4dp"
         android:background="@color/transparent"
-        android:scaleType="fitEnd"
+        android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintWidth_percent="0.15"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/btn_setting" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

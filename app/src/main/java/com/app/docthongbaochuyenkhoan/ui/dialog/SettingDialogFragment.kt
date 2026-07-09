@@ -24,6 +24,7 @@ import com.app.docthongbaochuyenkhoan.databinding.DialogChangeNotificationConten
 import com.app.docthongbaochuyenkhoan.databinding.DialogContactInfoBinding
 import com.app.docthongbaochuyenkhoan.databinding.DialogSettingBinding
 import com.app.docthongbaochuyenkhoan.databinding.DialogTtsHelperBinding
+import com.app.docthongbaochuyenkhoan.model.database.AppDatabase
 import com.app.docthongbaochuyenkhoan.service.MyNotificationListenerService
 import com.app.docthongbaochuyenkhoan.ui.activity.MainActivity
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
@@ -47,7 +48,7 @@ class SettingDialogFragment : DialogFragment() {
     private lateinit var listener: SettingDialogListener
     private var notificationSoundUri: Uri? = null
     private var dialogChangeNotificationContent: AlertDialog? = null
-    private val myEmail = "fabi0298lol@gmail.com"
+    private val myEmail = "ducnhuu0298@gmail.com"
     private val myZaloPhoneNumber = "0972800125"
 
     companion object {
@@ -166,6 +167,7 @@ class SettingDialogFragment : DialogFragment() {
 
         binding.btnBackupRestore.setOnClickListener { openDialogBackupRestore() }
         binding.btnRestoreSetting.setOnClickListener { restoreSetting() }
+        binding.btnDeleteData.setOnClickListener { confirmDeleteData() }
         binding.btnContactInfo.setOnClickListener { openContactInfoDialog() }
         binding.btnShowTTSHelper.setOnClickListener { openDialogTTSHelper() }
         binding.btnRateApp.setOnClickListener { openPlayStoreForRating() }
@@ -177,6 +179,7 @@ class SettingDialogFragment : DialogFragment() {
         binding.btnBackupRestore.addClickAnimation()
         binding.btnOpenTTSSetting.addClickAnimation()
         binding.btnRestoreSetting.addClickAnimation()
+        binding.btnDeleteData.addClickAnimation()
         binding.btnRateApp.addClickAnimation()
         binding.btnContactInfo.addClickAnimation()
         binding.btnShowTTSHelper.addClickAnimation()
@@ -392,6 +395,20 @@ class SettingDialogFragment : DialogFragment() {
         notificationSoundUri = if (notificationSound.isNotBlank())
             notificationSound.toUri()
         else null
+    }
+
+    private fun confirmDeleteData() {
+        AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+            .setTitle("Xoá toàn bộ dữ liệu")
+            .setMessage("Tất cả giao dịch sẽ bị xoá vĩnh viễn và không thể khôi phục.\n\nBạn có chắc chắn muốn tiếp tục?")
+            .setPositiveButton("Xoá") { _, _ ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    AppDatabase.getDatabase(requireContext()).transactionDao().deleteAll()
+                }
+                makeToast("Đã xoá toàn bộ dữ liệu giao dịch", false)
+            }
+            .setNegativeButton("Huỷ", null)
+            .show()
     }
 
     private fun restoreSetting() {

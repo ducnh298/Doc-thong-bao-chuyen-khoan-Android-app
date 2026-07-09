@@ -17,25 +17,34 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_close_light" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="40dp"
-        android:padding="2dp"
         android:background="@drawable/bg_dialog"
+        android:orientation="vertical"
+        android:paddingBottom="12dp"
         app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="12dp"
+            android:paddingBottom="4dp"
+            android:text="Chọn ngày"
+            android:textColor="@color/text_color_dialog"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <DatePicker
             android:id="@+id/datePicker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:background="@color/background_dialog"
             android:datePickerMode="calendar"
-            android:theme="@style/DatePickerTheme"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            android:theme="@style/DatePickerTheme" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

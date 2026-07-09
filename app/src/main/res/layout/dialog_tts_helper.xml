@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="20dp"
     android:background="@color/transparent">
 
     <ImageButton
@@ -25,20 +24,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="40dp"
             android:background="@drawable/bg_sub_dialog"
             android:orientation="vertical"
-            android:paddingLeft="20dp"
-            android:paddingTop="10dp"
-            android:paddingRight="20dp"
-            app:layout_constraintTop_toBottomOf="@+id/btnClose">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="20dp">
 
             <TextView
                 android:id="@+id/textView5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="30dp"
+                android:layout_marginBottom="12dp"
                 android:text="Sửa lỗi không có tiếng nói"
                 android:textAlignment="center"
                 android:textColor="@color/text_color_dialog"
@@ -48,26 +45,25 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="14dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
                 <androidx.appcompat.widget.AppCompatCheckBox
                     android:id="@+id/btnNotShowAgain"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:buttonTint="@color/text_color_dialog"
                     android:gravity="center" />
 
                 <TextView
                     android:id="@+id/tvNotShowAgain"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="Không hiển thị lại"
                     android:textColor="@color/text_color_dialog"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -75,17 +71,17 @@
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="8dp"
                 android:adjustViewBounds="true"
-                android:background="@color/blue"
+                android:background="@color/button_primary"
                 android:padding="2dp"
                 android:src="@drawable/img_setting_helper_step_1" />
 
             <ImageView
-                android:layout_width="40dp"
+                android:layout_width="32dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="8dp"
                 android:adjustViewBounds="true"
                 android:src="@drawable/ic_arrow_down" />
 
@@ -93,17 +89,17 @@
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="8dp"
                 android:adjustViewBounds="true"
-                android:background="@color/blue"
+                android:background="@color/button_primary"
                 android:padding="2dp"
                 android:src="@drawable/img_setting_helper_step_2" />
 
             <ImageView
-                android:layout_width="40dp"
+                android:layout_width="32dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="8dp"
                 android:adjustViewBounds="true"
                 android:src="@drawable/ic_arrow_down" />
 
@@ -111,17 +107,17 @@
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="8dp"
                 android:adjustViewBounds="true"
-                android:background="@color/blue"
+                android:background="@color/button_primary"
                 android:padding="2dp"
                 android:src="@drawable/img_setting_helper_step_3" />
 
             <ImageView
-                android:layout_width="40dp"
+                android:layout_width="32dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="8dp"
                 android:adjustViewBounds="true"
                 android:src="@drawable/ic_arrow_down" />
 
@@ -129,17 +125,17 @@
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="8dp"
                 android:adjustViewBounds="true"
-                android:background="@color/blue"
+                android:background="@color/button_primary"
                 android:padding="2dp"
                 android:src="@drawable/img_setting_helper_step_4" />
 
             <ImageView
-                android:layout_width="40dp"
+                android:layout_width="32dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="8dp"
                 android:adjustViewBounds="true"
                 android:src="@drawable/ic_arrow_down" />
 
@@ -147,21 +143,22 @@
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="16dp"
                 android:adjustViewBounds="true"
-                android:background="@color/blue"
+                android:background="@color/button_primary"
                 android:padding="2dp"
                 android:src="@drawable/img_setting_helper_step_5" />
-
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnClose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="4dp"
                 android:background="@drawable/btn_blue"
+                android:paddingHorizontal="20dp"
                 android:text="Đóng"
+                android:textAllCaps="false"
                 android:textColor="@color/white" />
 
         </LinearLayout>

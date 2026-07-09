@@ -42,44 +42,138 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/switchNightMode"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="15dp"
-                android:checked="false"
-                android:elevation="5dp"
-                android:thumb="@drawable/ic_thumb_switch_dark_mode"
-                app:track="@drawable/bg_track_switch_dark_mode" />
+                android:background="@drawable/bg_switch_card"
+                android:elevation="2dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingHorizontal="18dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="8dp">
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnCheckPermission"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/btn_blue"
-                android:elevation="5dp"
-                android:paddingHorizontal="10dp"
-                android:text="Kiểm tra quyền"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chế độ sáng / tối"
+                    android:textColor="@color/text_color_dialog"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnOpenTTSSetting"
-                android:layout_width="wrap_content"
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switchNightMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:checked="false"
+                    android:thumb="@drawable/ic_thumb_switch_dark_mode"
+                    app:track="@drawable/bg_track_switch_dark_mode" />
+
+            </LinearLayout>
+
+            <!-- Nhóm: Quyền & Âm thanh -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/btn_blue"
-                android:elevation="5dp"
-                android:paddingHorizontal="10dp"
-                android:text="Cài đặt giọng nói"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
+                android:background="@drawable/bg_layout_item_setting"
+                android:elevation="2dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="12dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="2dp"
+                    android:text="Quyền &amp; Âm thanh"
+                    android:textColor="@color/text_color_dialog"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/btnCheckPermission"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_permission_read_notifications"
+                        app:tint="@color/text_color_dialog" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:text="Kiểm tra quyền"
+                        android:textColor="@color/text_color"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_next_arrow"
+                        app:tint="@color/text_color" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="44dp"
+                    android:alpha="0.3"
+                    android:background="@color/stroke_color" />
+
+                <LinearLayout
+                    android:id="@+id/btnOpenTTSSetting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_speaker"
+                        app:tint="@color/text_color_dialog" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:text="Cài đặt giọng nói"
+                        android:textColor="@color/text_color"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_next_arrow"
+                        app:tint="@color/text_color" />
+                </LinearLayout>
+            </LinearLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -89,6 +183,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="20dp"
                 android:background="@drawable/bg_layout_item_setting"
+                android:elevation="2dp"
                 android:padding="10dp">
 
                 <TextView
@@ -127,9 +222,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
                             android:layout_gravity="center_vertical|end"
-                            android:gravity="center_vertical"
                             android:layout_weight="1"
                             android:clickable="false"
+                            android:gravity="center_vertical"
                             android:padding="5dp"
                             android:text="Nhận tiền"
                             android:textColor="@color/text_color_dialog"
@@ -140,9 +235,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
                             android:layout_gravity="center_vertical|end"
-                            android:gravity="center_vertical"
                             android:layout_weight="1"
                             android:clickable="false"
+                            android:gravity="center_vertical"
                             android:padding="5dp"
                             android:text="Chuyển tiền"
                             android:textColor="@color/text_color_dialog"
@@ -181,8 +276,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="80dp"
                         android:layout_marginStart="5dp"
-                        android:orientation="vertical"
                         android:layout_marginEnd="10dp"
+                        android:orientation="vertical"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintLeft_toRightOf="@+id/llCheckBoxNotificationBox"
                         app:layout_constraintTop_toTopOf="parent">
@@ -192,14 +287,14 @@
                             android:layout_width="100dp"
                             android:layout_height="0dp"
                             android:layout_gravity="center"
-                            android:gravity="center"
                             android:layout_marginVertical="3dp"
                             android:layout_weight="1"
-                            android:singleLine="true"
                             android:background="@drawable/bg_box_layout"
                             android:clickable="false"
                             android:contextClickable="true"
+                            android:gravity="center"
                             android:padding="5dp"
+                            android:singleLine="true"
                             android:text="Đã nhận "
                             android:textColor="@color/text_color"
                             android:textSize="16sp" />
@@ -209,14 +304,14 @@
                             android:layout_width="100dp"
                             android:layout_height="0dp"
                             android:layout_gravity="center"
-                            android:singleLine="true"
-                            android:gravity="center"
                             android:layout_marginVertical="3dp"
                             android:layout_weight="1"
                             android:background="@drawable/bg_box_layout"
                             android:clickable="false"
                             android:contextClickable="true"
+                            android:gravity="center"
                             android:padding="5dp"
+                            android:singleLine="true"
                             android:text="Đã chuyển"
                             android:textColor="@color/text_color"
                             android:textSize="16sp" />
@@ -232,6 +327,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="20dp"
                 android:background="@drawable/bg_layout_item_setting"
+                android:elevation="2dp"
                 android:padding="10dp">
 
                 <TextView
@@ -273,6 +369,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="20dp"
                 android:background="@drawable/bg_layout_item_setting"
+                android:elevation="2dp"
                 android:padding="10dp">
 
                 <TextView
@@ -305,82 +402,307 @@
                     app:layout_constraintTop_toBottomOf="@+id/tvChangeVolume" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnBackupRestore"
-                android:layout_width="wrap_content"
+            <!-- Nhóm: Dữ liệu -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="32dp"
-                android:text="Sao lưu và Khôi phục dữ liệu"
-                android:layout_gravity="center"
+                android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="10dp"
-                android:textAllCaps="false"
-                android:elevation="5dp"
-                android:paddingHorizontal="10dp"
-                android:textColor="@color/white"
-                android:background="@drawable/btn_blue"
-                android:textSize="16sp"
-                app:iconGravity="textStart"/>
+                android:background="@drawable/bg_layout_item_setting"
+                android:elevation="2dp"
+                android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnRateApp"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="12dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="2dp"
+                    android:text="Dữ liệu"
+                    android:textColor="@color/text_color_dialog"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/btnBackupRestore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_export"
+                        app:tint="@color/text_color_dialog" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:text="Sao lưu &amp; Khôi phục"
+                        android:textColor="@color/text_color"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_next_arrow"
+                        app:tint="@color/text_color" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="44dp"
+                    android:alpha="0.3"
+                    android:background="@color/stroke_color" />
+
+                <LinearLayout
+                    android:id="@+id/btnRestoreSetting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_import"
+                        app:tint="@color/text_color_dialog" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Khôi phục cài đặt"
+                            android:textColor="@color/text_color"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Không xoá dữ liệu giao dịch"
+                            android:textColor="@color/text_color"
+                            android:textSize="12sp"
+                            android:alpha="0.6" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_next_arrow"
+                        app:tint="@color/text_color" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="44dp"
+                    android:alpha="0.3"
+                    android:background="@color/stroke_color" />
+
+                <LinearLayout
+                    android:id="@+id/btnDeleteData"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_close_dark"
+                        app:tint="@color/red" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:text="Xoá toàn bộ dữ liệu"
+                        android:textColor="@color/red"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_next_arrow"
+                        app:tint="@color/red" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Nhóm: Hỗ trợ -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="32dp"
-                android:text="Đánh giá ứng dụng (5 sao!)"
-                android:layout_gravity="center"
+                android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="10dp"
-                android:textAllCaps="false"
-                android:elevation="5dp"
-                android:paddingHorizontal="10dp"
-                android:textColor="@color/white"
-                android:background="@drawable/btn_blue"
-                android:textSize="16sp"
-                app:iconGravity="textStart"/>
+                android:background="@drawable/bg_layout_item_setting"
+                android:elevation="2dp"
+                android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnShowTTSHelper"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/btn_blue"
-                android:elevation="5dp"
-                android:paddingHorizontal="10dp"
-                android:text="Sửa lỗi không có tiếng nói/ tiếng việt"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="12dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="2dp"
+                    android:text="Hỗ trợ"
+                    android:textColor="@color/text_color_dialog"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnRestoreSetting"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/btn_blue"
-                android:elevation="5dp"
-                android:paddingHorizontal="10dp"
-                android:text="Khôi phục cài đặt"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
+                <LinearLayout
+                    android:id="@+id/btnShowTTSHelper"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp">
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnContactInfo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp"
-                android:background="@color/transparent"
-                android:elevation="5dp"
-                android:paddingLeft="10dp"
-                android:paddingTop="5dp"
-                android:paddingRight="10dp"
-                android:paddingBottom="5dp"
-                android:text="Báo lỗi"
-                android:textAllCaps="false"
-                android:textColor="@color/text_color_dialog"
-                android:textSize="16sp" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_setting"
+                        app:tint="@color/text_color_dialog" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:text="Sửa lỗi không có tiếng nói"
+                        android:textColor="@color/text_color"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_next_arrow"
+                        app:tint="@color/text_color" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="44dp"
+                    android:alpha="0.3"
+                    android:background="@color/stroke_color" />
+
+                <LinearLayout
+                    android:id="@+id/btnRateApp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_statistic"
+                        app:tint="@color/text_color_dialog" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:text="Đánh giá ứng dụng"
+                        android:textColor="@color/text_color"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_next_arrow"
+                        app:tint="@color/text_color" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="44dp"
+                    android:alpha="0.3"
+                    android:background="@color/stroke_color" />
+
+                <LinearLayout
+                    android:id="@+id/btnContactInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_email"
+                        app:tint="@color/text_color_dialog" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:text="Báo lỗi / Liên hệ"
+                        android:textColor="@color/text_color"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_next_arrow"
+                        app:tint="@color/text_color" />
+                </LinearLayout>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvVersion"
