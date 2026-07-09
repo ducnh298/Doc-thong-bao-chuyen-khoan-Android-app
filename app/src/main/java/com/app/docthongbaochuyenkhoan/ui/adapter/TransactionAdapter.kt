@@ -65,14 +65,13 @@ class TransactionAdapter(private val listener: AdapterListener) :
         holder.bind(getItem(position))
     }
 
-    // DiffUtil to compare transactions
     class TransactionDiffCallback : DiffUtil.ItemCallback<Transaction>() {
         override fun areItemsTheSame(oldItem: Transaction, newItem: Transaction): Boolean {
-            return oldItem.content == newItem.content  // Compare using timestamp
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: Transaction, newItem: Transaction): Boolean {
-            return oldItem == newItem  // Compare all content
+            return oldItem == newItem
         }
     }
 }

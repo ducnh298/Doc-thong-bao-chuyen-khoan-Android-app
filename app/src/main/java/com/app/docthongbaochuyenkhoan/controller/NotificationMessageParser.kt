@@ -7,6 +7,13 @@ import com.app.docthongbaochuyenkhoan.model.Transaction
 class NotificationMessageParser {
 
     companion object {
+        private val MOMO_REGEX = Regex("""Số tiền:\s*([\d.,]+)\s*₫""")
+        private val SHINHAN_REGEX = Regex("""thay đổi\s*([+-])\s*VND\s*([\d.,]+)""", RegexOption.IGNORE_CASE)
+        private val VND_REGEX = Regex("""(VND|₫)""", RegexOption.IGNORE_CASE)
+        private val TITLE_AMOUNT_REGEX = Regex("""([+-]?)\s*(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d+)?)""")
+        private val CONTENT_AMOUNT_REGEX = Regex("""([+-]?)\s*(\d{1,3}(?:[.,]\d{3})*(?:\.\d+)?)""")
+        private val SEPARATORS_REGEX = Regex("""[.,]""")
+
         fun extractTransactionFromRawNotificationMessage(
             packageName: String,
             title: String,
@@ -38,22 +45,17 @@ class NotificationMessageParser {
             if (content == null)
                 return null
 
-            // Tìm cụm "Số tiền:" trong nội dung
-            val amountRegex = """Số tiền:\s*([\d.,]+)\s*₫""".toRegex()
-
-            // Kiểm tra và lấy số tiền
-            val matchResult = amountRegex.find(content)
+            val matchResult = MOMO_REGEX.find(content)
             var amount = matchResult?.groupValues?.get(1)
 
             if (amount != null) {
                 amount = amount.replace(",", "").replace(".", "")
 
-                // Nếu có dấu "+" hoặc "-"
                 if (amount.startsWith("-")) {
-                    amount.replace("-", "").trim()
+                    amount = amount.replace("-", "").trim()
                     return -amount.toLong()
                 } else {
-                    amount.replace("+", "").trim()
+                    amount = amount.replace("+", "").trim()
                     return amount.toLong()
                 }
             } else return null
@@ -62,12 +64,7 @@ class NotificationMessageParser {
         private fun extractAmountShinhanbank(content: String?): Long? {
             if (content.isNullOrBlank()) return null
 
-            val regex = Regex(
-                """thay đổi\s*([+-])\s*VND\s*([\d.,]+)""",
-                RegexOption.IGNORE_CASE
-            )
-
-            val match = regex.find(content) ?: return null
+            val match = SHINHAN_REGEX.find(content) ?: return null
 
             val sign = match.groupValues[1]   // "+" hoặc "-"
             val amountStr = match.groupValues[2]
@@ -115,23 +112,16 @@ class NotificationMessageParser {
             // `\d{1,3}`: 1 đến 3 chữ số đầu tiên.
             // `(?:[.,]\d{3})*`: Các nhóm .XXX hoặc ,XXX lặp lại.
             // `(?:[.,]\d+)?`: Tùy chọn phần thập phân (vd: .50).
-            val amountRegex = Regex("""([+-]?)\s*(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d+)?)""")
+            val allMatches = TITLE_AMOUNT_REGEX.findAll(title).toList()
 
-            val allMatches = amountRegex.findAll(title).toList()
-
-            // Lấy số tiền lớn nhất hoặc số cuối cùng trong tiêu đề có vẻ là số tiền
-            // Thường số tiền sẽ là số lớn nhất hoặc là số cuối cùng xuất hiện trong chuỗi
             val bestMatch = allMatches
                 .maxByOrNull {
-                    it.groupValues[2].replace("[.,]".toRegex(), "").toLongOrNull() ?: 0L
+                    it.groupValues[2].replace(SEPARATORS_REGEX, "").toLongOrNull() ?: 0L
                 }
-                ?: allMatches.lastOrNull() // Nếu không tìm thấy max, lấy match cuối cùng
+                ?: allMatches.lastOrNull()
 
-            val amountStrWithSeparators = bestMatch?.groupValues?.get(2) ?: run {
-                return null
-            }
-            val cleanAmountStr =
-                amountStrWithSeparators.replace("[.,]".toRegex(), "") // Loại bỏ dấu phân cách
+            val amountStrWithSeparators = bestMatch?.groupValues?.get(2) ?: return null
+            val cleanAmountStr = amountStrWithSeparators.replace(SEPARATORS_REGEX, "")
 
             val signFromRegex = bestMatch.groupValues[1] // Dấu lấy được từ regex (+/-)
 
@@ -168,10 +158,7 @@ class NotificationMessageParser {
             }
 
             // Bước 2: Tìm vị trí của đơn vị tiền tệ ("VND", "₫", "đ")
-            val vndRegex =
-                Regex("""(VND|₫)""", RegexOption.IGNORE_CASE) // Regex để tìm VND hoặc ₫/đ
-            val matchResult =
-                vndRegex.find(str) ?: return null // Tìm vị trí đầu tiên của đơn vị tiền tệ
+            val matchResult = VND_REGEX.find(str) ?: return null
 
             val vndIndex = matchResult.range.first // Lấy vị trí bắt đầu của đơn vị tiền tệ
 
@@ -188,10 +175,7 @@ class NotificationMessageParser {
             // - `(?:[.,]\d{3})*`: Theo sau bởi nhóm (dấu phẩy/chấm và 3 chữ số) lặp lại 0 hoặc nhiều lần (ví dụ: 1.000.000).
             // - `(?:\.\d+)?`: Tùy chọn phần thập phân (dấu chấm và ít nhất 1 chữ số).
             // - `(?<!\d)`: Lookbehind âm, đảm bảo không có chữ số ngay trước đó (để không bắt số điện thoại, số seri,... mà không có đơn vị tiền tệ)
-            val amountRegex = Regex("""([+-]?)\s*(\d{1,3}(?:[.,]\d{3})*(?:\.\d+)?)""")
-
-            // Tìm tất cả các khớp trong khu vực đã xác định
-            val allAmountsInArea = amountRegex.findAll(searchArea).toList()
+            val allAmountsInArea = CONTENT_AMOUNT_REGEX.findAll(searchArea).toList()
 
             // Chọn số tiền cuối cùng (gần đơn vị tiền tệ nhất)
             val lastAmountMatch = allAmountsInArea.lastOrNull() ?: return null

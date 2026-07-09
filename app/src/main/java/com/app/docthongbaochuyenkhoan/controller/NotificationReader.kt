@@ -12,6 +12,7 @@ import com.app.docthongbaochuyenkhoan.utils.AppUtils
 import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -20,7 +21,8 @@ import androidx.core.net.toUri
 class NotificationReader(private var context: Context) : TextToSpeech.OnInitListener {
     private var textToSpeech: TextToSpeech = TextToSpeech(context, this)
     private var vibrator: Vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    private val job = Job()
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + job)
     private var notificationSoundUri: Uri? = null
     private val notificationQueue = mutableListOf<String>()
     private var isReading = false
@@ -112,6 +114,7 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
     }
 
     fun onDestroy() {
+        job.cancel()
         textToSpeech.stop()
         textToSpeech.shutdown()
         SharedPreferencesManager.unRegisterOnSharedPreferenceChangeListener(preferenceChangeListener)
