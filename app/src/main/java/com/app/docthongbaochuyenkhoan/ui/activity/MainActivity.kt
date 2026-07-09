@@ -315,9 +315,16 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         SharedPreferencesManager.saveLastSeenVersionCode(versionCode)
 
         val message = """
-            🎨 Giao diện mới: dark/light mode, cài đặt được tổ chức lại
-            🗑️ Thêm tính năng xoá toàn bộ dữ liệu giao dịch
-            🔧 Sửa lỗi crash, đơ màn hình khi mở cài đặt
+            🎨 Thiết kế giao diện hoàn toàn mới
+            • Bảng màu sáng/tối blue-grey chuyên nghiệp
+            • Cài đặt: nhóm row items có icon thay vì các button rời
+
+            🗑️ Thêm tính năng Xoá toàn bộ dữ liệu giao dịch
+
+            🔧 Sửa lỗi
+            • Crash khi ngân hàng không xác định
+            • ANR (đơ màn hình) khi mở cài đặt
+            • Sao lưu/Khôi phục bị lỗi non-null
         """.trimIndent()
 
         AlertDialog.Builder(this, R.style.CustomDialogTheme)
