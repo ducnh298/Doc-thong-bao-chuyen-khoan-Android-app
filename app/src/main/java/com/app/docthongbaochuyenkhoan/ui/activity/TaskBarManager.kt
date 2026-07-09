@@ -1,6 +1,8 @@
 package com.app.docthongbaochuyenkhoan.ui.activity
 
 import android.app.Activity
+import android.content.ComponentName
+import android.service.notification.NotificationListenerService
 import android.view.View
 import android.widget.ImageButton
 import android.widget.Toast
@@ -35,6 +37,14 @@ class TaskbarManager(private val activity: Activity) {
                 MyNotificationListenerService.isNotificationListenerEnabled = isChecked
                 SharedPreferencesManager.saveNotificationListenerEnabled(isChecked)
                 taskBarListener.onSwitchNotificationClicked(isChecked)
+
+                val component = ComponentName(activity, MyNotificationListenerService::class.java)
+                if (isChecked) {
+                    NotificationListenerService.requestRebind(component)
+                } else {
+                    MyNotificationListenerService.instance?.requestUnbind()
+                }
+
                 Toast.makeText(
                     activity,
                     if (isChecked) "Đã bật tính năng đọc thông báo chuyển khoản" else "Đã tắt tính năng đọc thông báo chuyển khoản",

@@ -2,7 +2,6 @@ package com.app.docthongbaochuyenkhoan.service
 
 import android.app.Notification
 import android.content.ComponentName
-import android.content.pm.PackageManager
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import com.app.docthongbaochuyenkhoan.controller.NotificationMessageParser
@@ -21,13 +20,15 @@ import kotlinx.coroutines.launch
 class MyNotificationListenerService : NotificationListenerService() {
 
     companion object {
+        var instance: MyNotificationListenerService? = null
         var isNotificationListenerEnabled: Boolean = true
         var isNotificationReceivedEnabled: Boolean = true
         var isNotificationSentEnabled: Boolean = true
     }
 
-    override fun onCreate() {
-        super.onCreate()
+    override fun onListenerConnected() {
+        super.onListenerConnected()
+        instance = this
         isNotificationListenerEnabled = SharedPreferencesManager.isNotificationListenerEnabled()
         isNotificationReceivedEnabled = SharedPreferencesManager.isNotificationReceivedEnabled()
         isNotificationSentEnabled = SharedPreferencesManager.isNotificationSentEnabled()
@@ -83,32 +84,12 @@ class MyNotificationListenerService : NotificationListenerService() {
 
     override fun onListenerDisconnected() {
         super.onListenerDisconnected()
-        // Listen when Notification Listener is interrupted
-        restartNotificationService()
-    }
-
-    private fun restartNotificationService() {
-        val componentName = ComponentName(this, MyNotificationListenerService::class.java)
-        val pm = packageManager
-
-        // Disable NotificationListenerService
-        pm.setComponentEnabledSetting(
-            componentName,
-            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-            PackageManager.DONT_KILL_APP
-        )
-
-        // Enable NotificationListenerService
-        pm.setComponentEnabledSetting(
-            componentName,
-            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-            PackageManager.DONT_KILL_APP
-        )
-//        Log.d("NotificationListener", "NotificationListenerService restarted")
+        requestRebind(ComponentName(this, MyNotificationListenerService::class.java))
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        instance = null
         job.cancel()
         notificationReader?.onDestroy()
     }
