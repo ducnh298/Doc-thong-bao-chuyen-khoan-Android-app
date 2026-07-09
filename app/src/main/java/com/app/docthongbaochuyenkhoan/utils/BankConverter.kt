@@ -10,7 +10,7 @@ class BankConverter {
     }
 
     @TypeConverter
-    fun toBank(name: String?): Bank? {
-        return Bank.fromName(name) // Convert name to enum
+    fun toBank(name: String?): Bank {
+        return Bank.fromName(name) ?: Bank.UNKNOWN
     }
 }

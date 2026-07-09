@@ -12,7 +12,9 @@ import com.app.docthongbaochuyenkhoan.model.database.TransactionDao
 import com.app.docthongbaochuyenkhoan.model.uniqueKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -21,16 +23,20 @@ import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
 class ExportDialogViewModel : ViewModel() {
-    // replay = 1: đảm bảo event không bị mất khi lifecycle restart (file picker trả về)
-    private val _uiEvent = MutableSharedFlow<UiEvent>(replay = 1)
-    val uiEvent = _uiEvent.asSharedFlow()
+    // Persistent status text — survives dialog close/reopen
+    private val _statusText = MutableStateFlow<String?>(null)
+    val statusText = _statusText.asStateFlow()
+
+    // One-shot side effects (toast, loadTransactions) — no replay
+    private val _sideEffect = MutableSharedFlow<UiEvent>()
+    val sideEffect = _sideEffect.asSharedFlow()
 
     fun exportToZip(context: Context, uri: Uri) {
         val repository: TransactionDao = AppDatabase.getDatabase(context).transactionDao()
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _uiEvent.emit(UiEvent.Exporting)
+                _statusText.value = "Đang thực hiện…"
 
                 val transactions = repository.getAllTransactions()
                 val json = Json { prettyPrint = false }
@@ -47,11 +53,14 @@ class ExportDialogViewModel : ViewModel() {
                     }
                 }
 
-                _uiEvent.emit(UiEvent.ExportSuccess)
+                _statusText.value = "Xuất file thành công"
+                _sideEffect.emit(UiEvent.ExportSuccess)
 
             } catch (e: Exception) {
                 Log.e("ExportDialog", "Export failed", e)
-                _uiEvent.emit(UiEvent.Error("Xuất file thất bại: ${e.message}"))
+                val msg = "Xuất file thất bại: ${e.message}"
+                _statusText.value = msg
+                _sideEffect.emit(UiEvent.Error(msg))
             }
         }
     }
@@ -61,7 +70,7 @@ class ExportDialogViewModel : ViewModel() {
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _uiEvent.emit(UiEvent.Exporting)
+                _statusText.value = "Đang thực hiện…"
 
                 val inputStream = context.contentResolver.openInputStream(uri)
                     ?: throw IllegalStateException("Không thể mở file để đọc")
@@ -79,7 +88,8 @@ class ExportDialogViewModel : ViewModel() {
                     }
                 }
 
-                val exportData = Json.decodeFromString<TransactionExport>(json)
+                val importJson = Json { ignoreUnknownKeys = true; coerceInputValues = true }
+                val exportData = importJson.decodeFromString<TransactionExport>(json)
 
                 val existingKeys = repository.getAllTransactions()
                     .map { it.uniqueKey() }
@@ -91,11 +101,14 @@ class ExportDialogViewModel : ViewModel() {
 
                 repository.insertAll(newTransactions)
 
-                _uiEvent.emit(UiEvent.ImportSuccess(newTransactions.size))
+                _statusText.value = "Nhập thành công ${newTransactions.size} giao dịch"
+                _sideEffect.emit(UiEvent.ImportSuccess(newTransactions.size))
 
             } catch (e: Exception) {
                 Log.e("ExportDialog", "Import failed", e)
-                _uiEvent.emit(UiEvent.Error("Nhập file thất bại: ${e.message}"))
+                val msg = "Nhập file thất bại: ${e.message}"
+                _statusText.value = msg
+                _sideEffect.emit(UiEvent.Error(msg))
             }
         }
     }

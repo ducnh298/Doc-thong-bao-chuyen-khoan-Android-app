@@ -76,28 +76,26 @@ class BackupRestoreDialogFragment : DialogFragment() {
     }
 
     private fun observeViewModel() {
+        // Status text persists across dialog close/reopen (StateFlow)
         lifecycleScope.launch {
-            viewModel.uiEvent.collect { event ->
-                if (!isAdded) return@collect
+            viewModel.statusText.collect { text ->
+                if (!isAdded || text == null) return@collect
                 binding.tvResultStatus.visibility = View.VISIBLE
+                binding.tvResultStatus.text = text
+            }
+        }
+        // One-shot side effects: toast + reload (SharedFlow, no replay)
+        lifecycleScope.launch {
+            viewModel.sideEffect.collect { event ->
+                if (!isAdded) return@collect
                 when (event) {
-                    UiEvent.Exporting -> {
-                        binding.tvResultStatus.text = "Đang thực hiện…"
-                    }
-                    UiEvent.ExportSuccess -> {
-                        binding.tvResultStatus.text = "Xuất file thành công"
-                        showToast("Xuất file thành công")
-                    }
+                    UiEvent.ExportSuccess -> showToast("Xuất file thành công")
                     is UiEvent.ImportSuccess -> {
-                        binding.tvResultStatus.text = "Nhập thành công ${event.count} giao dịch"
                         showToast("Nhập thành công ${event.count} giao dịch")
                         mainViewModel.loadTransactions()
                     }
-                    is UiEvent.Error -> {
-                        val msg = event.message ?: "Thao tác thất bại"
-                        binding.tvResultStatus.text = msg
-                        showToast(msg)
-                    }
+                    is UiEvent.Error -> showToast(event.message ?: "Thao tác thất bại")
+                    else -> {}
                 }
             }
         }

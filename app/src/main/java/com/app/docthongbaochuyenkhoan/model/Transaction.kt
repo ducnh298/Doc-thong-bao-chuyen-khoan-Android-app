@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable as KtxSerializable
 @Entity(tableName = "transactions")
 data class Transaction(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val bank: Bank,
+    val bank: Bank = Bank.UNKNOWN,
     val title: String,
     val content: String,
     val amount: Long,

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.databinding.ItemTransactionBinding
+import com.app.docthongbaochuyenkhoan.model.Bank
 import com.app.docthongbaochuyenkhoan.model.Transaction
 import com.app.docthongbaochuyenkhoan.utils.AppUtils
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
@@ -25,7 +26,12 @@ class TransactionAdapter(private val listener: AdapterListener) :
         fun bind(transaction: Transaction) {
             binding.tvTitle.text = transaction.title ?: "Thông báo chuyển khoản"
             binding.tvContent.text = transaction.content ?: "Thông báo chuyển khoản"
-            binding.imgLogo.setImageResource(transaction.bank.logo)
+            if (transaction.bank == Bank.UNKNOWN || transaction.bank.logo == 0) {
+                binding.imgLogo.visibility = View.GONE
+            } else {
+                binding.imgLogo.visibility = View.VISIBLE
+                binding.imgLogo.setImageResource(transaction.bank.logo)
+            }
 
             binding.tvAmount.text = if (transaction.amount > 0)
                 "+" + AppUtils.formatCurrency(transaction.amount)

@@ -29,10 +29,12 @@ import com.app.docthongbaochuyenkhoan.ui.activity.MainActivity
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.getAppVersionInfo
 import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class SettingDialogFragment : DialogFragment() {
@@ -85,7 +87,7 @@ class SettingDialogFragment : DialogFragment() {
 
     override fun onResume() {
         super.onResume()
-        updateNotificationSoundName()
+        loadNotificationSoundNameAsync()
     }
 
     private fun setupUI(binding: DialogSettingBinding) {
@@ -197,21 +199,23 @@ class SettingDialogFragment : DialogFragment() {
         startActivity(intent)
     }
 
-    private fun updateNotificationSoundName() {
+    private fun loadNotificationSoundNameAsync() {
         getNotificationSound()
-
-        if (notificationSoundUri != null) {
-            val ringtone = RingtoneManager.getRingtone(
-                requireContext(),
-                notificationSoundUri
-            )
-            if (ringtone != null) {
-                val ringtoneTitle = ringtone.getTitle(requireContext())
-                binding.tvNotificationSound.text = ringtoneTitle
+        val uri = notificationSoundUri
+        val defaultName = requireContext().getString(R.string.notification_sound_default_name)
+        if (uri == null) {
+            binding.tvNotificationSound.text = defaultName
+            return
+        }
+        val ctx = requireContext().applicationContext
+        lifecycleScope.launch {
+            val title = withContext(Dispatchers.IO) {
+                runCatching {
+                    RingtoneManager.getRingtone(ctx, uri)?.getTitle(ctx)
+                }.getOrNull() ?: defaultName
             }
-        } else
-            binding.tvNotificationSound.text =
-                requireContext().getString(R.string.notification_sound_default_name)
+            if (isAdded) binding.tvNotificationSound.text = title
+        }
     }
 
     private fun openChangeNotificationContentDialog(
