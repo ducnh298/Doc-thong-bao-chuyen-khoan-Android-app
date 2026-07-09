@@ -56,11 +56,12 @@
         <ImageView
             android:id="@+id/imgLogo"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="top|end"
             android:adjustViewBounds="true"
             android:background="@drawable/bg_logo_bank"
             android:maxWidth="100dp"
+            android:maxHeight="34dp"
             android:paddingHorizontal="5dp"
             android:paddingVertical="2dp"
             app:layout_constraintBottom_toBottomOf="parent"

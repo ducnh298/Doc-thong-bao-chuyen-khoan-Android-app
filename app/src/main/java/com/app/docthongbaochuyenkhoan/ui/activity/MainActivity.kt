@@ -75,8 +75,6 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     private lateinit var transactionAdapter: TransactionAdapter
     private lateinit var ringtonePickerLauncher: ActivityResultLauncher<Intent>
     private lateinit var textToSpeech: TextToSpeech
-    private var needShowGuideStatisticfunction: Boolean = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -84,10 +82,6 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
         if (MyCustomApplication.isSamsungDevice() && !SharedPreferencesManager.getNotShowAgainDialogSettingHelper())
             openDialogTTSHelper()
-
-        needShowGuideStatisticfunction = SharedPreferencesManager.getGuideStatisticfunction()
-        if (needShowGuideStatisticfunction)
-            showGuideStatisticfunction()
 
         AppCompatDelegate.setDefaultNightMode(
             if (SharedPreferencesManager.isNightModeEnabled()) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
@@ -201,11 +195,6 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     private fun initLayoutTotalTransactions() {
         binding.btnStatistic.setOnClickListener {
             startActivity(Intent(this, StatisticsActivity::class.java))
-            if (needShowGuideStatisticfunction) {
-                needShowGuideStatisticfunction = false
-                showGuideStatisticfunction()
-                SharedPreferencesManager.setGuideStatisticfunction(false)
-            }
         }
         binding.btnStatistic.addClickAnimation()
     }
@@ -236,11 +225,6 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     private fun requestNotificationAccess() {
         makeToast("Tìm và chọn ứng dụng \"Đọc thông báo chuyển khoản\"", true)
         startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))
-    }
-
-    private fun showGuideStatisticfunction() {
-        binding.guideStatisticfunction.visibility =
-            if (needShowGuideStatisticfunction) View.VISIBLE else View.GONE
     }
 
     private fun checkNotificationAccessEnabled(): Boolean {

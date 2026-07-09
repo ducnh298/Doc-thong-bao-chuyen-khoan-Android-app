@@ -538,8 +538,8 @@
                     android:paddingVertical="10dp">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
                         android:src="@drawable/ic_close_dark"
                         app:tint="@color/red" />
 

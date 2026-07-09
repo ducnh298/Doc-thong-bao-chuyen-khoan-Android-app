@@ -77,19 +77,6 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvRequestNotificationAccessPermission" />
 
-    <TextView
-        android:id="@+id/guideStatisticfunction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:elevation="10dp"
-        android:padding="10dp"
-        android:text="Chức năng thống kê ⬇"
-        android:textColor="@color/text_color_dialog"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/btnStatistic"
-        app:layout_constraintRight_toRightOf="parent" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
@@ -105,8 +92,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/background"
+            android:clipToPadding="false"
             android:paddingHorizontal="4dp"
             android:paddingTop="4dp"
+            android:paddingBottom="56dp"
             tools:listitem="@layout/item_transaction" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
@@ -138,7 +127,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#40FFFFFF" />
+            android:background="@color/divider_on_primary" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -172,7 +161,7 @@
                 android:layout_height="20dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginHorizontal="8dp"
-                android:background="#60FFFFFF" />
+                android:background="@color/divider_on_primary_strong" />
 
             <TextView
                 android:id="@+id/textView2"
