@@ -1,3 +1,10 @@
+## v1.7.2 (build 24)
+- Cải thiện giao diện và trải nghiệm người dùng
+- Âm lượng đọc giờ sẽ theo âm lượng chuông thay vì âm lượng media
+- Sửa lỗi
+
+---
+
 ## v1.7.1 (build 23)
 - Cải thiện giao diện
 - Sửa một số lỗi và tối ưu hiệu suất
