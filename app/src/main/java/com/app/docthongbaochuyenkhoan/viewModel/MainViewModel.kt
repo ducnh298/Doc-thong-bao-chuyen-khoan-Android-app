@@ -7,12 +7,12 @@ import com.app.docthongbaochuyenkhoan.flow.TransactionFlowManager
 import com.app.docthongbaochuyenkhoan.model.Transaction
 import com.app.docthongbaochuyenkhoan.model.database.TransactionDao
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 class MainViewModel(private val dao: TransactionDao) : ViewModel() {
 
@@ -24,6 +24,7 @@ class MainViewModel(private val dao: TransactionDao) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    private val activeLoadCount = AtomicInteger(0)
 
     val today: Long get() = DateUtils.getStartTimeOfToday()
     val canGoNext: Boolean get() = _selectedDay.value < today
@@ -43,6 +44,7 @@ class MainViewModel(private val dao: TransactionDao) : ViewModel() {
 
     fun loadTransactions() {
         viewModelScope.launch {
+            activeLoadCount.incrementAndGet()
             _isLoading.value = true
             try {
                 _transactions.value = dao.getTransactionsForToday(
@@ -50,7 +52,7 @@ class MainViewModel(private val dao: TransactionDao) : ViewModel() {
                     _selectedDay.value + TimeUnit.DAYS.toMillis(1)
                 )
             } finally {
-                _isLoading.value = false
+                _isLoading.value = activeLoadCount.decrementAndGet() > 0
             }
         }
     }

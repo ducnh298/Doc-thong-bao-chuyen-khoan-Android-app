@@ -11,8 +11,6 @@ import android.util.Log
 import android.widget.Toast
 import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
-import java.io.IOException
-import androidx.core.net.toUri
 
 class MediaPlayerUtils {
     companion object {
@@ -25,38 +23,41 @@ class MediaPlayerUtils {
             onComplete: (() -> Unit)? = null
         ) {
             try {
-                // Safely stop and release the old MediaPlayer
                 safeStopAndRelease(currentMediaPlayer)
                 currentMediaPlayer = null
 
-                // Create new MediaPlayer
                 val audioAttributes = AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .build()
 
-                val defaultUri = "android.resource://${context.packageName}/${R.raw.ting}".toUri()
+                // Try custom sound first, fall back to bundled default if it fails or is null
+                val mediaPlayer: MediaPlayer? = if (soundUri != null) {
+                    val mp = try {
+                        MediaPlayer.create(context, soundUri, null, audioAttributes, AudioManager.AUDIO_SESSION_ID_GENERATE)
+                    } catch (e: Exception) {
+                        Log.e("playMedia", "Custom sound failed: ${e.message}")
+                        null
+                    }
+                    if (mp == null) {
+                        SharedPreferencesManager.removeNotificationSound()
+                        Handler(Looper.getMainLooper()).post {
+                            Toast.makeText(context, "Âm thanh thông báo không hợp lệ, đã đặt lại về mặc định.", Toast.LENGTH_SHORT).show()
+                        }
+                        MediaPlayer.create(context, R.raw.ting)
+                    } else mp
+                } else {
+                    MediaPlayer.create(context, R.raw.ting)
+                }
 
-                val mediaPlayer: MediaPlayer = try {
-                    MediaPlayer.create(context, soundUri ?: defaultUri, null, audioAttributes, AudioManager.AUDIO_SESSION_ID_GENERATE)
-                } catch (e: Exception) {
-                    Log.e("playMedia", "Error: ${e.message}")
-                    Toast.makeText(
-                        context,
-                        "Không thể phát âm thanh thông báo mới, sử dụng âm thanh mặc định.",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    SharedPreferencesManager.removeNotificationSound()
-
-                    MediaPlayer.create(context, defaultUri, null, audioAttributes, AudioManager.AUDIO_SESSION_ID_GENERATE)
+                if (mediaPlayer == null) {
+                    Log.e("playMedia", "MediaPlayer creation failed, skipping sound")
+                    onComplete?.invoke()
+                    return
                 }
 
                 currentMediaPlayer = mediaPlayer
 
-                // Attach listeners
-                mediaPlayer.setOnPreparedListener {
-                    it.start() // Start playing when ready
-                }
                 var completed = false
                 fun fireComplete() {
                     if (!completed) {
@@ -71,7 +72,7 @@ class MediaPlayerUtils {
                     fireComplete()
                 }
                 mediaPlayer.setOnErrorListener { mp, what, extra ->
-                    Log.e("MediaPlayer Error", "Error occurred: what=$what, extra=$extra")
+                    Log.e("MediaPlayer Error", "Error: what=$what, extra=$extra")
                     safeStopAndRelease(mp)
                     currentMediaPlayer = null
                     fireComplete()
@@ -80,22 +81,32 @@ class MediaPlayerUtils {
 
                 mediaPlayer.start()
 
-                // Stop after time limit
-                Handler(Looper.getMainLooper()).postDelayed({
-                    safeStopAndRelease(mediaPlayer)
-                    currentMediaPlayer = null
-                    fireComplete()
-                }, 2000)
+                val duration = try { mediaPlayer.duration } catch (e: Exception) { -1 }
+                // Trigger TTS ~300ms before sound ends so reading starts as bell fades out.
+                // Safety net fires at duration + 200ms in case onCompletion doesn't fire.
+                val earlyTriggerMs = if (duration > 300) (duration - 300L) else 0L
+                val safetyNetMs = if (duration > 0) (duration + 200L) else 1000L
 
-            } catch (e: IOException) {
-                Log.e("playMedia", "Error setting data source: ${e.message}")
-                e.printStackTrace()
-            } catch (e: IllegalStateException) {
-                Log.e("playMedia", "MediaPlayer is in an invalid state: ${e.message}")
-                e.printStackTrace()
+                if (earlyTriggerMs > 0) {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        if (!completed) {
+                            completed = true
+                            onComplete?.invoke()
+                        }
+                    }, earlyTriggerMs)
+                }
+
+                Handler(Looper.getMainLooper()).postDelayed({
+                    if (!completed) {
+                        safeStopAndRelease(mediaPlayer)
+                        currentMediaPlayer = null
+                        fireComplete()
+                    }
+                }, safetyNetMs)
+
             } catch (e: Exception) {
                 Log.e("playMedia", "Unexpected error: ${e.message}")
-                e.printStackTrace()
+                onComplete?.invoke()
             }
         }
 

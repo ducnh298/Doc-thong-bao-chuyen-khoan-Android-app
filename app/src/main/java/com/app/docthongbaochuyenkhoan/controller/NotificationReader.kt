@@ -39,15 +39,20 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
             isSuccessFullyInit = true
         }
 
-        notificationSoundUri = SharedPreferencesManager.getNotificationSound().toUri()
+        notificationSoundUri = savedSoundUri()
 
         SharedPreferencesManager.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
+    }
+
+    private fun savedSoundUri(): Uri? {
+        val path = SharedPreferencesManager.getNotificationSound()
+        return if (path.isBlank()) null else path.toUri()
     }
 
     private val preferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key == context.getString(R.string.notification_sound))
-                notificationSoundUri = SharedPreferencesManager.getNotificationSound().toUri()
+                notificationSoundUri = savedSoundUri()
         }
 
     fun addNotification(transaction: Transaction) {
