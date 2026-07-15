@@ -42,7 +42,7 @@ object SharedPreferencesManager {
     }
 
     fun isNotificationListenerEnabled(): Boolean {
-        return getDataString(appContext.getString(R.string.notification_enabled), "false") == "true"
+        return getDataString(appContext.getString(R.string.notification_enabled), "true") == "true"
     }
 
     fun saveNotificationListenerEnabled(isEnabled: Boolean) {

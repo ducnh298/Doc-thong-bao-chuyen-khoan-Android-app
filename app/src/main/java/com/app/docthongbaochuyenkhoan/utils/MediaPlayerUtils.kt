@@ -1,6 +1,8 @@
 package com.app.docthongbaochuyenkhoan.utils
 
 import android.content.Context
+import android.media.AudioAttributes
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Handler
@@ -10,6 +12,7 @@ import android.widget.Toast
 import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
 import java.io.IOException
+import androidx.core.net.toUri
 
 class MediaPlayerUtils {
     companion object {
@@ -18,7 +21,8 @@ class MediaPlayerUtils {
 
         fun playMedia(
             context: Context,
-            soundUri: Uri?
+            soundUri: Uri?,
+            onComplete: (() -> Unit)? = null
         ) {
             try {
                 // Safely stop and release the old MediaPlayer
@@ -26,12 +30,15 @@ class MediaPlayerUtils {
                 currentMediaPlayer = null
 
                 // Create new MediaPlayer
+                val audioAttributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+
+                val defaultUri = "android.resource://${context.packageName}/${R.raw.ting}".toUri()
+
                 val mediaPlayer: MediaPlayer = try {
-                    if (soundUri != null) {
-                        MediaPlayer.create(context, soundUri)
-                    } else {
-                        MediaPlayer.create(context, R.raw.ting)
-                    }
+                    MediaPlayer.create(context, soundUri ?: defaultUri, null, audioAttributes, AudioManager.AUDIO_SESSION_ID_GENERATE)
                 } catch (e: Exception) {
                     Log.e("playMedia", "Error: ${e.message}")
                     Toast.makeText(
@@ -41,7 +48,7 @@ class MediaPlayerUtils {
                     ).show()
                     SharedPreferencesManager.removeNotificationSound()
 
-                    MediaPlayer.create(context, R.raw.ting)
+                    MediaPlayer.create(context, defaultUri, null, audioAttributes, AudioManager.AUDIO_SESSION_ID_GENERATE)
                 }
 
                 currentMediaPlayer = mediaPlayer
@@ -50,29 +57,35 @@ class MediaPlayerUtils {
                 mediaPlayer.setOnPreparedListener {
                     it.start() // Start playing when ready
                 }
-                // Attach listener and start playing
+                var completed = false
+                fun fireComplete() {
+                    if (!completed) {
+                        completed = true
+                        onComplete?.invoke()
+                    }
+                }
+
                 mediaPlayer.setOnCompletionListener {
                     safeStopAndRelease(it)
                     currentMediaPlayer = null
+                    fireComplete()
                 }
                 mediaPlayer.setOnErrorListener { mp, what, extra ->
-                    Log.e(
-                        "MediaPlayer Error",
-                        "Error occurred: what=$what, extra=$extra"
-                    )
+                    Log.e("MediaPlayer Error", "Error occurred: what=$what, extra=$extra")
                     safeStopAndRelease(mp)
                     currentMediaPlayer = null
-                    true // Indicates we handled the error
+                    fireComplete()
+                    true
                 }
 
                 mediaPlayer.start()
-
 
                 // Stop after time limit
                 Handler(Looper.getMainLooper()).postDelayed({
                     safeStopAndRelease(mediaPlayer)
                     currentMediaPlayer = null
-                }, 2000)  // 2 seconds
+                    fireComplete()
+                }, 2000)
 
             } catch (e: IOException) {
                 Log.e("playMedia", "Error setting data source: ${e.message}")

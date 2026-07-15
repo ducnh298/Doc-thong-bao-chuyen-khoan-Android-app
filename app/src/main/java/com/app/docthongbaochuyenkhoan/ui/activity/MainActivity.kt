@@ -1,6 +1,7 @@
 package com.app.docthongbaochuyenkhoan.ui.activity
 
 import android.content.Intent
+import android.media.AudioManager
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Bundle
@@ -223,7 +224,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     }
 
     private fun requestNotificationAccess() {
-        makeToast("Tìm và chọn ứng dụng \"Đọc thông báo chuyển khoản\"", true)
+        makeToast("Tìm và chọn ứng dụng \"Đọc chuyển khoản miễn phí\"", true)
         startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))
     }
 
@@ -283,8 +284,12 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
                 notification.append(" ${AppUtils.formatCurrency(-transaction.amount)}")
             }
             if (!textToSpeech.isSpeaking) {
-                MediaPlayerUtils.playMedia(this, null)
-                textToSpeech.speak(notification.toString(), TextToSpeech.QUEUE_FLUSH, null, null)
+                val params = Bundle().apply {
+                    putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_NOTIFICATION)
+                }
+                MediaPlayerUtils.playMedia(this, null) {
+                    textToSpeech.speak(notification.toString(), TextToSpeech.QUEUE_FLUSH, params, null)
+                }
             }
         }
     }

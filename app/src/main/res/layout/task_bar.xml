@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="Đọc thông báo chuyển khoản"
+        android:text="Đọc chuyển khoản miễn phí"
         android:textColor="@color/text_color_taskbar"
         android:textStyle="bold"
         app:autoSizeMaxTextSize="18sp"

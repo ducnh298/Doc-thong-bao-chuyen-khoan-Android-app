@@ -2,7 +2,9 @@ package com.app.docthongbaochuyenkhoan.controller
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.media.AudioManager
 import android.net.Uri
+import android.os.Bundle
 import android.os.Vibrator
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -92,15 +94,12 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
 
     private fun readNotification(notification: String?) {
         makeVibration()
-        playNotificationSound()
-        textToSpeech.speak(notification, TextToSpeech.QUEUE_FLUSH, null, null)
-    }
-
-    private fun playNotificationSound() {
-        MediaPlayerUtils.playMedia(
-            context,
-            notificationSoundUri
-        )
+        val params = Bundle().apply {
+            putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_NOTIFICATION)
+        }
+        MediaPlayerUtils.playMedia(context, notificationSoundUri) {
+            textToSpeech.speak(notification, TextToSpeech.QUEUE_FLUSH, params, null)
+        }
     }
 
     private fun makeVibration() {

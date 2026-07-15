@@ -30,6 +30,8 @@ import com.app.docthongbaochuyenkhoan.ui.activity.MainActivity
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.getAppVersionInfo
 import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +49,10 @@ class SettingDialogFragment : DialogFragment() {
     private lateinit var binding: DialogSettingBinding
     private lateinit var listener: SettingDialogListener
     private var notificationSoundUri: Uri? = null
+    private val volumePreviewHandler = Handler(Looper.getMainLooper())
+    private val volumePreviewRunnable = Runnable {
+        MediaPlayerUtils.playMedia(requireContext(), notificationSoundUri)
+    }
     private var dialogChangeNotificationContent: AlertDialog? = null
     private val myEmail = "ducnhuu0298@gmail.com"
     private val myZaloPhoneNumber = "0972800125"
@@ -137,10 +143,15 @@ class SettingDialogFragment : DialogFragment() {
         }
 
         binding.tvNotificationSound.setOnClickListener(listener.onTvNotificationSoundClicked())
+        binding.btnResetNotificationSound.setOnClickListener {
+            SharedPreferencesManager.removeNotificationSound()
+            getNotificationSound()
+            binding.tvNotificationSound.text = "Mặc định"
+        }
 
         val audioManager = requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        binding.seekBarVolume.max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-        binding.seekBarVolume.progress = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        binding.seekBarVolume.max = audioManager.getStreamMaxVolume(AudioManager.STREAM_NOTIFICATION)
+        binding.seekBarVolume.progress = audioManager.getStreamVolume(AudioManager.STREAM_NOTIFICATION)
         binding.seekBarVolume.setOnSeekBarChangeListener(
             object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
@@ -152,14 +163,12 @@ class SettingDialogFragment : DialogFragment() {
                 override fun onStopTrackingTouch(p0: SeekBar?) {
                     if (p0 != null) {
                         audioManager.setStreamVolume(
-                            AudioManager.STREAM_MUSIC,
+                            AudioManager.STREAM_NOTIFICATION,
                             p0.progress,
                             0
                         )
-                        MediaPlayerUtils.playMedia(
-                            requireContext(),
-                            notificationSoundUri
-                        )
+                        volumePreviewHandler.removeCallbacks(volumePreviewRunnable)
+                        volumePreviewHandler.postDelayed(volumePreviewRunnable, 600)
                     }
                 }
             }

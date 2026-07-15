@@ -72,7 +72,7 @@ class RequestPermissionsDialogFragment : DialogFragment() {
     private fun requestNotificationAccess() {
         Toast.makeText(
             requireContext(),
-            "Tìm và cho phép ứng dụng \"Đọc thông báo chuyển khoản\"",
+            "Tìm và cho phép ứng dụng \"Đọc chuyển khoản miễn phí\"",
             Toast.LENGTH_LONG
         ).show()
 
