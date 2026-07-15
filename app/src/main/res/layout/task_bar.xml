@@ -6,7 +6,7 @@
     android:layout_height="52dp"
     android:background="@color/background_taskbar"
     android:elevation="6dp"
-    android:paddingStart="12dp"
+    android:paddingStart="16dp"
     android:paddingEnd="8dp">
 
     <TextView
@@ -15,38 +15,24 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="Đọc chuyển khoản miễn phí"
+        android:text="Đọc thông báo chuyển khoản"
         android:textColor="@color/text_color_taskbar"
         android:textStyle="bold"
-        app:autoSizeMaxTextSize="18sp"
-        app:autoSizeMinTextSize="12sp"
+        app:autoSizeMaxTextSize="20sp"
+        app:autoSizeMinTextSize="16sp"
         app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/switchNotification"
+        app:layout_constraintEnd_toStartOf="@+id/btnSetting"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/switchNotification"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:checked="false"
-        android:elevation="10dp"
-        android:scaleX="1.7"
-        android:scaleY="1.7"
-        android:thumb="@drawable/ic_thumb_switch_noti_on"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnSetting"
-        app:layout_constraintTop_toTopOf="parent"
-        app:track="@drawable/bg_track_switch_noti_on" />
-
     <ImageButton
         android:id="@+id/btnSetting"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginEnd="4dp"
         android:background="@color/transparent"
+        android:padding="4dp"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

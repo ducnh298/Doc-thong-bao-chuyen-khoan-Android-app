@@ -55,7 +55,7 @@ import java.util.Locale
 
 class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogListener,
     DatePickerDialogFragment.DatePickerDialogListener, TransactionAdapter.AdapterListener,
-    TextToSpeech.OnInitListener, TaskbarManager.TaskBarListener {
+    TextToSpeech.OnInitListener {
 
     private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
     private val MY_REQUEST_CODE = 290800
@@ -162,6 +162,9 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
     private fun initTVRequestNotificationAccessPermission() {
         binding.tvRequestNotificationAccessPermission.setOnClickListener {
             requestNotificationAccess()
+        }
+        binding.tvAppHelper.setOnClickListener {
+            taskbarManager.openSettingDialogFromOutside()
         }
     }
 
@@ -382,6 +385,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         textToSpeech.stop()
         textToSpeech.shutdown()
         binding.tvDate.setOnClickListener(null)
+        binding.tvAppHelper.setOnClickListener(null)
         binding.btnNext.setOnClickListener(null)
         binding.btnPrev.setOnClickListener(null)
         taskbarManager.release()
@@ -391,8 +395,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         Toast.makeText(this, msg, if (isLongToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
     }
 
-    override fun onSwitchNotificationClicked(isChecked: Boolean) {
-        binding.tvAppHelper.visibility =
-            if (SharedPreferencesManager.isNotificationListenerEnabled()) View.GONE else View.VISIBLE
+    override fun onAppEnabledChanged(isEnabled: Boolean) {
+        binding.tvAppHelper.visibility = if (isEnabled) View.GONE else View.VISIBLE
     }
 }

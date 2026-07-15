@@ -42,35 +42,78 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
+            <!-- Bật/tắt ứng dụng + Chế độ sáng/tối -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="15dp"
-                android:background="@drawable/bg_switch_card"
-                android:elevation="2dp"
-                android:gravity="center_horizontal"
-                android:orientation="vertical"
-                android:paddingHorizontal="18dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="8dp">
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="14dp"
+                android:baselineAligned="false"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Chế độ sáng / tối"
-                    android:textColor="@color/text_color_dialog"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_switch_card"
+                    android:elevation="2dp"
+                    android:gravity="top|center_horizontal"
+                    android:orientation="vertical"
+                    android:paddingVertical="10dp">
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switchNightMode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:checked="false"
-                    android:thumb="@drawable/ic_thumb_switch_dark_mode"
-                    app:track="@drawable/bg_track_switch_dark_mode" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Bật / Tắt ứng dụng"
+                        android:textColor="@color/text_color_dialog"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchAppEnabled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:checked="false"
+                        android:scaleX="1.7"
+                        android:scaleY="1.8"
+                        android:thumb="@drawable/ic_thumb_switch_noti_on"
+                        app:track="@drawable/bg_track_switch_noti_on" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_switch_card"
+                    android:elevation="2dp"
+                    android:gravity="top|center_horizontal"
+                    android:orientation="vertical"
+                    android:paddingVertical="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chế độ sáng / tối"
+                        android:textColor="@color/text_color_dialog"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchNightMode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:checked="false"
+                        android:scaleX="0.8"
+                        android:scaleY="0.8"
+                        android:thumb="@drawable/ic_thumb_switch_dark_mode"
+                        app:track="@drawable/bg_track_switch_dark_mode" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -85,14 +128,15 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="2dp"
                     android:text="Quyền &amp; Âm thanh"
+                    android:textAlignment="center"
                     android:textColor="@color/text_color_dialog"
-                    android:textSize="11sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -176,6 +220,7 @@
             </LinearLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutNotificationBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -192,10 +237,10 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:padding="5dp"
-                    android:text="Thông báo và nội dung thông báo"
+                    android:text="Cho phép đọc và nội dung đọc"
                     android:textAlignment="center"
                     android:textColor="@color/text_color_dialog"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -226,9 +271,9 @@
                             android:clickable="false"
                             android:gravity="center_vertical"
                             android:padding="5dp"
-                            android:text="Nhận tiền"
+                            android:text="Nhận tiền vào"
                             android:textColor="@color/text_color_dialog"
-                            android:textSize="18sp"
+                            android:textSize="15sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -239,9 +284,9 @@
                             android:clickable="false"
                             android:gravity="center_vertical"
                             android:padding="5dp"
-                            android:text="Chuyển tiền"
+                            android:text="Chuyển tiền đi"
                             android:textColor="@color/text_color_dialog"
-                            android:textSize="18sp"
+                            android:textSize="15sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -297,7 +342,7 @@
                             android:singleLine="true"
                             android:text="Đã nhận "
                             android:textColor="@color/text_color"
-                            android:textSize="16sp" />
+                            android:textSize="14sp" />
 
                         <TextView
                             android:id="@+id/tvNotificationContentSent"
@@ -314,7 +359,7 @@
                             android:singleLine="true"
                             android:text="Đã chuyển"
                             android:textColor="@color/text_color"
-                            android:textSize="16sp" />
+                            android:textSize="14sp" />
                     </LinearLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -338,7 +383,7 @@
                     android:padding="5dp"
                     android:text="Âm thanh thông báo"
                     android:textColor="@color/text_color_dialog"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -399,7 +444,7 @@
                     android:text="Âm lượng thông báo"
                     android:textAllCaps="false"
                     android:textColor="@color/text_color_dialog"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -431,14 +476,15 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="2dp"
                     android:text="Dữ liệu"
+                    android:textAlignment="center"
                     android:textColor="@color/text_color_dialog"
-                    android:textSize="11sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -521,10 +567,10 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:alpha="0.6"
                             android:text="Không xoá dữ liệu giao dịch"
                             android:textColor="@color/text_color"
-                            android:textSize="12sp"
-                            android:alpha="0.6" />
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                     <ImageView
@@ -589,14 +635,15 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="2dp"
                     android:text="Hỗ trợ"
+                    android:textAlignment="center"
                     android:textColor="@color/text_color_dialog"
-                    android:textSize="11sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <LinearLayout

@@ -2,12 +2,16 @@ package com.app.docthongbaochuyenkhoan.ui.dialog
 
 import android.app.Dialog
 import android.content.ActivityNotFoundException
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.service.notification.NotificationListenerService
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -18,6 +22,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
 import com.app.docthongbaochuyenkhoan.databinding.DialogChangeNotificationContentBinding
@@ -30,9 +35,6 @@ import com.app.docthongbaochuyenkhoan.ui.activity.MainActivity
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.getAppVersionInfo
 import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
-import android.os.Handler
-import android.os.Looper
-import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -44,6 +46,7 @@ class SettingDialogFragment : DialogFragment() {
 
     interface SettingDialogListener {
         fun onTvNotificationSoundClicked(): View.OnClickListener
+        fun onAppEnabledChanged(isEnabled: Boolean)
     }
 
     private lateinit var binding: DialogSettingBinding
@@ -54,6 +57,7 @@ class SettingDialogFragment : DialogFragment() {
         MediaPlayerUtils.playMedia(requireContext(), notificationSoundUri)
     }
     private var dialogChangeNotificationContent: AlertDialog? = null
+    private var suppressSwitchEvent = false
     private val myEmail = "ducnhuu0298@gmail.com"
     private val myZaloPhoneNumber = "0972800125"
 
@@ -98,6 +102,24 @@ class SettingDialogFragment : DialogFragment() {
     }
 
     private fun setupUI(binding: DialogSettingBinding) {
+        // Bật / Tắt toàn bộ ứng dụng
+        MyNotificationListenerService.isNotificationListenerEnabled =
+            SharedPreferencesManager.isNotificationListenerEnabled()
+        binding.switchAppEnabled.isChecked =
+            MyNotificationListenerService.isNotificationListenerEnabled
+
+        binding.switchAppEnabled.setOnCheckedChangeListener { _, isChecked ->
+            if (suppressSwitchEvent) return@setOnCheckedChangeListener
+            if (!isChecked) {
+                suppressSwitchEvent = true
+                binding.switchAppEnabled.isChecked = true
+                suppressSwitchEvent = false
+                showTurnOffConfirmationDialog(binding)
+            } else {
+                applyAppEnabledChange(true)
+            }
+        }
+
         binding.switchNightMode.isChecked =
             AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
 
@@ -120,7 +142,10 @@ class SettingDialogFragment : DialogFragment() {
         binding.checkBoxReceivedNotification.setOnCheckedChangeListener { _, isChecked ->
             SharedPreferencesManager.saveNotificationReceivedEnabled(isChecked)
             MyNotificationListenerService.isNotificationReceivedEnabled = isChecked
-            makeToast("Đã ${if (isChecked) "bật" else "tắt"} thông báo khi nhận tiền.", false)
+            makeToast(
+                "Đã ${if (isChecked) "bật" else "tắt"} đọc khi nhận tiền vào.",
+                false
+            )
         }
 
         val notificationSentEnabled = SharedPreferencesManager.isNotificationSentEnabled()
@@ -128,7 +153,10 @@ class SettingDialogFragment : DialogFragment() {
         binding.checkBoxSentNotification.setOnCheckedChangeListener { _, isChecked ->
             SharedPreferencesManager.saveNotificationSentEnabled(isChecked)
             MyNotificationListenerService.isNotificationSentEnabled = isChecked
-            makeToast("Đã ${if (isChecked) "bật" else "tắt"} thông báo khi chuyển tiền.", false)
+            makeToast(
+                "Đã ${if (isChecked) "bật" else "tắt"} đọc khi chuyển tiền đi.",
+                false
+            )
         }
         val notificationContentReceived = SharedPreferencesManager.getNotificationContentReceived()
         binding.tvNotificationContentReceived.text = notificationContentReceived
@@ -193,6 +221,49 @@ class SettingDialogFragment : DialogFragment() {
         binding.btnContactInfo.addClickAnimation()
         binding.btnShowTTSHelper.addClickAnimation()
         binding.btnClose.addClickAnimation()
+    }
+
+    private fun applyAppEnabledChange(isEnabled: Boolean) {
+        MyNotificationListenerService.isNotificationListenerEnabled = isEnabled
+        SharedPreferencesManager.saveNotificationListenerEnabled(isEnabled)
+        listener.onAppEnabledChanged(isEnabled)
+
+        val component = ComponentName(requireContext(), MyNotificationListenerService::class.java)
+        if (isEnabled) {
+            NotificationListenerService.requestRebind(component)
+        } else {
+            MyNotificationListenerService.instance?.requestUnbind()
+        }
+
+        makeToast(if (isEnabled) "Ứng dụng đang hoạt động" else "Ứng dụng đã tắt", false)
+    }
+
+    private fun showTurnOffConfirmationDialog(binding: DialogSettingBinding) {
+        val dialogBinding = com.app.docthongbaochuyenkhoan.databinding.DialogConfirmTurnOffBinding
+            .inflate(layoutInflater)
+        val builder = AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+        builder.setView(dialogBinding.root)
+
+        val dialog = builder.create()
+        dialog.window?.setGravity(Gravity.CENTER)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+
+        dialogBinding.iBtnClose.setOnClickListener { dialog.dismiss() }
+        dialogBinding.btnCancel.setOnClickListener { dialog.dismiss() }
+        dialogBinding.btnConfirmTurnOff.setOnClickListener {
+            suppressSwitchEvent = true
+            binding.switchAppEnabled.isChecked = false
+            suppressSwitchEvent = false
+            applyAppEnabledChange(false)
+            dialog.dismiss()
+        }
+
+        dialogBinding.iBtnClose.addClickAnimation()
+        dialogBinding.btnCancel.addClickAnimation()
+        dialogBinding.btnConfirmTurnOff.addClickAnimation()
+
+        dialog.show()
     }
 
     private fun openDialogRequestPermissions(autoClose: Boolean) {
