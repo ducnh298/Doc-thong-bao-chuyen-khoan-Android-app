@@ -144,7 +144,13 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
 
     override fun onRestart() {
         super.onRestart()
-        viewModel.resetToToday()
+        val pendingDate = StatisticsActivity.pendingNavigateToDate
+        if (pendingDate != null) {
+            StatisticsActivity.pendingNavigateToDate = null
+            viewModel.selectDay(pendingDate)
+        } else {
+            viewModel.resetToToday()
+        }
         checkPendingFlexibleUpdate()
         checkForAppUpdate()
     }

@@ -9,11 +9,14 @@ import com.app.docthongbaochuyenkhoan.model.DailyAmount
 import com.app.docthongbaochuyenkhoan.model.MonthlyAmount
 import com.app.docthongbaochuyenkhoan.model.database.TransactionDao
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Calendar
+
+private const val TAG = "StatsVM"
 
 class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewModel() {
 
@@ -26,8 +29,12 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
     private val _statusMessage = MutableStateFlow<String>("")
     val statusMessage: StateFlow<String> = _statusMessage.asStateFlow()
 
+    private var loadJob: Job? = null
+
     fun loadTransactionAmountsFromDayToDay(startDate: Long, endDate: Long) {
-        viewModelScope.launch {
+        Log.d(TAG, "loadFromDayToDay: ${DateUtils.formatDate(startDate)} → ${DateUtils.formatDate(endDate)}")
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
 
             val data = transactionDao.getTotalReceivedAndSentByDays(startDate, endDate)
 
@@ -48,16 +55,20 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
                     calendar.add(Calendar.DAY_OF_YEAR, 1) // Chuyển sang ngày tiếp theo
                 }
 
+                Log.d(TAG, "emit dailyAmounts: ${resultList.size} entries")
                 _dailyAmounts.emit(resultList)
             }
-            else
+            else {
+                Log.d(TAG, "no daily data in range")
                 _statusMessage.emit("Không có dữ liệu thống kê trong khoảng thời gian này")
+            }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun loadTransactionAmountsFromDayToDayByMonths(startDate: Long, endDate: Long) {
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
           val  firstDayOfMonth = DateUtils.getFirstDayOfMonth(startDate)
 
             val data = transactionDao.getTotalReceivedAndSentByMonth(firstDayOfMonth, endDate)
@@ -85,7 +96,9 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
     }
 
     fun loadTransactionAmountsByDays(endCalendar: Calendar, numberOfDays: Int) {
-        viewModelScope.launch {
+        Log.d(TAG, "loadByDays: numberOfDays=$numberOfDays")
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
 
             val endDate = endCalendar.timeInMillis
             endCalendar.add(Calendar.DAY_OF_YEAR, -numberOfDays + 1)
@@ -116,7 +129,9 @@ class StatisticsViewModel(private val transactionDao: TransactionDao) : ViewMode
     }
 
     fun loadTransactionAmountsByMonths(endCalendar: Calendar, numberOfMonths: Int) {
-        viewModelScope.launch {
+        Log.d(TAG, "loadByMonths: numberOfMonths=$numberOfMonths")
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             val endDate = endCalendar.timeInMillis
             endCalendar.add(Calendar.MONTH, -numberOfMonths + 1)
             val startDate = endCalendar.timeInMillis

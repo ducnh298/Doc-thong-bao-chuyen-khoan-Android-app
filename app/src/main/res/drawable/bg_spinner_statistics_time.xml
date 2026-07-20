@@ -4,12 +4,13 @@
         <layer-list>
             <item>
                 <shape android:shape="rectangle">
+                    <solid android:color="@color/background_dialog" />
                     <stroke android:width="2dp" android:color="@color/stroke_color" />
-                    <corners android:radius="5dp" />
-                    <padding android:bottom="4dp" android:left="4dp" android:right="10dp" android:top="6dp" />
+                    <corners android:radius="3dp" />
+                    <padding android:bottom="4dp" android:left="12dp" android:right="32dp" android:top="4dp" />
                 </shape>
             </item>
-            <item android:gravity="center_vertical|right" android:drawable="@drawable/ic_arrow_down" />
+            <item android:gravity="center_vertical|right" android:drawable="@drawable/ic_arrow_down" android:right="8dp" />
         </layer-list>
     </item>
 </selector>

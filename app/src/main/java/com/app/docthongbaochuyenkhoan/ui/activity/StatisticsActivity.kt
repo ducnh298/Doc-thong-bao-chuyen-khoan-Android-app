@@ -4,14 +4,16 @@ import android.graphics.Paint
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import kotlin.math.roundToInt
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.app.docthongbaochuyenkhoan.R
@@ -33,9 +35,13 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
-import kotlinx.coroutines.CoroutineScope
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.ChartTouchListener
+import com.github.mikephil.charting.listener.OnChartGestureListener
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -52,6 +58,19 @@ class StatisticsActivity : AppCompatActivity(),
     private val statisticsRangeOfDayList =
         listOf("7 ngày", "14 ngày", "1 tháng", "3 tháng", "6 tháng", "1 năm", "Tự chọn")
 
+    // Flag để tránh mở dialog khi khôi phục trạng thái "Tự chọn"
+    private var isRestoringCustomRange = false
+    private var currentDataList: List<Amount> = emptyList()
+    private var chartDataGeneration = 0
+
+    companion object {
+        var savedSpinnerPosition = 0
+        var savedCustomStartDate = -1L
+        var savedCustomEndDate = -1L
+        var savedCustomIsMonthly = false
+        var pendingNavigateToDate: Long? = null
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityStatisticsBinding.inflate(layoutInflater)
@@ -60,13 +79,7 @@ class StatisticsActivity : AppCompatActivity(),
         barChart = findViewById(R.id.barChart)
         barChart.setDoubleTapToZoomEnabled(false)
 
-        viewModel.loadTransactionAmountsByDays(
-            Calendar.getInstance(),
-            7
-        )    // Default get data in 7 days
-
-        // Quan sát dữ liệu từ ViewModel và cập nhật biểu đồ
-       lifecycleScope.launch {
+        lifecycleScope.launch {
             viewModel.dailyAmounts.collect { dailyAmounts ->
                 if (dailyAmounts.isNotEmpty()) initChartData(dailyAmounts)
             }
@@ -109,13 +122,23 @@ class StatisticsActivity : AppCompatActivity(),
                 position: Int,
                 id: Long
             ) {
+                savedSpinnerPosition = position
+                updateResetButtonVisibility(position)
                 loadDataBySelectedOptionPosition(position)
-            } // to close the onItemSelected
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-
             }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
+
+        // Khôi phục trạng thái đã lưu
+        val pos = savedSpinnerPosition
+        if (pos == 6 && savedCustomStartDate != -1L) {
+            isRestoringCustomRange = true
+        }
+        if (pos != 0) {
+            spinnerTime.setSelection(pos)
+        }
+        // pos == 0: adapter tự fire onItemSelected(0) → loadDataBySelectedOptionPosition(0) → 7 ngày
 
         binding.tvDateRange.setOnClickListener {
             openDatePickerStatisticDialog()
@@ -128,29 +151,56 @@ class StatisticsActivity : AppCompatActivity(),
             finish()
         }
 
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            CoroutineScope(Dispatchers.Main).launch {
-                binding.barChart.let { chart ->
-                    chart.setFitBars(true)
-                    chart.fitScreen()
-                    chart.invalidate()
-                }
-                binding.swipeRefreshLayout.isRefreshing =
-                    false // Turn off refresh when completed
-            }
+        binding.btnReset.setOnClickListener {
+            savedSpinnerPosition = 0
+            savedCustomStartDate = -1L
+            savedCustomEndDate = -1L
+            savedCustomIsMonthly = false
+            binding.spinnerTime.setSelection(0)
+            // updateResetButtonVisibility sẽ được gọi từ spinner listener
         }
 
         binding.btnChooseDateRange.addClickAnimation()
         binding.btnBack.addClickAnimation()
+        binding.btnReset.addClickAnimation()
     }
 
     private val viewModel: StatisticsViewModel by viewModels<StatisticsViewModel> {
         StatisticsViewModelFactory(AppDatabase.getDatabase(this).transactionDao())
     }
 
+    private fun updateResetButtonVisibility(position: Int) {
+        binding.btnReset.visibility = if (position != 0) View.VISIBLE else View.GONE
+    }
+
     private fun initChartData(dataList: List<Amount>) {
+        currentDataList = dataList
+        val gen = ++chartDataGeneration
+        barChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
+            override fun onValueSelected(e: Entry?, h: Highlight?) {
+                val index = e?.x?.toInt() ?: return
+                val amount = currentDataList.getOrNull(index) ?: return
+                val timestamp = when (amount) {
+                    is DailyAmount -> DateUtils.parseDateToStartOfDay(amount.label)
+                    is MonthlyAmount -> DateUtils.parseMonthToFirstDayStartOfDay(amount.label)
+                    else -> return
+                }
+                if (timestamp > 0) {
+                    pendingNavigateToDate = timestamp
+                    finish()
+                }
+            }
+
+            override fun onNothingSelected() {}
+        })
+
         try {
             val size = dataList.size
+            val maxVisible = minOf(size, 12)
+            val isScrollable = size > maxVisible
+            val scrollMax = size - maxVisible
+            val barTextSize = if (maxVisible <= 7) 12f else 10f
+
             val entriesSent = mutableListOf<BarEntry>()
             val entriesReceived = mutableListOf<BarEntry>()
             val labels = mutableListOf<String>()
@@ -159,17 +209,13 @@ class StatisticsActivity : AppCompatActivity(),
 
             dataList.forEachIndexed { index, item ->
                 labels.add(
-                    item.label.substring(
-                        0,
-                        2
-                    ) + (if (item is DailyAmount && size <= 7) " " + DateUtils.getDayOfWeek(item.label)
-                    else if (item is MonthlyAmount && size <= 6) " " + DateUtils.getMonthOfYear(item.label)
+                    item.label.substring(0, 2) +
+                    (if (item is DailyAmount && maxVisible <= 7) " " + DateUtils.getDayOfWeek(item.label)
+                    else if (item is MonthlyAmount && maxVisible <= 6) " " + DateUtils.getMonthOfYear(item.label)
                     else "")
                 )
-
                 entriesSent.add(BarEntry(index.toFloat(), item.sent.toFloat()))
                 entriesReceived.add(BarEntry(index.toFloat(), item.received.toFloat()))
-
                 totalSent += item.sent
                 totalReceived += item.received
             }
@@ -179,41 +225,58 @@ class StatisticsActivity : AppCompatActivity(),
                 updateTotalAmount(totalSent, totalReceived)
             }
 
-            sentDataSet = BarDataSet(listOf<BarEntry>(), "Tiền gửi").apply {
+            sentDataSet = BarDataSet(listOf<BarEntry>(), "Tiền chuyển").apply {
                 color = resources.getColor(R.color.text_color_amount_negative)
-                valueTextSize =
-                    if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
+                valueTextSize = barTextSize
                 valueTextColor = color
             }
 
             receivedDataSet = BarDataSet(listOf<BarEntry>(), "Tiền nhận").apply {
                 color = resources.getColor(R.color.text_color_amount_positive)
-                valueTextSize =
-                    if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
+                valueTextSize = barTextSize
                 valueTextColor = color
             }
 
             sentDataSet.values = entriesSent
             receivedDataSet.values = entriesReceived
 
-            val barData = BarData(sentDataSet, receivedDataSet).apply {
-                barWidth = 0.3f // Điều chỉnh độ rộng cột
-                setValueFormatter(valueFormatter)
+            // Sent: ẩn "0", chỉ hiện khi > 0
+            sentDataSet.setValueFormatter(object : ValueFormatter() {
+                override fun getBarLabel(barEntry: BarEntry): String {
+                    return if (barEntry.y == 0f) "" else valueFormatter.getFormattedValue(barEntry.y)
+                }
+            })
+
+            // Received: ẩn "0" khi chỉ mình nó = 0; hiện "0" khi cả 2 đều = 0
+            receivedDataSet.setValueFormatter(object : ValueFormatter() {
+                override fun getBarLabel(barEntry: BarEntry): String {
+                    if (barEntry.y > 0f) return valueFormatter.getFormattedValue(barEntry.y)
+                    // x sau groupBars() = index + offset nhỏ → toInt() cho ra index gốc
+                    val idx = barEntry.x.toInt()
+                    val bothZero = dataList.getOrNull(idx)?.let { it.received == 0L && it.sent == 0L } ?: false
+                    return if (bothZero) "0" else ""
+                }
+            })
+
+            val barData = BarData(receivedDataSet, sentDataSet).apply {
+                barWidth = 0.3f
             }
 
             barChart.apply {
                 data = barData
+                setScaleEnabled(false)
+                isDragEnabled = isScrollable
+
                 xAxis.apply {
-                    valueFormatter = IndexAxisValueFormatter(labels) // Hiển thị nhãn trên trục X
+                    valueFormatter = IndexAxisValueFormatter(labels)
                     granularity = 1f
                     axisMinimum = 0f
                     position = XAxis.XAxisPosition.BOTTOM
                     axisMaximum = labels.size.toFloat()
-                    barChart.xAxis.labelCount = labels.size
-                    setCenterAxisLabels(true) // Căn chỉnh cột theo nhóm
+                    labelCount = maxVisible
+                    setCenterAxisLabels(true)
                     setAvoidFirstLastClipping(true)
-                    textSize =
-                        if (size <= 7) 12f else if (size <= 14) 10f else if (size <= 30) 8f else 6f
+                    textSize = barTextSize
                     textColor = resources.getColor(R.color.text_color)
                 }
 
@@ -221,19 +284,65 @@ class StatisticsActivity : AppCompatActivity(),
                 axisLeft.textColor = resources.getColor(R.color.text_color)
                 axisRight.isEnabled = false
                 description.isEnabled = false
-
                 extraBottomOffset = 20f
 
                 setFitBars(true)
-                barChart.groupBars(0f, 0.3f, 0.05f) // Nhóm các cột gần nhau
+                groupBars(0f, 0.3f, 0.05f)
                 invalidate()
 
                 legend.textSize = 14f
                 legend.textColor = resources.getColor(R.color.text_color)
-                legend.xEntrySpace = 30f   // Tăng khoảng cách ngang giữa các mục
-                legend.formSize = 14f      // Kích thước ô màu
+                legend.xEntrySpace = 30f
+                legend.formSize = 14f
                 legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
             }
+
+            // SeekBar
+            val seekBar = binding.seekBarChart
+            if (isScrollable) {
+                seekBar.max = scrollMax
+                seekBar.progress = scrollMax   // Bắt đầu ở cuối (ngày gần nhất)
+                seekBar.visibility = View.VISIBLE
+
+                seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                        if (fromUser) barChart.moveViewToX(progress.toFloat())
+                    }
+                    override fun onStartTrackingTouch(seekBar: SeekBar) {}
+                    override fun onStopTrackingTouch(seekBar: SeekBar) {}
+                })
+
+                barChart.onChartGestureListener = object : OnChartGestureListener {
+                    override fun onChartTranslate(me: MotionEvent?, dX: Float, dY: Float) {
+                        seekBar.progress = barChart.lowestVisibleX.roundToInt().coerceIn(0, scrollMax)
+                    }
+                    override fun onChartGestureStart(me: MotionEvent?, lastPerformedGesture: ChartTouchListener.ChartGesture?) {}
+                    override fun onChartGestureEnd(me: MotionEvent?, lastPerformedGesture: ChartTouchListener.ChartGesture?) {}
+                    override fun onChartLongPressed(me: MotionEvent?) {}
+                    override fun onChartDoubleTapped(me: MotionEvent?) {}
+                    override fun onChartSingleTapped(me: MotionEvent?) {}
+                    override fun onChartFling(me1: MotionEvent?, me2: MotionEvent?, velocityX: Float, velocityY: Float) {}
+                    override fun onChartScale(me: MotionEvent?, scaleX: Float, scaleY: Float) {}
+                }
+
+                // Dùng post{} để đảm bảo chart đã được layout trước khi set viewport
+                // gen guard: bỏ qua nếu đây là post cũ (user đã chọn thời gian khác)
+                barChart.post {
+                    if (gen != chartDataGeneration) return@post
+                    barChart.setVisibleXRangeMaximum(maxVisible.toFloat())
+                    barChart.moveViewToX(size.toFloat())
+                    seekBar.progress = barChart.lowestVisibleX.roundToInt().coerceIn(0, scrollMax)
+                }
+            } else {
+                seekBar.visibility = View.GONE
+                barChart.onChartGestureListener = null
+                // Reset viewport về trạng thái ban đầu (hiện tất cả dữ liệu)
+                barChart.post {
+                    if (gen != chartDataGeneration) return@post
+                    barChart.fitScreen()
+                }
+            }
+
         } catch (e: Exception) {
             Log.e("StatisticsActivity", "Error: ${e.message}")
             Toast.makeText(this, "Lỗi đọc dữ liệu thống kê, vui lòng thử lại.", Toast.LENGTH_SHORT)
@@ -246,13 +355,11 @@ class StatisticsActivity : AppCompatActivity(),
         val fragment = supportFragmentManager.findFragmentByTag("DatePickerDialogStatisticFragment")
 
         if (fragment != null && fragment is DatePickerDialogStatisticFragment) {
-            // If fragment has been added
             if (fragment.isVisible) {
-                fragment.dismiss() // Make sure the fragment is deleted before displaying it again
+                fragment.dismiss()
                 fragment.show(supportFragmentManager, "DatePickerDialogStatisticFragment")
             }
         } else {
-            // If the fragment does not exist, create a new one and display it
             val dialog = DatePickerDialogStatisticFragment.newInstance(this)
             dialog.show(supportFragmentManager, "DatePickerDialogStatisticFragment")
         }
@@ -272,20 +379,22 @@ class StatisticsActivity : AppCompatActivity(),
             val absValue = abs(value)
             return if (absValue >= 1000000) {
                 "${(value / 1000000).toInt()}" +
-                        "${if (absValue % 1000000 / 100000 > 0) ("." + (absValue % 1000000 / 100000).toInt()) else ""}M" // Đổi sang đơn vị triệu
+                        "${if (absValue % 1000000 / 100000 > 0) ("." + (absValue % 1000000 / 100000).toInt()) else ""}M"
             } else if (absValue >= 1000) {
-                "${(value / 1000).toInt()}K" // Đổi sang đơn vị nghìn
+                "${(value / 1000).toInt()}K"
             } else {
-                value.toInt().toString() // Hiển thị số bình thường nếu nhỏ
+                value.toInt().toString()
             }
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onConfirmClicked(startDate: Long, endDate: Long, isStatisticByMonth: Boolean) {
         binding.spinnerTime.setSelection(6)
+        savedCustomStartDate = startDate
+        savedCustomEndDate = endDate
+        savedCustomIsMonthly = isStatisticByMonth
 
-        if (isStatisticByMonth)
+        if (isStatisticByMonth && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             viewModel.loadTransactionAmountsFromDayToDayByMonths(startDate, endDate)
         else
             viewModel.loadTransactionAmountsFromDayToDay(startDate, endDate)
@@ -294,38 +403,25 @@ class StatisticsActivity : AppCompatActivity(),
     fun loadDataBySelectedOptionPosition(position: Int) {
         val selectedItem = binding.spinnerTime.getItemAtPosition(position).toString()
         when (selectedItem) {
-            statisticsRangeOfDayList[0] -> viewModel.loadTransactionAmountsByDays(
-                Calendar.getInstance(),
-                7
-            )
-
-            statisticsRangeOfDayList[1] -> viewModel.loadTransactionAmountsByDays(
-                Calendar.getInstance(),
-                14
-            )
-
-            statisticsRangeOfDayList[2] -> viewModel.loadTransactionAmountsByDays(
-                Calendar.getInstance(),
-                30
-            )
-
-            statisticsRangeOfDayList[3] -> viewModel.loadTransactionAmountsByDays(
-                Calendar.getInstance(),
-                90
-            )
-
-            statisticsRangeOfDayList[4] -> viewModel.loadTransactionAmountsByMonths(
-                Calendar.getInstance(),
-                6
-            )
-
-            statisticsRangeOfDayList[5] -> viewModel.loadTransactionAmountsByMonths(
-                Calendar.getInstance(),
-                12
-            )
-
-            statisticsRangeOfDayList[6] -> openDatePickerStatisticDialog()
-
+            statisticsRangeOfDayList[0] -> viewModel.loadTransactionAmountsByDays(Calendar.getInstance(), 7)
+            statisticsRangeOfDayList[1] -> viewModel.loadTransactionAmountsByDays(Calendar.getInstance(), 14)
+            statisticsRangeOfDayList[2] -> viewModel.loadTransactionAmountsByDays(Calendar.getInstance(), 30)
+            statisticsRangeOfDayList[3] -> viewModel.loadTransactionAmountsByDays(Calendar.getInstance(), 90)
+            statisticsRangeOfDayList[4] -> viewModel.loadTransactionAmountsByMonths(Calendar.getInstance(), 6)
+            statisticsRangeOfDayList[5] -> viewModel.loadTransactionAmountsByMonths(Calendar.getInstance(), 12)
+            statisticsRangeOfDayList[6] -> {
+                if (isRestoringCustomRange) {
+                    isRestoringCustomRange = false
+                    val start = savedCustomStartDate
+                    val end = savedCustomEndDate
+                    if (savedCustomIsMonthly && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                        viewModel.loadTransactionAmountsFromDayToDayByMonths(start, end)
+                    else
+                        viewModel.loadTransactionAmountsFromDayToDay(start, end)
+                } else {
+                    openDatePickerStatisticDialog()
+                }
+            }
             else -> viewModel.loadTransactionAmountsByDays(Calendar.getInstance(), 7)
         }
     }
@@ -333,10 +429,9 @@ class StatisticsActivity : AppCompatActivity(),
     override fun onDestroy() {
         super.onDestroy()
 
-        binding.tvDateRange.setOnClickListener {null}
-        binding.btnChooseDateRange.setOnClickListener {null}
-
-        binding.btnBack.setOnClickListener {null}
-        binding.swipeRefreshLayout.setOnRefreshListener {null}
+        binding.tvDateRange.setOnClickListener { null }
+        binding.btnChooseDateRange.setOnClickListener { null }
+        binding.btnBack.setOnClickListener { null }
+        binding.btnReset.setOnClickListener { null }
     }
 }

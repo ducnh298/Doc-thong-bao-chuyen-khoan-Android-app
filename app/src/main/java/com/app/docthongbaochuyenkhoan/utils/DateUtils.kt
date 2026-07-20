@@ -65,6 +65,29 @@ class DateUtils {
             return sdfOutput.format(date) // Ví dụ: "Jun"
         }
 
+        fun parseDateToStartOfDay(dateString: String): Long {
+            val date = sdfDate.parse(dateString) ?: return 0L
+            return Calendar.getInstance().apply {
+                time = date
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.timeInMillis
+        }
+
+        fun parseMonthToFirstDayStartOfDay(monthString: String): Long {
+            val date = sdfMonth.parse(monthString) ?: return 0L
+            return Calendar.getInstance().apply {
+                time = date
+                set(Calendar.DAY_OF_MONTH, 1)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.timeInMillis
+        }
+
         fun getDaysBetweenDates(startDate: Long, endDate: Long): Long {
             // 1. Tính khoảng thời gian chênh lệch (đơn vị: mili giây)
             val difference = endDate - startDate
