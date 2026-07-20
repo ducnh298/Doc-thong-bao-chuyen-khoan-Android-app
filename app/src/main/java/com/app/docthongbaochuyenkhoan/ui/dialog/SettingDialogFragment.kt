@@ -213,6 +213,7 @@ class SettingDialogFragment : DialogFragment() {
         val (versionName, versionCode) = requireContext().getAppVersionInfo()
         binding.tvVersion.text = "Có gì mới - V$versionName ($versionCode)"
         binding.tvVersion.setOnClickListener { openVersionHistoryDialog() }
+        binding.tvVersion.addClickAnimation()
 
         binding.btnCheckPermission.addClickAnimation()
         binding.btnBackupRestore.addClickAnimation()

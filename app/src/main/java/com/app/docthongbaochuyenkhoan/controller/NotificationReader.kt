@@ -19,32 +19,75 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
 import androidx.core.net.toUri
+import kotlin.time.Duration.Companion.milliseconds
 
 class NotificationReader(private var context: Context) : TextToSpeech.OnInitListener {
 
-    companion object { private const val TAG = "NotifReader" }
-    private var textToSpeech: TextToSpeech = TextToSpeech(context, this)
+    companion object {
+        private const val TAG = "NotifReader"
+        private const val GOOGLE_TTS_ENGINE = "com.google.android.tts"
+    }
+
+    // Thử Google TTS trước — nhiều hãng (Xiaomi, Huawei) đặt engine riêng làm default,
+    // engine đó không hỗ trợ tiếng Việt dù Google TTS đã cài.
+    private var textToSpeech: TextToSpeech = TextToSpeech(context, this, GOOGLE_TTS_ENGINE)
+    private var usingGoogleEngine = true
+    private var preferenceListenerRegistered = false
+
     private var vibrator: Vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     private val job = Job()
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + job)
     private var notificationSoundUri: Uri? = null
     private val notificationQueue = mutableListOf<String>()
-    private var isReading = false
-    private var isSuccessFullyInit = false
+    @Volatile private var isReading = false
+    @Volatile private var isSuccessFullyInit = false
 
     override fun onInit(status: Int) {
-        Log.i(TAG, "TTS onInit status=${if (status == TextToSpeech.SUCCESS) "SUCCESS" else "FAILED($status)"}")
+        val engineLabel = if (usingGoogleEngine) "Google TTS" else "system default"
+        Log.i(TAG, "TTS onInit: engine=$engineLabel status=${if (status == TextToSpeech.SUCCESS) "SUCCESS" else "FAILED($status)"}")
+
         if (status == TextToSpeech.SUCCESS) {
-            textToSpeech.language = Locale("vi")
-            textToSpeech.setOnUtteranceCompletedListener {
-                isReading = false
+            val langResult = textToSpeech.setLanguage(Locale("vi"))
+            Log.i(TAG, "TTS setLanguage(vi): result=$langResult engine=$engineLabel")
+
+            if (langResult >= TextToSpeech.LANG_AVAILABLE) {
+                textToSpeech.setOnUtteranceCompletedListener { isReading = false }
+                isSuccessFullyInit = true
+                Log.i(TAG, "TTS ready with $engineLabel (Vietnamese supported)")
+            } else {
+                // Engine khởi động được nhưng không hỗ trợ tiếng Việt
+                Log.w(TAG, "Vietnamese not available on $engineLabel (langResult=$langResult)")
+                if (usingGoogleEngine) {
+                    fallbackToSystemDefault()
+                } else {
+                    Log.e(TAG, "No TTS engine supports Vietnamese. User should install/configure Google TTS with Vietnamese data.")
+                    textToSpeech.setOnUtteranceCompletedListener { isReading = false }
+                    isSuccessFullyInit = true // tránh block queue mãi mãi
+                }
             }
-            isSuccessFullyInit = true
+        } else {
+            // Engine không khởi động được (chưa cài / lỗi)
+            if (usingGoogleEngine) {
+                Log.w(TAG, "Google TTS engine not available, falling back to system default")
+                fallbackToSystemDefault()
+            } else {
+                Log.e(TAG, "All TTS engines failed to initialize")
+                isSuccessFullyInit = true // tránh block queue mãi mãi
+            }
         }
 
-        notificationSoundUri = savedSoundUri()
+        // Chỉ đăng ký 1 lần dù onInit có thể được gọi nhiều lần khi retry
+        if (!preferenceListenerRegistered) {
+            notificationSoundUri = savedSoundUri()
+            SharedPreferencesManager.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
+            preferenceListenerRegistered = true
+        }
+    }
 
-        SharedPreferencesManager.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
+    private fun fallbackToSystemDefault() {
+        usingGoogleEngine = false
+        textToSpeech.shutdown()
+        textToSpeech = TextToSpeech(context, this) // onInit sẽ được gọi lại
     }
 
     private fun savedSoundUri(): Uri? {
@@ -72,32 +115,27 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
             notification.append(" ${AppUtils.formatCurrency(-transaction.amount)}")
         }
 
-        Log.d("NotificationReader", "addNotification: $notification")
-
         notificationQueue.add(notification.toString())
         processQueue()
     }
 
     private fun processQueue() {
-        if (isReading || notificationQueue.isEmpty()) return // Processed or no notification
+        if (isReading || notificationQueue.isEmpty()) return
         isReading = true
 
-        // Get the first message out of the queue
         val currentNotification = notificationQueue.removeAt(0)
 
-        // Check when TTS is done to process the next message
         scope.launch(Dispatchers.IO) {
-            // Notification
             while (!isSuccessFullyInit)
-                delay(100)
+                delay(100.milliseconds)
 
             readNotification(currentNotification)
 
             while (textToSpeech.isSpeaking) {
-                delay(100) // Chờ 100ms
+                delay(100.milliseconds)
             }
-            isReading = false // The current message is done
-            processQueue() // Continue processing the next message
+            isReading = false
+            processQueue()
         }
     }
 
@@ -115,11 +153,7 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
 
     private fun makeVibration() {
         if (vibrator.hasVibrator()) {
-            val mVibratePattern: LongArray = longArrayOf(0, 200, 100, 200)
-
-            // -1: If you don't want it to repeat
-            // 0 if you want it to repeat from the first element position
-            vibrator.vibrate(mVibratePattern, -1)
+            vibrator.vibrate(longArrayOf(0, 200, 100, 200), -1)
         }
     }
 
