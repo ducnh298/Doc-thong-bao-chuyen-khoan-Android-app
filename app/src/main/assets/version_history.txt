@@ -1,3 +1,10 @@
+## v1.7.4 (build 26)
+- Cải thiện màn thống kê: biểu đồ cuộn ngang, thanh kéo, bấm cột để xem ngày
+- Sửa lỗi âm báo và đồng bộ âm lượng chuông/đọc
+- Cải thiện giao diện cài đặt và sao lưu
+
+---
+
 ## v1.7.3 (build 25)
 - Cải thiện giao diện và trải nghiệm người dùng
 - Sửa lỗi

@@ -15,8 +15,8 @@ android {
         applicationId = "com.app.docthongbaochuyenkhoan"
         minSdk = 24
         targetSdk = 35
-        versionCode = 25
-        versionName = "1.7.3"
+        versionCode = 26
+        versionName = "1.7.4"
         archivesName = "Đọc chuyển khoản miễn phí-v$versionName.$versionCode"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
