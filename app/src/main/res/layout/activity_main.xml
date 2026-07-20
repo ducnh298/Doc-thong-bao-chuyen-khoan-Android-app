@@ -253,7 +253,6 @@
             android:clickable="true"
             android:elevation="6dp"
             android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
             android:gravity="center"
             android:orientation="horizontal"
             android:paddingHorizontal="12dp">

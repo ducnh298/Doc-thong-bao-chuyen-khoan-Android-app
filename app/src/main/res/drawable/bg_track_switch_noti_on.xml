@@ -6,14 +6,12 @@
 
     <item android:state_checked="true" android:state_enabled="true">
         <layer-list>
-            <item android:drawable="@drawable/ic_switch_on_disable" android:left="0.5dp" android:top="1dp" />
             <item android:bottom="1dp" android:drawable="@drawable/ic_switch_on" android:right="0.5dp" />
         </layer-list>
     </item>
 
     <item android:state_checked="false" android:state_enabled="true">
         <layer-list>
-            <item android:drawable="@drawable/ic_switch_off_disable" android:left="0.5dp" android:top="1dp" />
             <item android:bottom="1dp" android:drawable="@drawable/ic_switch_off" android:right="0.5dp" />
         </layer-list>
     </item>
