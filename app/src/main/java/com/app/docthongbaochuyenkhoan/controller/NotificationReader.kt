@@ -21,6 +21,8 @@ import java.util.Locale
 import androidx.core.net.toUri
 
 class NotificationReader(private var context: Context) : TextToSpeech.OnInitListener {
+
+    companion object { private const val TAG = "NotifReader" }
     private var textToSpeech: TextToSpeech = TextToSpeech(context, this)
     private var vibrator: Vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     private val job = Job()
@@ -31,6 +33,7 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
     private var isSuccessFullyInit = false
 
     override fun onInit(status: Int) {
+        Log.i(TAG, "TTS onInit status=${if (status == TextToSpeech.SUCCESS) "SUCCESS" else "FAILED($status)"}")
         if (status == TextToSpeech.SUCCESS) {
             textToSpeech.language = Locale("vi")
             textToSpeech.setOnUtteranceCompletedListener {
@@ -56,6 +59,7 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
         }
 
     fun addNotification(transaction: Transaction) {
+        Log.d(TAG, "addNotification: bank=${transaction.bank} amount=${transaction.amount} queueSize=${notificationQueue.size}")
         val notification = StringBuilder(transaction.bank.speakName)
 
         if (transaction.amount > 0) {
@@ -98,9 +102,11 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
     }
 
     private fun readNotification(notification: String?) {
+        Log.d(TAG, "readNotification: \"$notification\"")
         makeVibration()
         val params = Bundle().apply {
             putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_NOTIFICATION)
+            putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1.0f)
         }
         MediaPlayerUtils.playMedia(context, notificationSoundUri) {
             textToSpeech.speak(notification, TextToSpeech.QUEUE_FLUSH, params, null)

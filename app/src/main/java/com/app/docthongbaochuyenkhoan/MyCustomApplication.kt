@@ -18,6 +18,11 @@ class MyCustomApplication : Application() {
         super.onCreate()
         SharedPreferencesManager.init(this)
 
+        if (SharedPreferencesManager.getNotificationSound().isBlank()) {
+            val defaultUri = "android.resource://$packageName/${R.raw.ting}"
+            SharedPreferencesManager.saveNotificationSound(defaultUri)
+        }
+
         //Set UncaughtExceptionHandler globally
         Thread.setDefaultUncaughtExceptionHandler { thread, exception ->
             handleUncaughtException(thread, exception)

@@ -44,10 +44,10 @@ class MediaPlayerUtils {
                         Handler(Looper.getMainLooper()).post {
                             Toast.makeText(context, "Âm thanh thông báo không hợp lệ, đã đặt lại về mặc định.", Toast.LENGTH_SHORT).show()
                         }
-                        MediaPlayer.create(context, R.raw.ting)
+                        createRawMediaPlayer(context, audioAttributes)
                     } else mp
                 } else {
-                    MediaPlayer.create(context, R.raw.ting)
+                    createRawMediaPlayer(context, audioAttributes)
                 }
 
                 if (mediaPlayer == null) {
@@ -107,6 +107,21 @@ class MediaPlayerUtils {
             } catch (e: Exception) {
                 Log.e("playMedia", "Unexpected error: ${e.message}")
                 onComplete?.invoke()
+            }
+        }
+
+        private fun createRawMediaPlayer(context: Context, audioAttributes: AudioAttributes): MediaPlayer? {
+            return try {
+                val mp = MediaPlayer()
+                mp.setAudioAttributes(audioAttributes)
+                val afd = context.resources.openRawResourceFd(R.raw.ting)
+                mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                afd.close()
+                mp.prepare()
+                mp
+            } catch (e: Exception) {
+                Log.e("playMedia", "Raw sound creation failed: ${e.message}")
+                null
             }
         }
 

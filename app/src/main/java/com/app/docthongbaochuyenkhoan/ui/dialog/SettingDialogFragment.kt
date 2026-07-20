@@ -172,9 +172,10 @@ class SettingDialogFragment : DialogFragment() {
 
         binding.tvNotificationSound.setOnClickListener(listener.onTvNotificationSoundClicked())
         binding.btnResetNotificationSound.setOnClickListener {
-            SharedPreferencesManager.removeNotificationSound()
+            val defaultUri = "android.resource://${requireContext().packageName}/${R.raw.ting}"
+            SharedPreferencesManager.saveNotificationSound(defaultUri)
             getNotificationSound()
-            binding.tvNotificationSound.text = "Mặc định"
+            binding.tvNotificationSound.text = requireContext().getString(R.string.notification_sound_default_name)
         }
 
         val audioManager = requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -210,7 +211,8 @@ class SettingDialogFragment : DialogFragment() {
         binding.btnRateApp.setOnClickListener { openPlayStoreForRating() }
         binding.btnClose.setOnClickListener { this.dismiss() }
         val (versionName, versionCode) = requireContext().getAppVersionInfo()
-        binding.tvVersion.text = "V$versionName ($versionCode)"
+        binding.tvVersion.text = "Có gì mới - V$versionName ($versionCode)"
+        binding.tvVersion.setOnClickListener { openVersionHistoryDialog() }
 
         binding.btnCheckPermission.addClickAnimation()
         binding.btnBackupRestore.addClickAnimation()
@@ -286,7 +288,8 @@ class SettingDialogFragment : DialogFragment() {
         getNotificationSound()
         val uri = notificationSoundUri
         val defaultName = requireContext().getString(R.string.notification_sound_default_name)
-        if (uri == null) {
+        val defaultRawUri = "android.resource://${requireContext().packageName}/${R.raw.ting}"
+        if (uri == null || uri.toString() == defaultRawUri) {
             binding.tvNotificationSound.text = defaultName
             return
         }
@@ -521,6 +524,32 @@ class SettingDialogFragment : DialogFragment() {
             if (isLongToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
         )
             .show()
+    }
+
+    private fun openVersionHistoryDialog() {
+        val dialogBinding = com.app.docthongbaochuyenkhoan.databinding.DialogVersionHistoryBinding
+            .inflate(layoutInflater)
+        val builder = AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+        builder.setView(dialogBinding.root)
+
+        val dialog = builder.create()
+        dialog.window?.setGravity(Gravity.CENTER)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+
+        val history = runCatching {
+            requireContext().assets.open("version_history.txt")
+                .bufferedReader()
+                .readText()
+        }.getOrDefault("Không thể tải lịch sử phiên bản.")
+        dialogBinding.tvVersionHistory.text = history
+
+        dialogBinding.iBtnClose.setOnClickListener { dialog.dismiss() }
+        dialogBinding.btnClose.setOnClickListener { dialog.dismiss() }
+        dialogBinding.iBtnClose.addClickAnimation()
+        dialogBinding.btnClose.addClickAnimation()
+
+        dialog.show()
     }
 
     override fun onDestroy() {

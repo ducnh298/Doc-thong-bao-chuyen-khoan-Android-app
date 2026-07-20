@@ -1,0 +1,30 @@
+## v1.7.3 (build 25)
+- Cải thiện giao diện và trải nghiệm người dùng
+- Sửa lỗi
+
+---
+
+## v1.7.2 (build 24)
+- Cải thiện giao diện và trải nghiệm người dùng
+- Âm lượng đọc giờ sẽ theo âm lượng chuông thay vì âm lượng media
+- Sửa lỗi
+
+---
+
+## v1.7.1 (build 23)
+- Cải thiện giao diện
+- Sửa một số lỗi và tối ưu hiệu suất
+
+---
+
+## v1.7.0 (build 22)
+- Cải thiện giao diện toàn diện, hỗ trợ chế độ sáng/tối
+- Thêm tính năng xoá dữ liệu giao dịch
+- Sửa một số lỗi và tối ưu hiệu suất
+
+---
+
+## v1.6.4 (build 21)
+- Thêm tính năng Sao lưu & Khôi phục dữ liệu giao dịch
+- Cải thiện thông báo cập nhật phiên bản mới
+- Sửa một số lỗi và tối ưu hiệu suất

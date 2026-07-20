@@ -4,7 +4,9 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.view.Gravity
 import android.view.View
 import android.widget.Toast
@@ -111,12 +113,12 @@ class BackupRestoreDialogFragment : DialogFragment() {
     }
 
     private val createFileLauncher =
-        registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        registerForActivityResult(CreateDocumentInDocuments()) { uri ->
             uri?.let { viewModel.exportToZip(requireContext(), it) }
         }
 
     private val openFileLauncher =
-        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        registerForActivityResult(OpenDocumentInDocuments()) { uri ->
             uri?.let {
                 requireContext().contentResolver.takePersistableUriPermission(
                     it,
@@ -130,4 +132,26 @@ class BackupRestoreDialogFragment : DialogFragment() {
         if (!isAdded) return
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
+}
+
+private val documentsInitialUri: Uri
+    get() = DocumentsContract.buildDocumentUri(
+        "com.android.externalstorage.documents",
+        "primary:Documents"
+    )
+
+private fun Intent.applyDocumentsInitialUri(): Intent = also { intent ->
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, documentsInitialUri)
+    }
+}
+
+private class CreateDocumentInDocuments : ActivityResultContracts.CreateDocument("application/json") {
+    override fun createIntent(context: Context, input: String): Intent =
+        super.createIntent(context, input).applyDocumentsInitialUri()
+}
+
+private class OpenDocumentInDocuments : ActivityResultContracts.OpenDocument() {
+    override fun createIntent(context: Context, input: Array<String>): Intent =
+        super.createIntent(context, input).applyDocumentsInitialUri()
 }

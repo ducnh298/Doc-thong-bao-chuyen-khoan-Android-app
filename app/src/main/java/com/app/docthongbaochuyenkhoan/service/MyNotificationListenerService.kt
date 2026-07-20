@@ -12,6 +12,7 @@ import com.app.docthongbaochuyenkhoan.model.Bank
 import com.app.docthongbaochuyenkhoan.model.Transaction
 import com.app.docthongbaochuyenkhoan.model.database.AppDatabase
 import com.app.docthongbaochuyenkhoan.model.database.TransactionDao
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -19,19 +20,13 @@ import kotlinx.coroutines.launch
 
 class MyNotificationListenerService : NotificationListenerService() {
 
-    companion object {
-        var instance: MyNotificationListenerService? = null
-        var isNotificationListenerEnabled: Boolean = true
-        var isNotificationReceivedEnabled: Boolean = true
-        var isNotificationSentEnabled: Boolean = true
-    }
-
     override fun onListenerConnected() {
         super.onListenerConnected()
         instance = this
         isNotificationListenerEnabled = SharedPreferencesManager.isNotificationListenerEnabled()
         isNotificationReceivedEnabled = SharedPreferencesManager.isNotificationReceivedEnabled()
         isNotificationSentEnabled = SharedPreferencesManager.isNotificationSentEnabled()
+        Log.i(TAG, "Listener connected — enabled=$isNotificationListenerEnabled received=$isNotificationReceivedEnabled sent=$isNotificationSentEnabled")
     }
 
     private var notificationReader: NotificationReader? = null
@@ -50,6 +45,7 @@ class MyNotificationListenerService : NotificationListenerService() {
 
         if (packageName.isBlank() || title.isBlank() || content.isBlank()) return
 
+        Log.d(TAG, "onNotificationPosted pkg=$packageName")
         coroutineScope.launch {
             if (transactionDao == null)
                 transactionDao = AppDatabase.getDatabase(applicationContext).transactionDao()
@@ -73,24 +69,43 @@ class MyNotificationListenerService : NotificationListenerService() {
             )
 
         if (transaction != null) {
+            Log.i(TAG, "Transaction parsed: bank=${transaction.bank} amount=${transaction.amount}")
             TransactionFlowManager.emitTransaction(transaction)
             coroutineScope.launch {
                 transactionDao?.insert(transaction)
-                if ((transaction.amount > 0 && isNotificationReceivedEnabled) || (transaction.amount < 0 && isNotificationSentEnabled))
+                Log.d(TAG, "Transaction saved to DB")
+                val shouldRead = (transaction.amount > 0 && isNotificationReceivedEnabled) ||
+                        (transaction.amount < 0 && isNotificationSentEnabled)
+                if (shouldRead) {
                     notificationReader?.addNotification(transaction)
+                } else {
+                    Log.d(TAG, "TTS skipped — read setting disabled for this direction")
+                }
             }
+        } else {
+            Log.d(TAG, "No transaction extracted from pkg=$packageName")
         }
     }
 
     override fun onListenerDisconnected() {
         super.onListenerDisconnected()
+        Log.w(TAG, "Listener disconnected — requesting rebind")
         requestRebind(ComponentName(this, MyNotificationListenerService::class.java))
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.i(TAG, "Service destroyed")
         instance = null
         job.cancel()
         notificationReader?.onDestroy()
+    }
+
+    companion object {
+        private const val TAG = "NotifService"
+        var instance: MyNotificationListenerService? = null
+        var isNotificationListenerEnabled: Boolean = true
+        var isNotificationReceivedEnabled: Boolean = true
+        var isNotificationSentEnabled: Boolean = true
     }
 }
