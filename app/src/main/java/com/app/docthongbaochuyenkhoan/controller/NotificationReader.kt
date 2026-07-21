@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.PowerManager
 import android.os.Vibrator
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -42,6 +43,14 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + job)
     // @Volatile: được đọc từ IO coroutine, ghi từ main thread qua preferenceChangeListener
     @Volatile private var notificationSoundUri: Uri? = null
+
+    // PARTIAL_WAKE_LOCK: giữ CPU tỉnh từ lúc nhận thông báo đến khi TTS đọc xong.
+    // Không có wake lock → device ngủ giữa chừng → TTS không nói được trên máy cũ.
+    private val wakeLock: PowerManager.WakeLock by lazy {
+        (context.getSystemService(Context.POWER_SERVICE) as PowerManager)
+            .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "DocChuyenKhoan:TtsWakeLock")
+            .apply { setReferenceCounted(false) }
+    }
 
     // ConcurrentLinkedQueue thread-safe, không cần synchronized khi add/poll
     private val notificationQueue = ConcurrentLinkedQueue<String>()
@@ -129,6 +138,7 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
         if (!isProcessing.compareAndSet(false, true)) return
 
         scope.launch(Dispatchers.IO) {
+            wakeLock.acquire(60_000L) // tối đa 60s, Android yêu cầu luôn có timeout
             try {
                 // Timeout 10s: safety net nếu TTS không bao giờ gọi onInit (thiết bị thiếu engine)
                 val ready = withTimeoutOrNull(10_000) {
@@ -146,6 +156,7 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
                 }
             } finally {
                 isProcessing.set(false)
+                if (wakeLock.isHeld) wakeLock.release()
                 // Nếu có item mới được thêm vào trong lúc coroutine đang dừng, khởi động lại
                 if (notificationQueue.isNotEmpty()) startProcessingIfIdle()
             }
@@ -172,6 +183,7 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
 
     fun onDestroy() {
         job.cancel()
+        if (wakeLock.isHeld) wakeLock.release()
         textToSpeech.stop()
         textToSpeech.shutdown()
         SharedPreferencesManager.unRegisterOnSharedPreferenceChangeListener(preferenceChangeListener)

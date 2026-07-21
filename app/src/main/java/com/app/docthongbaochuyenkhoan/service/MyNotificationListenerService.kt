@@ -43,6 +43,8 @@ class MyNotificationListenerService : NotificationListenerService() {
         isNotificationListenerEnabled = SharedPreferencesManager.isNotificationListenerEnabled()
         isNotificationReceivedEnabled = SharedPreferencesManager.isNotificationReceivedEnabled()
         isNotificationSentEnabled = SharedPreferencesManager.isNotificationSentEnabled()
+        // Đảm bảo foreground service chạy để ROM không kill process giữa chừng
+        KeepAliveService.start(applicationContext)
         Log.i(TAG, "Listener connected — enabled=$isNotificationListenerEnabled received=$isNotificationReceivedEnabled sent=$isNotificationSentEnabled")
     }
 
