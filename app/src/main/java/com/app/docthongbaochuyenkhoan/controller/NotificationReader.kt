@@ -138,8 +138,8 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
         if (!isProcessing.compareAndSet(false, true)) return
 
         scope.launch(Dispatchers.IO) {
-            wakeLock.acquire(60_000L) // tối đa 60s, Android yêu cầu luôn có timeout
             try {
+                wakeLock.acquire(60_000L) // tối đa 60s, Android yêu cầu luôn có timeout
                 // Timeout 10s: safety net nếu TTS không bao giờ gọi onInit (thiết bị thiếu engine)
                 val ready = withTimeoutOrNull(10_000) {
                     while (!isSuccessFullyInit) delay(100.milliseconds)

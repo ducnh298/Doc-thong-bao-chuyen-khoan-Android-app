@@ -2,6 +2,7 @@ package com.app.docthongbaochuyenkhoan.service
 
 import android.app.Notification
 import android.content.ComponentName
+import android.content.Intent
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import com.app.docthongbaochuyenkhoan.controller.NotificationMessageParser
@@ -112,6 +113,9 @@ class MyNotificationListenerService : NotificationListenerService() {
         instance = null
         job.cancel()
         if (::notificationReader.isInitialized) notificationReader.onDestroy()
+        // Dừng KeepAlive khi NLS bị destroy (user revoke permission hoặc hệ thống kill).
+        // onListenerConnected sẽ start lại khi hệ thống rebind.
+        stopService(Intent(this, KeepAliveService::class.java))
     }
 
     companion object {

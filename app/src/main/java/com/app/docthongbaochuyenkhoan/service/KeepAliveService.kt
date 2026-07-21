@@ -62,10 +62,16 @@ class KeepAliveService : Service() {
 
         fun start(context: Context) {
             val intent = Intent(context, KeepAliveService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(intent)
+                } else {
+                    context.startService(intent)
+                }
+            } catch (e: Exception) {
+                // ForegroundServiceStartNotAllowedException (API 31+) hoặc các lỗi background start.
+                // Không crash app — service không critical, NLS vẫn hoạt động được.
+                Log.e(TAG, "Cannot start KeepAliveService: ${e.message}")
             }
         }
     }
