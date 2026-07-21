@@ -17,7 +17,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Locale
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.AtomicBoolean
 import androidx.core.net.toUri
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -37,9 +40,13 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
     private var vibrator: Vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     private val job = Job()
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + job)
-    private var notificationSoundUri: Uri? = null
-    private val notificationQueue = mutableListOf<String>()
-    @Volatile private var isReading = false
+    // @Volatile: được đọc từ IO coroutine, ghi từ main thread qua preferenceChangeListener
+    @Volatile private var notificationSoundUri: Uri? = null
+
+    // ConcurrentLinkedQueue thread-safe, không cần synchronized khi add/poll
+    private val notificationQueue = ConcurrentLinkedQueue<String>()
+    // AtomicBoolean để compareAndSet — tránh race condition khi nhiều thread gọi đồng thời
+    private val isProcessing = AtomicBoolean(false)
     @Volatile private var isSuccessFullyInit = false
 
     override fun onInit(status: Int) {
@@ -51,7 +58,6 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
             Log.i(TAG, "TTS setLanguage(vi): result=$langResult engine=$engineLabel")
 
             if (langResult >= TextToSpeech.LANG_AVAILABLE) {
-                textToSpeech.setOnUtteranceCompletedListener { isReading = false }
                 isSuccessFullyInit = true
                 Log.i(TAG, "TTS ready with $engineLabel (Vietnamese supported)")
             } else {
@@ -61,7 +67,6 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
                     fallbackToSystemDefault()
                 } else {
                     Log.e(TAG, "No TTS engine supports Vietnamese. User should install/configure Google TTS with Vietnamese data.")
-                    textToSpeech.setOnUtteranceCompletedListener { isReading = false }
                     isSuccessFullyInit = true // tránh block queue mãi mãi
                 }
             }
@@ -115,27 +120,35 @@ class NotificationReader(private var context: Context) : TextToSpeech.OnInitList
             notification.append(" ${AppUtils.formatCurrency(-transaction.amount)}")
         }
 
-        notificationQueue.add(notification.toString())
-        processQueue()
+        notificationQueue.offer(notification.toString())
+        startProcessingIfIdle()
     }
 
-    private fun processQueue() {
-        if (isReading || notificationQueue.isEmpty()) return
-        isReading = true
-
-        val currentNotification = notificationQueue.removeAt(0)
+    private fun startProcessingIfIdle() {
+        // compareAndSet đảm bảo chỉ 1 coroutine xử lý queue tại một thời điểm
+        if (!isProcessing.compareAndSet(false, true)) return
 
         scope.launch(Dispatchers.IO) {
-            while (!isSuccessFullyInit)
-                delay(100.milliseconds)
+            try {
+                // Timeout 10s: safety net nếu TTS không bao giờ gọi onInit (thiết bị thiếu engine)
+                val ready = withTimeoutOrNull(10_000) {
+                    while (!isSuccessFullyInit) delay(100.milliseconds)
+                }
+                if (ready == null) Log.e(TAG, "TTS init timeout after 10s, proceeding without TTS")
 
-            readNotification(currentNotification)
-
-            while (textToSpeech.isSpeaking) {
-                delay(100.milliseconds)
+                var msg = notificationQueue.poll()
+                while (msg != null) {
+                    readNotification(msg)
+                    // Chờ MediaPlayer + TTS xong trước khi đọc thông báo tiếp theo
+                    delay(300.milliseconds)
+                    while (textToSpeech.isSpeaking) delay(100.milliseconds)
+                    msg = notificationQueue.poll()
+                }
+            } finally {
+                isProcessing.set(false)
+                // Nếu có item mới được thêm vào trong lúc coroutine đang dừng, khởi động lại
+                if (notificationQueue.isNotEmpty()) startProcessingIfIdle()
             }
-            isReading = false
-            processQueue()
         }
     }
 

@@ -49,6 +49,7 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.Calendar
 import java.util.Locale
 
@@ -101,6 +102,8 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         observeViewModel()
 
         if (!checkNotificationAccessEnabled()) openDialogRequestPermissions(true)
+
+        checkAndShowCrashLog()
 
         ringtonePickerLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -395,6 +398,38 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         binding.btnNext.setOnClickListener(null)
         binding.btnPrev.setOnClickListener(null)
         taskbarManager.release()
+    }
+
+    private fun checkAndShowCrashLog() {
+        val crashFile = File(filesDir, MyCustomApplication.CRASH_LOG_FILE)
+        if (!crashFile.exists()) return
+        val log = try { crashFile.readText().trim() } catch (e: Exception) { return }
+        crashFile.delete()
+        File(filesDir, MyCustomApplication.CRASH_TIMESTAMP_FILE).delete()
+        if (log.isBlank()) return
+
+        Snackbar.make(binding.root, "App bị crash lần trước. Xem log để báo lỗi.", Snackbar.LENGTH_INDEFINITE)
+            .setAction("Xem log") { showCrashLogDialog(log) }
+            .show()
+    }
+
+    private fun showCrashLogDialog(log: String) {
+        val displayLog = if (log.length > 4000) log.take(4000) + "\n...(còn nữa)" else log
+        AlertDialog.Builder(this)
+            .setTitle("Crash Report")
+            .setMessage(displayLog)
+            .setPositiveButton("Chia sẻ") { _, _ -> shareCrashLog(log) }
+            .setNegativeButton("Đóng", null)
+            .show()
+    }
+
+    private fun shareCrashLog(log: String) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_SUBJECT, "Crash Report - Đọc thông báo chuyển khoản")
+            putExtra(Intent.EXTRA_TEXT, log)
+        }
+        startActivity(Intent.createChooser(intent, "Chia sẻ log lỗi"))
     }
 
     private fun makeToast(msg: String, isLongToast: Boolean) {
