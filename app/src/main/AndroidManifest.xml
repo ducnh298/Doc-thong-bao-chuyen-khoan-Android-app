@@ -10,7 +10,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!-- Android 14+: khai báo loại foreground service -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- specialUse thay vì dataSync: tránh giới hạn 6h/24h của dataSync trên Android 16 (API 36) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <application
         android:name=".MyCustomApplication"
@@ -50,10 +51,15 @@
         </service>
 
         <!-- Foreground service giữ process sống trên các ROM aggressive -->
+        <!-- specialUse: giữ app chạy liên tục để không bỏ lỡ thông báo; không có giới hạn thời gian như dataSync -->
         <service
             android:name=".service.KeepAliveService"
-            android:foregroundServiceType="dataSync"
-            android:exported="false" />
+            android:foregroundServiceType="specialUse"
+            android:exported="false">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Keeps app process alive on aggressive OEM ROMs (Xiaomi/Huawei/Oppo) to maintain NotificationListenerService connection for bank transfer reading" />
+        </service>
 
         <receiver
             android:name=".service.BootReceiver"

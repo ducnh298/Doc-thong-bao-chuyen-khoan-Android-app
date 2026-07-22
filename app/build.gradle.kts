@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.app.docthongbaochuyenkhoan"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.app.docthongbaochuyenkhoan"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 26
         versionName = "1.7.4"
         archivesName = "Đọc chuyển khoản miễn phí-v$versionName.$versionCode"
