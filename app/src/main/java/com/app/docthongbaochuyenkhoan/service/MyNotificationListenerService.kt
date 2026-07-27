@@ -87,10 +87,11 @@ class MyNotificationListenerService : NotificationListenerService() {
                     Log.d(TAG, "Transaction saved to DB")
                     val shouldRead = (transaction.amount > 0 && isNotificationReceivedEnabled) ||
                             (transaction.amount < 0 && isNotificationSentEnabled)
-                    if (shouldRead) {
+                    val isBankEnabled = SharedPreferencesManager.isBankEnabled(transaction.bank)
+                    if (shouldRead && isBankEnabled) {
                         notificationReader.addNotification(transaction)
                     } else {
-                        Log.d(TAG, "TTS skipped — read setting disabled for this direction")
+                        Log.d(TAG, "TTS skipped — shouldRead=$shouldRead isBankEnabled=$isBankEnabled")
                     }
                 }
             } else {

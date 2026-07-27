@@ -3,6 +3,7 @@ package com.app.docthongbaochuyenkhoan.controller
 import android.content.Context
 import android.content.SharedPreferences
 import com.app.docthongbaochuyenkhoan.R
+import com.app.docthongbaochuyenkhoan.model.Bank
 
 object SharedPreferencesManager {
     private const val PREFS_NAME = "app_prefs"
@@ -109,6 +110,15 @@ object SharedPreferencesManager {
 
     fun getNotShowAgainDialogSettingHelper(): Boolean{
         return getDataString(appContext.getString(R.string.not_show_again_dialog_tts_helper), "true") == "true"
+    }
+
+    fun isBankEnabled(bank: Bank): Boolean {
+        return sharedPreferences.getBoolean("bank_enabled_${bank.name}", true)
+    }
+
+    fun saveBankEnabled(bank: Bank, isEnabled: Boolean) {
+        editor.putBoolean("bank_enabled_${bank.name}", isEnabled)
+        editor.apply()
     }
 
     fun restoreSetting() {

@@ -203,6 +203,7 @@ class SettingDialogFragment : DialogFragment() {
             }
         )
 
+        binding.btnBankFilter.setOnClickListener { openBankFilterDialog() }
         binding.btnBackupRestore.setOnClickListener { openDialogBackupRestore() }
         binding.btnRestoreSetting.setOnClickListener { restoreSetting() }
         binding.btnDeleteData.setOnClickListener { confirmDeleteData() }
@@ -216,6 +217,7 @@ class SettingDialogFragment : DialogFragment() {
         binding.tvVersion.addClickAnimation()
 
         binding.btnCheckPermission.addClickAnimation()
+        binding.btnBankFilter.addClickAnimation()
         binding.btnBackupRestore.addClickAnimation()
         binding.btnOpenTTSSetting.addClickAnimation()
         binding.btnRestoreSetting.addClickAnimation()
@@ -272,6 +274,11 @@ class SettingDialogFragment : DialogFragment() {
     private fun openDialogRequestPermissions(autoClose: Boolean) {
         val dialog = RequestPermissionsDialogFragment.newInstance(autoClose)
         dialog.show(requireActivity().supportFragmentManager, "RequestPermissionsDialogFragment")
+    }
+
+    private fun openBankFilterDialog() {
+        BankFilterDialogFragment.newInstance()
+            .show(parentFragmentManager, "BankFilterDialogFragment")
     }
 
     private fun openDialogBackupRestore() {
