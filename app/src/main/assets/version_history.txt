@@ -1,3 +1,11 @@
+## v1.7.5 (build 27)
+- Bật/tắt đọc thông báo theo từng ngân hàng hoặc ví điện tử (Cài đặt → Ngân hàng)
+- Sửa lỗi không đọc được trên một số máy Xiaomi, Huawei
+- Cải thiện độ ổn định: giảm trường hợp app bị tắt ngầm, bỏ sót thông báo
+- Hỗ trợ Android 16
+
+---
+
 ## v1.7.4 (build 26)
 - Cải thiện màn thống kê: biểu đồ cuộn ngang, thanh kéo, bấm cột để xem ngày
 - Sửa lỗi âm báo và đồng bộ âm lượng chuông/đọc
