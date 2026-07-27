@@ -82,9 +82,9 @@ class MediaPlayerUtils {
                 mediaPlayer.start()
 
                 val duration = try { mediaPlayer.duration } catch (e: Exception) { -1 }
-                // Trigger TTS ~300ms before sound ends so reading starts as bell fades out.
+                // Trigger TTS ~500ms before sound ends so reading starts as bell fades out.
                 // Safety net fires at duration + 200ms in case onCompletion doesn't fire.
-                val earlyTriggerMs = if (duration > 300) (duration - 300L) else 0L
+                val earlyTriggerMs = if (duration > 500) (duration - 500L) else 0L
                 val safetyNetMs = if (duration > 0) (duration + 200L) else 1000L
 
                 if (earlyTriggerMs > 0) {
