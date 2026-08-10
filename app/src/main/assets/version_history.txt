@@ -1,3 +1,11 @@
+## v1.7.6 (build 28)
+- Thêm mục "Ủng hộ tôi" trong Cài đặt (chuyển khoản/QR ngân hàng, Momo, ViettelPay)
+- Sửa lỗi không đọc được thông báo nhận tiền qua Momo
+- Sửa lỗi tiêu đề giao dịch bị đè bởi icon ngân hàng khi tên dài
+- Đổi vị trí ví điện tử lên trước ngân hàng trong mục chọn ngân hàng
+
+---
+
 ## v1.7.5 (build 27)
 - Bật/tắt đọc thông báo theo từng ngân hàng hoặc ví điện tử (Cài đặt → Ngân hàng)
 - Sửa lỗi không đọc được trên một số máy Xiaomi, Huawei
