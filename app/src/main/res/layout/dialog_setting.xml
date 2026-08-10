@@ -792,6 +792,49 @@
                     android:background="@color/stroke_color" />
 
                 <LinearLayout
+                    android:id="@+id/btnSupportMe"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_support_me"
+                        app:tint="@color/text_color_dialog" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:text="Ủng hộ tôi"
+                        android:textColor="@color/text_color"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_next_arrow"
+                        app:tint="@color/text_color" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="44dp"
+                    android:alpha="0.3"
+                    android:background="@color/stroke_color" />
+
+                <LinearLayout
                     android:id="@+id/btnContactInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -816,7 +859,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:text="Báo lỗi / Liên hệ"
+                        android:text="Báo lỗi / Liên hệ / Đề xuất tính năng"
                         android:textColor="@color/text_color"
                         android:textSize="15sp" />
 

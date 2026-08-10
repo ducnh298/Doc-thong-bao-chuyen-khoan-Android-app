@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.DocumentsContract
-import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,6 +18,7 @@ import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.databinding.DialogBackupRestoreBinding
 import com.app.docthongbaochuyenkhoan.model.UiEvent
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
+import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.applyCustomStyle
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
 import com.app.docthongbaochuyenkhoan.viewModel.ExportDialogViewModel
 import com.app.docthongbaochuyenkhoan.viewModel.MainViewModel
@@ -53,9 +53,7 @@ class BackupRestoreDialogFragment : DialogFragment() {
             .setView(binding.root)
             .create()
 
-        dialog.window?.setGravity(Gravity.CENTER)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+        dialog.applyCustomStyle()
 
         binding.exportLayout.setOnClickListener { onExportClick() }
         binding.importLayout.setOnClickListener { onImportClick() }

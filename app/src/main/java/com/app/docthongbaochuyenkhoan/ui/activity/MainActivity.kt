@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.DatePicker
@@ -38,6 +37,7 @@ import com.app.docthongbaochuyenkhoan.ui.dialog.RequestPermissionsDialogFragment
 import com.app.docthongbaochuyenkhoan.ui.dialog.SettingDialogFragment
 import com.app.docthongbaochuyenkhoan.utils.AppUtils
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
+import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.applyCustomStyle
 import com.app.docthongbaochuyenkhoan.utils.DateUtils
 import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
 import com.app.docthongbaochuyenkhoan.viewModel.MainViewModel
@@ -312,9 +312,7 @@ class MainActivity : AppCompatActivity(), SettingDialogFragment.SettingDialogLis
         builder.setView(dialogBinding.root)
 
         val dialog = builder.create()
-        dialog.window?.setGravity(Gravity.CENTER)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+        dialog.applyCustomStyle()
 
         dialogBinding.btnNotShowAgain.isChecked =
             SharedPreferencesManager.getNotShowAgainDialogSettingHelper()

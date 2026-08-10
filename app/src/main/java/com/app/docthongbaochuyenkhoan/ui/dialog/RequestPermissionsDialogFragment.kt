@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
-import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -18,6 +17,7 @@ import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.databinding.DialogRequestPermissionsBinding
 import com.app.docthongbaochuyenkhoan.utils.AppUtils
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
+import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.applyCustomStyle
 
 class RequestPermissionsDialogFragment : DialogFragment() {
     private lateinit var binding: DialogRequestPermissionsBinding
@@ -42,8 +42,7 @@ class RequestPermissionsDialogFragment : DialogFragment() {
         val dialogRequestPermissions = builder.create()
 
         dialogRequestPermissions.let { dialog ->
-            dialog.window?.setGravity(Gravity.CENTER)
-            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+            dialog.applyCustomStyle()
 
             binding.let {
                 it.llNotificationAccessSetting.setOnClickListener { requestNotificationAccess() }
@@ -56,9 +55,7 @@ class RequestPermissionsDialogFragment : DialogFragment() {
             }
 
             dialog.show()
-            dialog.window?.attributes =
-                AppUtils.getDialogDimension(requireActivity(), dialog)
-            dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+            dialog.window?.attributes = AppUtils.getDialogDimension(requireActivity(), dialog)
 
             return dialog
         }

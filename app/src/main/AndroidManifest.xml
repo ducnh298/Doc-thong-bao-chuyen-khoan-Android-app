@@ -12,6 +12,13 @@
     <!-- Android 14+: khai báo loại foreground service -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
+    <queries>
+        <package android:name="com.mservice.momotransfer" />
+        <package android:name="com.viettel.viettelmoney" />
+        <package android:name="com.mbmobile" />
+        <package android:name="vn.com.techcombank.bb.app" />
+    </queries>
+
     <application
         android:name=".MyCustomApplication"
         android:allowBackup="true"

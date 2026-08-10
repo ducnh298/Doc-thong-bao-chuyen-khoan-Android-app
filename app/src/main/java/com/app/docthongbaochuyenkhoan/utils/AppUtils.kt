@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageButton
+import com.app.docthongbaochuyenkhoan.R
 import java.text.NumberFormat
 import java.util.Currency
 
@@ -62,6 +64,12 @@ class AppUtils {
                 (activity.resources.displayMetrics.widthPixels * 0.95).toInt() // 90% of screen width
             lp.height = ViewGroup.LayoutParams.WRAP_CONTENT
             return lp
+        }
+
+        fun Dialog.applyCustomStyle() {
+            window?.setGravity(Gravity.CENTER)
+            window?.setBackgroundDrawableResource(android.R.color.transparent)
+            window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
         }
 
         fun Context.getAppVersionInfo(): Pair<String, Long> {

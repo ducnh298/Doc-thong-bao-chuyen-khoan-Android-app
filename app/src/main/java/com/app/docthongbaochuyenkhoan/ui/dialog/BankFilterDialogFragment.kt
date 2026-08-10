@@ -2,7 +2,6 @@ package com.app.docthongbaochuyenkhoan.ui.dialog
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.Gravity
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -12,6 +11,7 @@ import com.app.docthongbaochuyenkhoan.databinding.DialogBankFilterBinding
 import com.app.docthongbaochuyenkhoan.model.Bank
 import com.app.docthongbaochuyenkhoan.ui.adapter.BankFilterAdapter
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
+import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.applyCustomStyle
 
 class BankFilterDialogFragment : DialogFragment() {
 
@@ -58,9 +58,7 @@ class BankFilterDialogFragment : DialogFragment() {
         walletAdapter.onBankToggled = { syncSwitchAll() }
 
         val dialog = builder.create()
-        dialog.window?.setGravity(Gravity.CENTER)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+        dialog.applyCustomStyle()
 
         binding.btnClose.setOnClickListener { dismiss() }
         binding.btnClose.addClickAnimation()

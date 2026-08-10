@@ -389,11 +389,15 @@ class StatisticsActivity : AppCompatActivity(),
     }
 
     override fun onConfirmClicked(startDate: Long, endDate: Long, isStatisticByMonth: Boolean) {
+        applyConfirmedRange(startDate, endDate, isStatisticByMonth)
+    }
+
+    private fun applyConfirmedRange(startDate: Long, endDate: Long, isStatisticByMonth: Boolean) {
         binding.spinnerTime.setSelection(6)
+        savedSpinnerPosition = 6
         savedCustomStartDate = startDate
         savedCustomEndDate = endDate
         savedCustomIsMonthly = isStatisticByMonth
-
         if (isStatisticByMonth && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             viewModel.loadTransactionAmountsFromDayToDayByMonths(startDate, endDate)
         else

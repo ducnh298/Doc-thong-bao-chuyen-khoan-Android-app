@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent">
+
+    <ImageButton
+        android:id="@+id/iBtnClose"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@color/transparent"
+        android:elevation="5dp"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_close_light" />
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_dialog"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iBtnClose">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ủng hộ tôi"
+            android:textColor="@color/text_color_dialog"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:text="Nhấn vào để sao chép và xem QR"
+            android:textColor="@color/text_color"
+            android:textSize="12sp" />
+
+        <!-- Row 1: MB Bank + Techcombank -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/cardBank"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_layout_item_setting"
+                android:clickable="true"
+                android:elevation="2dp"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="12dp">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/logo_mbbank" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="MB Bank"
+                    android:textColor="@color/text_color_dialog"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View android:layout_width="10dp" android:layout_height="1dp" />
+
+            <LinearLayout
+                android:id="@+id/cardTechcombank"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_layout_item_setting"
+                android:clickable="true"
+                android:elevation="2dp"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="12dp">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/logo_techcombank" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Techcombank"
+                    android:textColor="@color/text_color_dialog"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View android:layout_width="1dp" android:layout_height="10dp" />
+
+        <!-- Row 2: Momo + ViettelPay -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/cardMomo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_layout_item_setting"
+                android:clickable="true"
+                android:elevation="2dp"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="12dp">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/logo_momo" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Momo"
+                    android:textColor="@color/text_color_dialog"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View android:layout_width="10dp" android:layout_height="1dp" />
+
+            <LinearLayout
+                android:id="@+id/cardViettelPay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_layout_item_setting"
+                android:clickable="true"
+                android:elevation="2dp"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="12dp">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/logo_viettel_money" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="ViettelPay"
+                    android:textColor="@color/text_color_dialog"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View android:layout_width="1dp" android:layout_height="10dp" />
+
+        <!-- Xem quảng cáo -->
+        <LinearLayout
+            android:id="@+id/cardWatchAd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:background="@drawable/bg_layout_item_setting"
+            android:clickable="true"
+            android:elevation="2dp"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_support_me"
+                app:tint="@color/text_color_dialog" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="Xem quảng cáo để ủng hộ"
+                android:textColor="@color/text_color_dialog"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/btn_blue"
+            android:paddingHorizontal="24dp"
+            android:text="Đóng"
+            android:textAllCaps="false"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

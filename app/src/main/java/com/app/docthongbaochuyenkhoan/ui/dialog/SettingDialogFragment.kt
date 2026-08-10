@@ -13,7 +13,6 @@ import android.os.Handler
 import android.os.Looper
 import android.service.notification.NotificationListenerService
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.widget.SeekBar
@@ -27,12 +26,15 @@ import com.app.docthongbaochuyenkhoan.R
 import com.app.docthongbaochuyenkhoan.controller.SharedPreferencesManager
 import com.app.docthongbaochuyenkhoan.databinding.DialogChangeNotificationContentBinding
 import com.app.docthongbaochuyenkhoan.databinding.DialogContactInfoBinding
+import com.app.docthongbaochuyenkhoan.databinding.DialogQrCodeBinding
 import com.app.docthongbaochuyenkhoan.databinding.DialogSettingBinding
+import com.app.docthongbaochuyenkhoan.databinding.DialogSupportMeBinding
 import com.app.docthongbaochuyenkhoan.databinding.DialogTtsHelperBinding
 import com.app.docthongbaochuyenkhoan.model.database.AppDatabase
 import com.app.docthongbaochuyenkhoan.service.MyNotificationListenerService
 import com.app.docthongbaochuyenkhoan.ui.activity.MainActivity
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.addClickAnimation
+import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.applyCustomStyle
 import com.app.docthongbaochuyenkhoan.utils.AppUtils.Companion.getAppVersionInfo
 import com.app.docthongbaochuyenkhoan.utils.MediaPlayerUtils
 import kotlinx.coroutines.CoroutineScope
@@ -79,9 +81,7 @@ class SettingDialogFragment : DialogFragment() {
         setupUI(binding)
 
         val dialog = builder.create()
-        dialog.window?.setGravity(Gravity.CENTER)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+        dialog.applyCustomStyle()
 
         return dialog
     }
@@ -204,6 +204,8 @@ class SettingDialogFragment : DialogFragment() {
         )
 
         binding.btnBankFilter.setOnClickListener { openBankFilterDialog() }
+        binding.btnSupportMe.setOnClickListener { openSupportMeDialog() }
+        binding.btnSupportMe.addClickAnimation()
         binding.btnBackupRestore.setOnClickListener { openDialogBackupRestore() }
         binding.btnRestoreSetting.setOnClickListener { restoreSetting() }
         binding.btnDeleteData.setOnClickListener { confirmDeleteData() }
@@ -250,9 +252,7 @@ class SettingDialogFragment : DialogFragment() {
         builder.setView(dialogBinding.root)
 
         val dialog = builder.create()
-        dialog.window?.setGravity(Gravity.CENTER)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+        dialog.applyCustomStyle()
 
         dialogBinding.iBtnClose.setOnClickListener { dialog.dismiss() }
         dialogBinding.btnCancel.setOnClickListener { dialog.dismiss() }
@@ -328,9 +328,7 @@ class SettingDialogFragment : DialogFragment() {
             dialogChangeNotificationContent = builder.create()
             dialogChangeNotificationContent.let { dialog ->
                 if (dialog != null) {
-                    dialog.window?.setGravity(Gravity.CENTER)
-                    dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-                    dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+                    dialog.applyCustomStyle()
                     dialog.setOnDismissListener {
                         dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
                     }
@@ -346,21 +344,13 @@ class SettingDialogFragment : DialogFragment() {
                         }
 
                         b.btnConfirm.setOnClickListener {
-                            if (content != b.etContent.text.toString()) {
-                                if (isReceivedNotification)
-                                    SharedPreferencesManager.saveNotificationContentReceived(
-                                        b.etContent.text.toString()
-                                    )
-                                else
-                                    SharedPreferencesManager.saveNotificationContentSent(
-                                        b.etContent.text.toString()
-                                    )
-
-                                makeToast("Nội dung thông báo đã thay đổi", false)
-                                notifyNotificationContentChanged()
-                                dialog.dismiss()
-                            } else
+                            val newContent = b.etContent.text.toString()
+                            if (content == newContent) {
                                 makeToast("Nội dung không thay đổi", false)
+                                return@setOnClickListener
+                            }
+                            applyNotificationContent(isReceivedNotification, newContent)
+                            dialog.dismiss()
                         }
 
                         b.btnClose.setOnClickListener {
@@ -375,6 +365,69 @@ class SettingDialogFragment : DialogFragment() {
         }
     }
 
+    private fun applyNotificationContent(isReceivedNotification: Boolean, newContent: String) {
+        if (isReceivedNotification)
+            SharedPreferencesManager.saveNotificationContentReceived(newContent)
+        else
+            SharedPreferencesManager.saveNotificationContentSent(newContent)
+        makeToast("Nội dung thông báo đã thay đổi", false)
+        notifyNotificationContentChanged()
+    }
+
+    private fun openSupportMeDialog() {
+        val builder = AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+        val b = DialogSupportMeBinding.inflate(layoutInflater)
+        builder.setView(b.root)
+        val dialog = builder.create()
+        dialog.applyCustomStyle()
+
+        fun copyAccount() {
+            val clipboard = requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            clipboard.setPrimaryClip(android.content.ClipData.newPlainText("account", "0972800125"))
+            makeToast("Đã sao chép số tài khoản", false)
+        }
+
+        fun showQr(titleRes: String, drawableRes: Int) {
+            copyAccount()
+            val qb = AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
+            val qrBinding = DialogQrCodeBinding.inflate(layoutInflater)
+            qb.setView(qrBinding.root)
+            val qrDialog = qb.create()
+            qrDialog.applyCustomStyle()
+            qrBinding.tvQrTitle.text = titleRes
+            qrBinding.ivQrCode.setImageResource(drawableRes)
+            qrBinding.iBtnClose.setOnClickListener { qrDialog.dismiss() }
+            qrBinding.btnClose.setOnClickListener { qrDialog.dismiss() }
+            qrDialog.show()
+        }
+
+        fun openApp(packageName: String) {
+            try {
+                val intent = requireContext().packageManager.getLaunchIntentForPackage(packageName)
+                if (intent != null) startActivity(intent)
+            } catch (_: Exception) {}
+        }
+
+        b.cardBank.setOnClickListener {
+            showQr("MB Bank", R.drawable.support_me_mbb)
+        }
+        b.cardTechcombank.setOnClickListener {
+            showQr("Techcombank", R.drawable.support_me_tcb)
+        }
+        b.cardMomo.setOnClickListener {
+            copyAccount()
+            openApp("com.mservice.momotransfer")
+        }
+        b.cardViettelPay.setOnClickListener {
+            copyAccount()
+            openApp("com.viettel.viettelmoney")
+        }
+        b.iBtnClose.setOnClickListener { dialog.dismiss() }
+        b.btnClose.setOnClickListener { dialog.dismiss() }
+
+        dialog.show()
+    }
+
     private fun openContactInfoDialog() {
         val builder = AlertDialog.Builder(requireContext(), R.style.CustomDialogTheme)
         val bindingDialogContactInfo = DialogContactInfoBinding.inflate(layoutInflater)
@@ -382,9 +435,7 @@ class SettingDialogFragment : DialogFragment() {
 
         val dialog = builder.create()
         dialog.let {
-            dialog.window?.setGravity(Gravity.CENTER)
-            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-            dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+            dialog.applyCustomStyle()
             dialog.setOnDismissListener {
                 dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
             }
@@ -447,11 +498,7 @@ class SettingDialogFragment : DialogFragment() {
         builder.setView(dialogBinding.root)
 
         val dialog = builder.create()
-        dialog.let {
-            dialog.window?.setGravity(Gravity.CENTER)
-            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-            dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
-        }
+        dialog.applyCustomStyle()
 
         dialogBinding.btnNotShowAgain.isChecked =
             SharedPreferencesManager.getNotShowAgainDialogSettingHelper()
@@ -541,9 +588,7 @@ class SettingDialogFragment : DialogFragment() {
         builder.setView(dialogBinding.root)
 
         val dialog = builder.create()
-        dialog.window?.setGravity(Gravity.CENTER)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        dialog.window?.attributes?.windowAnimations = R.style.CustomDialogAnimation
+        dialog.applyCustomStyle()
 
         val history = runCatching {
             requireContext().assets.open("version_history.txt")
@@ -564,6 +609,7 @@ class SettingDialogFragment : DialogFragment() {
         super.onDestroy()
 
         binding.btnRestoreSetting.setOnClickListener { null }
+        binding.btnSupportMe.setOnClickListener { null }
         binding.btnContactInfo.setOnClickListener { null }
         binding.btnShowTTSHelper.setOnClickListener { null }
         binding.btnRateApp.setOnClickListener { null }
