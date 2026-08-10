@@ -7,7 +7,9 @@ import com.app.docthongbaochuyenkhoan.model.Transaction
 class NotificationMessageParser {
 
     companion object {
-        private val MOMO_REGEX = Regex("""Số tiền:\s*([\d.,]+)\s*₫""")
+        private val MOMO_REGEX = Regex("""Số tiền:?\s*([+-]?[\d.,]+)\s*₫""")
+        private val MOMO_TRANSFER_TITLE_REGEX =
+            Regex("""nhận tiền chuyển khoản""", RegexOption.IGNORE_CASE)
         private val SHINHAN_REGEX = Regex("""thay đổi\s*([+-])\s*VND\s*([\d.,]+)""", RegexOption.IGNORE_CASE)
         private val VND_REGEX = Regex("""(VND|₫)""", RegexOption.IGNORE_CASE)
         private val TITLE_AMOUNT_REGEX = Regex("""([+-]?)\s*(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d+)?)""")
@@ -24,7 +26,7 @@ class NotificationMessageParser {
             Log.d("MainActivity", "Raw notification: Bank: $bank\nTitle: $title\nContent: $content")
             val amount: Long? =
                 when (bank) {
-                    Bank.MOMO -> extractAmountMomo(content)
+                    Bank.MOMO -> extractAmountMomo(title, content)
                     Bank.SHINHANBANK -> extractAmountShinhanbank(content)
                     else -> extractAmount(title, content)
                 }
@@ -41,8 +43,11 @@ class NotificationMessageParser {
             else null
         }
 
-        private fun extractAmountMomo(content: String?): Long? {
-            if (content == null)
+        private fun extractAmountMomo(title: String?, content: String?): Long? {
+            if (title == null || content == null)
+                return null
+
+            if (!MOMO_TRANSFER_TITLE_REGEX.containsMatchIn(title))
                 return null
 
             val matchResult = MOMO_REGEX.find(content)
